@@ -11,6 +11,9 @@
     <ownedAttribute xmi:type="uml:Property" xmi:id="_SxF8oMitEfCJDN02MzQ9qg" name="Number" isUnique="false">
       <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
     </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_NeQ3UMo9EfCzSqcRLunPhQ" name="Seats" visibility="private">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </ownedAttribute>
   </packagedElement>
   <packagedElement xmi:type="uml:Class" xmi:id="_BtD6EMiQEfCaVfJDYyadQw" name="Room">
     <ownedAttribute xmi:type="uml:Property" xmi:id="_4AuMEsiZEfCaVfJDYyadQw" name="table" type="_7SmYEMiPEfCaVfJDYyadQw" association="_4AtlAMiZEfCaVfJDYyadQw">
@@ -19,6 +22,12 @@
     </ownedAttribute>
     <ownedAttribute xmi:type="uml:Property" xmi:id="_PSlOYMitEfCJDN02MzQ9qg" name="Number" isUnique="false">
       <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_qUsskMo8EfCzSqcRLunPhQ" name="Floor" visibility="private">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_gxxvYMo9EfCzSqcRLunPhQ" name="Available" visibility="private">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Boolean"/>
     </ownedAttribute>
   </packagedElement>
   <packagedElement xmi:type="uml:Class" xmi:id="_CzU-kMiQEfCaVfJDYyadQw" name="Building">
@@ -73,6 +82,9 @@
   <packagedElement xmi:type="uml:Class" xmi:id="_MvdQgMiQEfCaVfJDYyadQw" name="StudySession">
     <ownedAttribute xmi:type="uml:Property" xmi:id="_lm9mgMiZEfCaVfJDYyadQw" name="SessionCode">
       <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_8K35YMo7EfCzSqcRLunPhQ" name="Title" visibility="private">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
     </ownedAttribute>
   </packagedElement>
   <packagedElement xmi:type="uml:Enumeration" xmi:id="_sp6a8MiQEfCaVfJDYyadQw" name="Courses">
