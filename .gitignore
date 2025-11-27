@@ -8,3 +8,6 @@ Code/.classpath
 Code/.project
 Code/vite.generated.ts
 Code/src/main/frontend/generated/
+
+#macos
+.DS_Store
