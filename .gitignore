@@ -1,1 +1,9 @@
 Documents/Diagrams/.settings
+
+Code/.settings
+Code/node_modules
+Code/target
+Code/.classpath
+Code/.project
+Code/vite.generated.ts
+Code/src/main/frontend/generated/
