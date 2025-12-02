@@ -417,4 +417,7 @@
     <ownedEnd xmi:type="uml:Property" xmi:id="_st5BEs7oEfCf1PbQoZmaog" name="disiscrizione dalla sessione di studio" type="_ESj-kM7kEfCf1PbQoZmaog" association="_st3y8M7oEfCf1PbQoZmaog"/>
     <ownedEnd xmi:type="uml:Property" xmi:id="_st5BE87oEfCf1PbQoZmaog" name="student" type="_X8z-0M7oEfCf1PbQoZmaog" association="_st3y8M7oEfCf1PbQoZmaog"/>
   </packagedElement>
+  <packagedElement xmi:type="uml:Interaction" xmi:id="_W4JiIM-_EfCDNO3SSnGgbg" name="Interaction50">
+    <lifeline xmi:type="uml:Lifeline" xmi:id="_ZLbzYM-_EfCDNO3SSnGgbg" name="richiesta utente"/>
+  </packagedElement>
 </uml:Model>
