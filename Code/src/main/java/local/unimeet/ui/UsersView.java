@@ -9,12 +9,16 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import jakarta.annotation.security.PermitAll;
 import local.unimeet.entity.User;
 import local.unimeet.service.UserService;
 
 @Route("")
+@PageTitle("Users")
+@PermitAll	//All authenticated users can see this page
 public class UsersView extends VerticalLayout{
 	
 	private final UserService userService;

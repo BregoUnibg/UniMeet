@@ -1,0 +1,36 @@
+package local.unimeet.service;
+
+import local.unimeet.entity.User;
+import local.unimeet.repository.UserRepository;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
+
+    private final UserRepository userRepository;
+
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        //Return a Spring Security User object
+        //ENCRYPTION NOT YET IMPPLEMENTED
+        //MUST BE CHANGED
+        String badPassword = "{noop}" + user.getPassword();
+        
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(badPassword)
+                .roles("USER")
+                .build();
+    }
+}
