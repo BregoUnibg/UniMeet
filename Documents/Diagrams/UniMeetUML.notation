@@ -1530,4 +1530,25 @@
       <targetAnchor xmi:type="notation:IdentityAnchor" xmi:id="_5LN8oc9lEfCArNQEN5jdww" id="(0.9819004524886877,0.36065573770491804)"/>
     </edges>
   </notation:Diagram>
+  <notation:Diagram xmi:id="_Xh1YUM-_EfCDNO3SSnGgbg" type="PapyrusUMLSequenceDiagram" name="Sequence" measurementUnit="Pixel">
+    <children xmi:type="notation:Shape" xmi:id="_Xh1YUc-_EfCDNO3SSnGgbg" type="Interaction_Shape">
+      <children xmi:type="notation:DecorationNode" xmi:id="_Xh1YUs-_EfCDNO3SSnGgbg" type="Interaction_NameLabel"/>
+      <children xmi:type="notation:BasicCompartment" xmi:id="_Xh1YU8-_EfCDNO3SSnGgbg" type="Interaction_SubfragmentCompartment">
+        <children xmi:type="notation:Shape" xmi:id="_ZLmygM-_EfCDNO3SSnGgbg" type="Lifeline_Shape">
+          <children xmi:type="notation:DecorationNode" xmi:id="_ZLmygs-_EfCDNO3SSnGgbg" type="Lifeline_NameLabel"/>
+          <element xmi:type="uml:Lifeline" href="UniMeetUML.uml#_ZLbzYM-_EfCDNO3SSnGgbg"/>
+          <layoutConstraint xmi:type="notation:Bounds" xmi:id="_ZLmygc-_EfCDNO3SSnGgbg" x="34" y="10"/>
+        </children>
+        <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Xh1YVM-_EfCDNO3SSnGgbg"/>
+      </children>
+      <element xmi:type="uml:Interaction" href="UniMeetUML.uml#_W4JiIM-_EfCDNO3SSnGgbg"/>
+      <layoutConstraint xmi:type="notation:Bounds" xmi:id="_Xh1YVc-_EfCDNO3SSnGgbg"/>
+    </children>
+    <styles xmi:type="notation:StringValueStyle" xmi:id="_Xh1YVs-_EfCDNO3SSnGgbg" name="diagram_compatibility_version" stringValue="1.4.0"/>
+    <styles xmi:type="notation:DiagramStyle" xmi:id="_Xh1YV8-_EfCDNO3SSnGgbg"/>
+    <styles xmi:type="style:PapyrusDiagramStyle" xmi:id="_Xh1YWM-_EfCDNO3SSnGgbg" diagramKindId="org.eclipse.papyrus.uml.diagram.sequence">
+      <owner xmi:type="uml:Model" href="UniMeetUML.uml#_PIE_oMiOEfCaVfJDYyadQw"/>
+    </styles>
+    <element xmi:type="uml:Interaction" href="UniMeetUML.uml#_W4JiIM-_EfCDNO3SSnGgbg"/>
+  </notation:Diagram>
 </xmi:XMI>
