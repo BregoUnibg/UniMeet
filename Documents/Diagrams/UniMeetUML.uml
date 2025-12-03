@@ -209,7 +209,9 @@
     </packagedElement>
     <packagedElement xmi:type="uml:Package" xmi:id="_cEOlkM43EfCcLZJcoZN6Qw" name="Gestione sessioni di studio">
       <packagedElement xmi:type="uml:UseCase" xmi:id="_zORXIM7jEfCf1PbQoZmaog" name="Creazione sessioni di studio"/>
-      <packagedElement xmi:type="uml:UseCase" xmi:id="_2HUA0M7jEfCf1PbQoZmaog" name="Ricerca sessioni di studio"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="_2HUA0M7jEfCf1PbQoZmaog" name="Ricerca sessioni di studio">
+        <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="_wlfc8M9lEfCArNQEN5jdww" name="ExtensionPoint1"/>
+      </packagedElement>
       <packagedElement xmi:type="uml:UseCase" xmi:id="_5oDjsM7jEfCf1PbQoZmaog" name="Visualizzazione sessione di studio prorpietarie">
         <extensionPoint xmi:type="uml:ExtensionPoint" xmi:id="_OXLr4M7pEfCf1PbQoZmaog" name="ExtensionPoint1"/>
       </packagedElement>
@@ -217,7 +219,9 @@
         <extend xmi:type="uml:Extend" xmi:id="_OXKdwM7pEfCf1PbQoZmaog" extendedCase="_5oDjsM7jEfCf1PbQoZmaog" extensionLocation="_OXLr4M7pEfCf1PbQoZmaog"/>
       </packagedElement>
       <packagedElement xmi:type="uml:Package" xmi:id="_l8jVkM43EfCcLZJcoZN6Qw" name="Iscrizione e partecipazione">
-        <packagedElement xmi:type="uml:UseCase" xmi:id="_Iav78M7kEfCf1PbQoZmaog" name="Richiesta partecipazione alla sessione di studio"/>
+        <packagedElement xmi:type="uml:UseCase" xmi:id="_Iav78M7kEfCf1PbQoZmaog" name="Richiesta partecipazione alla sessione di studio">
+          <extend xmi:type="uml:Extend" xmi:id="_wle14M9lEfCArNQEN5jdww" extendedCase="_2HUA0M7jEfCf1PbQoZmaog" extensionLocation="_wlfc8M9lEfCArNQEN5jdww"/>
+        </packagedElement>
         <packagedElement xmi:type="uml:UseCase" xmi:id="_ZL1TgM7kEfCf1PbQoZmaog" name="Accetta richiesta"/>
         <packagedElement xmi:type="uml:UseCase" xmi:id="_fTZHoM7kEfCf1PbQoZmaog" name="Rifiuta richiesta"/>
         <packagedElement xmi:type="uml:UseCase" xmi:id="_ESj-kM7kEfCf1PbQoZmaog" name="Disiscrizione dalla sessione di studio"/>
@@ -403,18 +407,11 @@
     <ownedEnd xmi:type="uml:Property" xmi:id="_UZCWEc7oEfCf1PbQoZmaog" name="visualizzazione sessione di studio aderite" type="_h__wcM7nEfCf1PbQoZmaog" association="_UZAg4M7oEfCf1PbQoZmaog"/>
     <ownedEnd xmi:type="uml:Property" xmi:id="_UZCWEs7oEfCf1PbQoZmaog" type="_TR6V8M7oEfCf1PbQoZmaog" association="_UZAg4M7oEfCf1PbQoZmaog"/>
   </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_X8z-0M7oEfCf1PbQoZmaog" memberEnd="_X810As7oEfCf1PbQoZmaog _X810A87oEfCf1PbQoZmaog">
-    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_X810AM7oEfCf1PbQoZmaog" source="org.eclipse.papyrus">
-      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_X810Ac7oEfCf1PbQoZmaog" key="nature" value="UML_Nature"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_5KNQAM9lEfCArNQEN5jdww" memberEnd="_5KQTUM9lEfCArNQEN5jdww _5KQ6YM9lEfCArNQEN5jdww">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_5KPFMM9lEfCArNQEN5jdww" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_5KPFMc9lEfCArNQEN5jdww" key="nature" value="UML_Nature"/>
     </eAnnotations>
-    <ownedEnd xmi:type="uml:Property" xmi:id="_X810As7oEfCf1PbQoZmaog" name="richiesta partecipazione alla sessione di studio" type="_Iav78M7kEfCf1PbQoZmaog" association="_X8z-0M7oEfCf1PbQoZmaog"/>
-    <ownedEnd xmi:type="uml:Property" xmi:id="_X810A87oEfCf1PbQoZmaog" name="student" type="_aFujcM41EfCcLZJcoZN6Qw" association="_X8z-0M7oEfCf1PbQoZmaog"/>
-  </packagedElement>
-  <packagedElement xmi:type="uml:Association" xmi:id="_st3y8M7oEfCf1PbQoZmaog" memberEnd="_st5BEs7oEfCf1PbQoZmaog _st5BE87oEfCf1PbQoZmaog">
-    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_st5BEM7oEfCf1PbQoZmaog" source="org.eclipse.papyrus">
-      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_st5BEc7oEfCf1PbQoZmaog" key="nature" value="UML_Nature"/>
-    </eAnnotations>
-    <ownedEnd xmi:type="uml:Property" xmi:id="_st5BEs7oEfCf1PbQoZmaog" name="disiscrizione dalla sessione di studio" type="_ESj-kM7kEfCf1PbQoZmaog" association="_st3y8M7oEfCf1PbQoZmaog"/>
-    <ownedEnd xmi:type="uml:Property" xmi:id="_st5BE87oEfCf1PbQoZmaog" name="student" type="_X8z-0M7oEfCf1PbQoZmaog" association="_st3y8M7oEfCf1PbQoZmaog"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_5KQTUM9lEfCArNQEN5jdww" name="disiscrizione dalla sessione di studio" type="_ESj-kM7kEfCf1PbQoZmaog" association="_5KNQAM9lEfCArNQEN5jdww"/>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_5KQ6YM9lEfCArNQEN5jdww" type="_MyeNUM7oEfCf1PbQoZmaog" association="_5KNQAM9lEfCArNQEN5jdww"/>
   </packagedElement>
 </uml:Model>
