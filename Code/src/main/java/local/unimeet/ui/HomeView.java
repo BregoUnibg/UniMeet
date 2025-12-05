@@ -94,7 +94,7 @@ public class HomeView extends VerticalLayout {
         
         return grid;
     }
-
+//here it's created the banner in the homeview
     private Component createPremiumBanner() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if(username == null || username.isEmpty()) username = "Studente";
@@ -127,6 +127,7 @@ public class HomeView extends VerticalLayout {
         return banner;
     }
 
+    //here it's created the banner where we keep track of the users profile statistics
     private Component createStatsRow() {
         HorizontalLayout row = new HorizontalLayout();
         row.setWidthFull();
@@ -138,6 +139,7 @@ public class HomeView extends VerticalLayout {
         return row;
     }
 
+    
     private VerticalLayout createCard(String l, String v, Component i, String c) {
         VerticalLayout card = new VerticalLayout();
         card.addClassNames(LumoUtility.Background.BASE, LumoUtility.BoxShadow.XSMALL, LumoUtility.BorderRadius.MEDIUM, LumoUtility.Padding.MEDIUM);

@@ -25,7 +25,7 @@ import jakarta.annotation.security.PermitAll;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-
+//this class have the purpose of design how the section of the dashboard looks like
 @Route(value = "gestione-sessioni", layout = MainLayout.class)
 @PageTitle("Le mie Sessioni | UniMeet")
 @PermitAll
