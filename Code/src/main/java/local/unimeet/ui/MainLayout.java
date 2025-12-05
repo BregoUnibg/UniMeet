@@ -1,54 +1,126 @@
 package local.unimeet.ui;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.sidenav.SideNav;
+import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.theme.lumo.LumoUtility;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
+public class MainLayout extends AppLayout {
 
-	import com.vaadin.flow.component.applayout.AppLayout;
-	import com.vaadin.flow.component.applayout.DrawerToggle;
-	import com.vaadin.flow.component.html.H1;
-	import com.vaadin.flow.component.icon.VaadinIcon;
-	import com.vaadin.flow.component.orderedlayout.FlexComponent;
-	import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-	import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-	import com.vaadin.flow.component.sidenav.SideNav;
-	import com.vaadin.flow.component.sidenav.SideNavItem;
-	import com.vaadin.flow.theme.lumo.LumoUtility;
+    public MainLayout() {
+        createHeader();
+        createDrawer();
+        getElement().getThemeList().add("no-border");
+    }
+//create the header when are sitated the bell the aeroplano and the tre liniette for opening and closing the left column
+    private void createHeader() {
+        DrawerToggle toggle = new DrawerToggle();
+        Div spacer = new Div();
 
-	public class MainLayout extends AppLayout {
+        // Icona Aeroplano (Richieste)
+        Button requestsBtn = new Button(VaadinIcon.PAPERPLANE.create());
+        requestsBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
+        requestsBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
+        
+        Span reqBadge = new Span("2");
+        reqBadge.getElement().getThemeList().add("badge small error pill");
+        reqBadge.getStyle().set("position", "absolute").set("top", "-3px").set("right", "-3px").set("box-shadow", "0 0 0 2px white"); 
+        Div reqWrapper = new Div(requestsBtn, reqBadge);
+        reqWrapper.getStyle().set("position", "relative").set("margin-right", "20px");
 
-	    public MainLayout() {
-	        createHeader();
-	        createDrawer();
-	    }
+        // Icona Campanella
+        Button notificationBtn = new Button(VaadinIcon.BELL.create());
+        notificationBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
+        notificationBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
 
-	    private void createHeader() {
-	        H1 logo = new H1("UniMeet");
-	        logo.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.Margin.MEDIUM);
+        HorizontalLayout header = new HorizontalLayout(toggle, spacer, reqWrapper, notificationBtn);
+        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        header.setWidthFull(); header.expand(spacer);
+        header.addClassNames(LumoUtility.Padding.Vertical.NONE, LumoUtility.Padding.Horizontal.MEDIUM, LumoUtility.BoxShadow.SMALL, LumoUtility.Background.BASE);
+        addToNavbar(header);
+    }
+//create the icon where the user can navigate and do the various activity offered by the app 
+    private void createDrawer() {
+        VerticalLayout drawerContent = new VerticalLayout();
+        drawerContent.setSizeFull(); drawerContent.setPadding(false); drawerContent.setSpacing(false);
+        drawerContent.getStyle().set("background-color", "#0f172a").set("color", "white");
+        drawerContent.getElement().getThemeList().add("dark");
 
-	        // Il pulsante per aprire/chiudere il menu
-	        DrawerToggle toggle = new DrawerToggle();
+        Icon capIcon = VaadinIcon.ACADEMY_CAP.create();
+        capIcon.setSize("32px"); capIcon.setColor("white");
+        H1 appName = new H1("UniMeet");
+        appName.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.FontWeight.EXTRABOLD);
+        appName.getStyle().set("margin", "0").set("color", "white");
+        
+        HorizontalLayout branding = new HorizontalLayout(capIcon, appName);
+        branding.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        branding.setPadding(true); branding.setSpacing(true); branding.addClassName(LumoUtility.Margin.Bottom.MEDIUM);
 
-	        // Header: Toggle + Logo.
-	        // NESSUNA campanella, NESSUN avatar a destra.
-	        HorizontalLayout header = new HorizontalLayout(toggle, logo);
-	        
-	        // Allineamento verticale centrato
-	        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-	        header.setWidthFull();
-	        header.addClassNames(LumoUtility.Padding.Vertical.NONE, LumoUtility.Padding.Horizontal.MEDIUM);
+        SideNav nav = new SideNav();
+        
+        // --- QUI C'È IL COLLEGAMENTO GIUSTO ---
+        nav.addItem(new SideNavItem("Dashboard", HomeView.class, VaadinIcon.DASHBOARD.create()));
+        nav.addItem(new SideNavItem("Lezioni Amici", HomeView.class, VaadinIcon.GROUP.create())); // Placeholder
+        nav.addItem(new SideNavItem("Gestione Utenti", UsersView.class, VaadinIcon.USERS.create()));
+        
+        // QUESTA PUNTA ALLA PAGINA DI GESTIONE (SessionsView)
+        nav.addItem(new SideNavItem("Le mie Sessioni", SessionsView.class, VaadinIcon.BOOK.create())); 
 
-	        addToNavbar(header);
-	    }
+        Div navWrapper = new Div(nav);
+        navWrapper.addClassName(LumoUtility.Padding.Horizontal.MEDIUM);
+        navWrapper.setWidthFull();
 
-	    private void createDrawer() {
-	        SideNav nav = new SideNav();
+        HorizontalLayout footer = createUserProfileFooter();
+        drawerContent.add(branding, navWrapper, footer);
+        drawerContent.expand(navWrapper);
+        addToDrawer(drawerContent);
+    }
 
-	        // Link alla HomeView (Dashboard)
-	        nav.addItem(new SideNavItem("Dashboard", HomeView.class, VaadinIcon.DASHBOARD.create()));
-	        nav.addItem(new SideNavItem("Le mie Sessioni", HomeView.class, VaadinIcon.BOOK.create()));
-	        nav.addItem(new SideNavItem("Impostazioni", HomeView.class, VaadinIcon.COG.create()));
+    //create the avatar and the email in the left column 
+    private HorizontalLayout createUserProfileFooter() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if (username == null) username = "Studente";
+        Avatar avatar = new Avatar(username);
+        avatar.addThemeName("xsmall");
+        avatar.getStyle().set("background-color", "white").set("color", "#0f172a"); 
+        
+        Span nameSpan = new Span(username);
+        nameSpan.addClassNames(LumoUtility.FontWeight.BOLD, LumoUtility.FontSize.SMALL); nameSpan.getStyle().set("color", "white");
+        Span emailSpan = new Span(username + "@uni.it");
+        emailSpan.addClassNames(LumoUtility.FontSize.XSMALL); emailSpan.getStyle().set("color", "#e2e8f0"); 
 
-	        VerticalLayout scroller = new VerticalLayout(nav);
-	        addToDrawer(scroller);
-	    }
-	}
+        VerticalLayout userInfo = new VerticalLayout(nameSpan, emailSpan);
+        userInfo.setSpacing(false); userInfo.setPadding(false);
+        
+        Button logoutBtn = new Button(VaadinIcon.SIGN_OUT.create());
+        logoutBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
+        logoutBtn.getStyle().set("color", "white");
+        logoutBtn.addClickListener(e -> {
+            SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+            logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(), null, null);
+            UI.getCurrent().getPage().setLocation("/login");
+        });
 
+        HorizontalLayout footer = new HorizontalLayout(avatar, userInfo, logoutBtn);
+        footer.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+        footer.setWidthFull(); footer.addClassNames(LumoUtility.Padding.MEDIUM);
+        footer.getStyle().set("background-color", "rgba(255, 255, 255, 0.05)"); 
+        return footer;
+    }
+}

@@ -1,169 +1,150 @@
 package local.unimeet.ui;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
-@PageTitle("UniMeet | Dashboard")
-@Route(value = "", layout = MainLayout.class) // Home Page principale
+@Route(value = "", layout = MainLayout.class)
+@PageTitle("Dashboard | UniMeet")
 @PermitAll
 public class HomeView extends VerticalLayout {
 
-    // Contenitore per cambiare il contenuto sotto i tab
-    private final Div contentContainer = new Div();
+    private final SessionService sessionService;
 
-    public HomeView() {
-        setSpacing(false);
-        setSizeFull();
-        addClassNames("home-view");
-
-        // 1. Titolo Pagina
-        HorizontalLayout header = new HorizontalLayout(new H2("Bentornato"));
-        header.addClassNames(LumoUtility.Margin.MEDIUM);
-
-        // 2. I Tabs (Sessioni vs Suggerimenti)
-        Tab tabSessioni = new Tab(VaadinIcon.LIST.create(), new Span("Sessioni Recenti"));
-        Tab tabSuggeriti = new Tab(VaadinIcon.LIGHTBULB.create(), new Span("Suggeriti per te"));
+    public HomeView(SessionService sessionService) {
+        this.sessionService = sessionService;
         
-        Tabs tabs = new Tabs(tabSessioni, tabSuggeriti);
+        addClassName("dashboard-view");
+        setPadding(true); 
+        setSpacing(true);
+
+        // Banner Premium
+        add(createPremiumBanner());
+
+        VerticalLayout mainContent = new VerticalLayout();
+        mainContent.setPadding(false); 
+        mainContent.setSpacing(true);
+
+        // Stats
+        mainContent.add(createStatsRow());
+
+        // Tabs
+        Tab sessioni = new Tab("Le mie Sessioni");
+        Tabs tabs = new Tabs(sessioni, new Tab("Suggeriti"));
         tabs.setWidthFull();
+        tabs.addClassName(LumoUtility.Margin.Top.MEDIUM);
 
-        // 3. Logica cambio scheda
-        tabs.addSelectedChangeListener(event -> {
-            contentContainer.removeAll();
-            if (tabs.getSelectedTab().equals(tabSessioni)) {
-                contentContainer.add(createSessionLayout());
-            } else {
-                contentContainer.add(createSuggestedLayout());
-            }
-        });
+        Div container = new Div();
+        // QUI CARICHIAMO SOLO LA LISTA, NIENTE TASTI ELIMINA/CREA
+        container.add(createReadOnlyList());
 
-        // Contenuto di default (appena apri la pagina)
-        contentContainer.setSizeFull();
-        contentContainer.add(createSessionLayout());
-
-        add(header, tabs, contentContainer);
+        mainContent.add(tabs, container);
+        add(mainContent);
     }
 
-    // --- LAYOUT TAB 1: GRIGLIA E RICERCA ---
-    private VerticalLayout createSessionLayout() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
-        layout.setPadding(true);
-
-        // -- BARRA STRUMENTI --
-        TextField search = new TextField();
-        search.setPlaceholder("Cerca sessione...");
-        search.setPrefixComponent(VaadinIcon.SEARCH.create());
-        search.setWidth("300px");
-
-        Button btnNew = new Button("Nuova Sessione");
-        btnNew.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        btnNew.setIcon(VaadinIcon.PLUS.create());
-
-        // HorizontalLayout mette gli elementi uno dopo l'altro partendo da SINISTRA.
-        // Quindi search è a sinistra, il bottone subito dopo.
-        HorizontalLayout toolbar = new HorizontalLayout(search, btnNew);
-        toolbar.setWidthFull(); 
-        // Se volessimo il bottone tutto a destra useremmo setJustifyContentMode, 
-        // ma tu volevi tutto a sinistra/vicino.
+    private Grid<SessionService.SessionItem> createReadOnlyList() {
+        Grid<SessionService.SessionItem> grid = new Grid<>(SessionService.SessionItem.class, false);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_ROW_STRIPES);
         
-        // -- GRIGLIA --
-        Grid<MockSession> grid = new Grid<>(MockSession.class, false);
-        grid.addColumn(MockSession::getTitolo).setHeader("Materia / Titolo").setAutoWidth(true);
-        grid.addColumn(MockSession::getData).setHeader("Data");
-        
-        // Colonna stato con Badge colorato
-        grid.addComponentColumn(session -> {
-            Span badge = new Span(session.getStato());
-            String theme = "badge";
-            if (session.getStato().equalsIgnoreCase("Completato")) theme += " success";
-            else if (session.getStato().equalsIgnoreCase("In Corso")) theme += " contrast";
-            else theme += " error";
+        grid.addColumn(new ComponentRenderer<>(session -> {
+            Span title = new Span(session.materia);
+            title.addClassNames(LumoUtility.FontWeight.EXTRABOLD, LumoUtility.FontSize.LARGE, LumoUtility.TextColor.HEADER);
             
+            Icon clock = VaadinIcon.CLOCK.create(); clock.setSize("12px"); clock.setColor("#64748b");
+            String dataStr = session.data.format(DateTimeFormatter.ofPattern("dd MMM")) + " - " + session.orario;
+            Span date = new Span(clock, new Span(dataStr));
+            date.addClassNames(LumoUtility.FontSize.SMALL); date.getStyle().set("color", "#64748b").set("display", "flex").set("align-items", "center").set("gap", "5px");
+
+            VerticalLayout info = new VerticalLayout(title, date);
+            info.setSpacing(false); info.setPadding(false);
+
+            Span badge = new Span(session.stato);
+            String theme = "badge";
+            if(session.stato.equals("Attivo")) theme += " success primary"; else theme += " contrast";
             badge.getElement().getThemeList().add(theme);
-            return badge;
-        }).setHeader("Stato");
+            badge.getStyle().set("border-radius", "6px");
 
-        // Dati Mock (Interni, niente DB che si blocca)
-        List<MockSession> items = new ArrayList<>();
-        items.add(new MockSession("Analisi Matematica 1", "05/12/2023", "In Corso"));
-        items.add(new MockSession("Programmazione Java", "01/12/2023", "Completato"));
-        items.add(new MockSession("Basi di Dati", "28/11/2023", "Bozza"));
-        grid.setItems(items);
-        grid.setSizeFull();
+            HorizontalLayout row = new HorizontalLayout(info, badge);
+            row.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+            row.setWidthFull(); row.expand(info); row.addClassName(LumoUtility.Padding.Vertical.SMALL);
+            return row;
+        })).setHeader("Prossime Attività"); // NESSUNA COLONNA ELIMINA QUI
 
-        layout.add(toolbar, grid);
-        return layout;
-    }
-
-    // --- LAYOUT TAB 2: SUGGERIMENTI (CARD) ---
-    private VerticalLayout createSuggestedLayout() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setPadding(true);
-        layout.setSpacing(true);
-
-        layout.add(new H4("Suggerimenti basati sul tuo studio"));
-
-        HorizontalLayout cards = new HorizontalLayout();
-        cards.addClassNames(LumoUtility.Gap.MEDIUM, LumoUtility.FlexWrap.WRAP);
-
-        cards.add(createCard("Ripasso", "Hai un esame di Analisi tra 3 giorni."));
-        cards.add(createCard("Gruppo Studio", "Ci sono 2 nuovi gruppi per Java."));
+        grid.setItems(sessionService.getAll());
         
-        layout.add(cards);
-        return layout;
+        if(sessionService.getAll().isEmpty()) { grid.setHeight("100px"); }
+        
+        return grid;
     }
 
-    private VerticalLayout createCard(String title, String text) {
+    private Component createPremiumBanner() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        if(username == null || username.isEmpty()) username = "Studente";
+        else username = username.substring(0, 1).toUpperCase() + username.substring(1);
+
+        HorizontalLayout banner = new HorizontalLayout();
+        banner.setWidthFull(); banner.setMinHeight("180px"); 
+        banner.addClassNames(LumoUtility.Padding.XLARGE, LumoUtility.BorderRadius.LARGE, LumoUtility.AlignItems.CENTER);
+        banner.getStyle().set("background", "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)");
+        banner.getStyle().set("color", "white");
+        banner.getStyle().set("box-shadow", "inset 0 1px 1px rgba(255,255,255,0.2), 0 10px 25px -5px rgba(0,0,0,0.3)");
+        banner.getStyle().set("position", "relative"); banner.getStyle().set("overflow", "hidden");
+
+        H1 title = new H1("Ciao, " + username + "!");
+        title.addClassNames(LumoUtility.Margin.NONE, LumoUtility.FontWeight.EXTRABOLD);
+        title.getStyle().set("font-size", "2.5rem").set("color", "white");
+        
+        Span subtitle = new Span("Bentornato su UniMeet.");
+        subtitle.addClassNames(LumoUtility.FontSize.LARGE);
+        subtitle.getStyle().set("color", "white").set("font-weight", "500");
+
+        VerticalLayout textContainer = new VerticalLayout(title, subtitle);
+        textContainer.setPadding(false); textContainer.setSpacing(false);
+
+        Icon decorationIcon = VaadinIcon.DIPLOMA_SCROLL.create();
+        decorationIcon.setSize("200px"); decorationIcon.setColor("white");
+        decorationIcon.getStyle().set("opacity", "0.1").set("position", "absolute").set("right", "-20px").set("bottom", "-30px").set("transform", "rotate(-15deg)");
+
+        banner.add(textContainer, decorationIcon); banner.expand(textContainer);
+        return banner;
+    }
+
+    private Component createStatsRow() {
+        HorizontalLayout row = new HorizontalLayout();
+        row.setWidthFull();
+        row.addClassNames(LumoUtility.Gap.MEDIUM, LumoUtility.FlexWrap.WRAP, LumoUtility.Margin.Vertical.MEDIUM);
+        
+        int count = sessionService.getAll().size();
+        row.add(createCard("Sessioni Attive", String.valueOf(count), VaadinIcon.CLOCK.create(), "primary"));
+        row.add(createCard("Esami Previsti", "0", VaadinIcon.CALENDAR.create(), "contrast"));
+        return row;
+    }
+
+    private VerticalLayout createCard(String l, String v, Component i, String c) {
         VerticalLayout card = new VerticalLayout();
-        card.setWidth("300px");
-        card.setPadding(true);
-        card.setSpacing(false);
-        // Stile Card
-        card.getStyle().set("border", "1px solid var(--lumo-contrast-10pct)");
-        card.getStyle().set("border-radius", "var(--lumo-border-radius-m)");
-        card.getStyle().set("box-shadow", "var(--lumo-box-shadow-xs)");
-
-        H4 t = new H4(title);
-        t.addClassNames(LumoUtility.Margin.Top.NONE);
-        Span d = new Span(text);
-        d.addClassNames(LumoUtility.TextColor.SECONDARY);
-
-        card.add(t, d);
+        card.addClassNames(LumoUtility.Background.BASE, LumoUtility.BoxShadow.XSMALL, LumoUtility.BorderRadius.MEDIUM, LumoUtility.Padding.MEDIUM);
+        card.setMinWidth("220px"); card.setSpacing(false);
+        if(c.equals("primary")) i.getStyle().set("color", "var(--lumo-primary-color)");
+        if(c.equals("contrast")) i.getStyle().set("color", "#0f172a");
+        card.add(i, new H3(v), new Span(l));
         return card;
-    }
-
-    // Classe DTO interna per i dati finti
-    public static class MockSession {
-        private String titolo;
-        private String data;
-        private String stato;
-
-        public MockSession(String titolo, String data, String stato) {
-            this.titolo = titolo;
-            this.data = data;
-            this.stato = stato;
-        }
-        public String getTitolo() { return titolo; }
-        public String getData() { return data; }
-        public String getStato() { return stato; }
     }
 }
