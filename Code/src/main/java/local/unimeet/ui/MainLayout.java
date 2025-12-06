@@ -28,12 +28,14 @@ public class MainLayout extends AppLayout {
         createDrawer();
         getElement().getThemeList().add("no-border");
     }
-//create the header when are sitated the bell the aeroplano and the tre liniette for opening and closing the left column
+
+    //create the header when are sitated the bell the aeroplano and the tre liniette for opening and closing the left column
+    
     private void createHeader() {
         DrawerToggle toggle = new DrawerToggle();
         Div spacer = new Div();
 
-        // Icona Aeroplano (Richieste)
+        // paper plane Icon
         Button requestsBtn = new Button(VaadinIcon.PAPERPLANE.create());
         requestsBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
         requestsBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
@@ -44,7 +46,7 @@ public class MainLayout extends AppLayout {
         Div reqWrapper = new Div(requestsBtn, reqBadge);
         reqWrapper.getStyle().set("position", "relative").set("margin-right", "20px");
 
-        // Icona Campanella
+        // Bell Icon
         Button notificationBtn = new Button(VaadinIcon.BELL.create());
         notificationBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
         notificationBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
@@ -55,7 +57,9 @@ public class MainLayout extends AppLayout {
         header.addClassNames(LumoUtility.Padding.Vertical.NONE, LumoUtility.Padding.Horizontal.MEDIUM, LumoUtility.BoxShadow.SMALL, LumoUtility.Background.BASE);
         addToNavbar(header);
     }
-//create the icon where the user can navigate and do the various activity offered by the app 
+
+    //create the icon where the user can navigate and do the various activity offered by the app 
+    
     private void createDrawer() {
         VerticalLayout drawerContent = new VerticalLayout();
         drawerContent.setSizeFull(); drawerContent.setPadding(false); drawerContent.setSpacing(false);
@@ -93,6 +97,7 @@ public class MainLayout extends AppLayout {
     }
 
     //create the avatar and the email in the left column 
+    
     private HorizontalLayout createUserProfileFooter() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         if (username == null) username = "Studente";

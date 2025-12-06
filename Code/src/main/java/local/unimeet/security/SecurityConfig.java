@@ -8,12 +8,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @EnableWebSecurity
 @Configuration
-// We suppress the deprecation warning to use the stable VaadinWebSecurity class
-// because the new VaadinSecurityConfigurer is currently not publicly instantiable.
+// Suppressing warnings since a deprecated method is being used
 @SuppressWarnings("deprecation") 
 public class SecurityConfig extends VaadinWebSecurity {
 
@@ -32,6 +33,13 @@ public class SecurityConfig extends VaadinWebSecurity {
     @Bean
     public WebSecurityCustomizer h2ConsoleCustomizer() {
         return (web) -> web.ignoring().requestMatchers(new AntPathRequestMatcher("/h2-console/**"));
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+    	//Passwords will be encrypted with BCrypts alghoritm
+    	return new BCryptPasswordEncoder();
+    	
     }
   
 }

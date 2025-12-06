@@ -23,14 +23,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         //Return a Spring Security User object
-        //ENCRYPTION NOT YET IMPPLEMENTED
-        //MUST BE CHANGED
-        String badPassword = "{noop}" + user.getPassword();
-        
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
-                .password(badPassword)
-                .roles("USER")
+                .password(user.getPassword())
+                .roles(user.getRole().name())
                 .build();
     }
 }

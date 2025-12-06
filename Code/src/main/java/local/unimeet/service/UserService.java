@@ -7,19 +7,27 @@ import org.springframework.stereotype.Service;
 
 import local.unimeet.entity.User;
 import local.unimeet.repository.UserRepository;
+import local.unimeet.security.SecurityConfig;
 
 @Service
 public class UserService {
 	
 	private final UserRepository userRepository;
+	private final SecurityConfig securityConfig;
+	
 	
 	@Autowired
-	public UserService(UserRepository userRepository) {
+	public UserService(UserRepository userRepository, SecurityConfig securityConfig) {
 		this.userRepository = userRepository;
+		this.securityConfig = securityConfig;
 	}
 	
 	
 	public User saveUser(User user) {
+		
+		String clearPassword = user.getPassword();
+		user.setPassword(this.securityConfig.passwordEncoder().encode(clearPassword));
+		//Crypts password before saving user
 		return this.userRepository.save(user);
 	}
 	
@@ -29,6 +37,11 @@ public class UserService {
 	
 	public List<User> getAllUsers(){
 		return this.userRepository.findAll();
+	}
+
+
+	public boolean userExists(String username) {
+		return this.userRepository.existsById(username);
 	}
 	
 	

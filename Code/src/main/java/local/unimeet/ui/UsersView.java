@@ -9,6 +9,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
+import local.unimeet.entity.Role;
 import local.unimeet.entity.User;
 import local.unimeet.service.UserService;
 
@@ -34,7 +35,7 @@ public class UsersView extends VerticalLayout {
         Button addBtn = new Button("Aggiungi");
         addBtn.addClickListener(e -> {
             if(!usernameField.isEmpty() && !passwordField.isEmpty()){
-                userService.saveUser(new User(usernameField.getValue(), passwordField.getValue()));
+                userService.saveUser(new User(usernameField.getValue(), passwordField.getValue(), Role.USER));
                 updateGrid();
             }
         });
