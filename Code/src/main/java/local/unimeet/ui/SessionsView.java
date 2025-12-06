@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 //this class have the purpose of design how the section of the dashboard looks like
-@Route(value = "gestione-sessioni", layout = MainLayout.class)
+@Route(value = "sessions", layout = MainLayout.class)
 @PageTitle("Le mie Sessioni | UniMeet")
 @PermitAll
 public class SessionsView extends VerticalLayout {
@@ -46,13 +46,11 @@ public class SessionsView extends VerticalLayout {
         setPadding(true);
         setSpacing(true);
 
-        add(new H2("Gestisci le tue Sessioni"));
+        add(new H2("Manage your Sessions"));
 
-        // 1. CARD PER AGGIUNGERE NUOVA SESSIONE
         add(createCreationCard());
 
-        // 2. LISTA SESSIONI (Con Tasto Elimina)
-        add(new H4("Sessioni Attive"));
+        add(new H4("Active Sessions"));
         configureGrid();
         add(grid);
         refreshGrid();
@@ -64,12 +62,14 @@ public class SessionsView extends VerticalLayout {
         card.setSpacing(true);
 
         // Riga 1: Materia e Stato
-        materiaSelect = new ComboBox<>("Materia");
+        materiaSelect = new ComboBox<>("Course");
         materiaSelect.setItems("Analisi Matematica 1", "Analisi Matematica 2", "Fisica Tecnica", "Programmazione Java", "Basi di Dati", "Architettura degli Elaboratori");
         materiaSelect.setPlaceholder("Scegli materia...");
         materiaSelect.setWidthFull();
-
-        statoSelect = new ComboBox<>("Stato");
+        
+        
+        // What does status even mean? soon to be deleted
+        statoSelect = new ComboBox<>("Status???");
         statoSelect.setItems("Attivo", "Pianificato", "In Pausa");
         statoSelect.setValue("Pianificato");
         statoSelect.setWidthFull();
@@ -77,12 +77,12 @@ public class SessionsView extends VerticalLayout {
         HorizontalLayout row1 = new HorizontalLayout(materiaSelect, statoSelect);
         row1.setWidthFull();
 
-        // Riga 2: Data e Ora
-        datePicker = new DatePicker("Data");
+        // Date & time
+        datePicker = new DatePicker("Date");
         datePicker.setValue(LocalDate.now());
         datePicker.setWidthFull();
 
-        timePicker = new TimePicker("Orario");
+        timePicker = new TimePicker("Time");
         timePicker.setStep(java.time.Duration.ofMinutes(15));
         timePicker.setValue(LocalTime.now());
         timePicker.setWidthFull();
@@ -91,7 +91,7 @@ public class SessionsView extends VerticalLayout {
         row2.setWidthFull();
 
         // Tasto Salva
-        Button saveBtn = new Button("Aggiungi alla lista", VaadinIcon.PLUS.create());
+        Button saveBtn = new Button("Add", VaadinIcon.PLUS.create());
         saveBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveBtn.setWidthFull();
         saveBtn.addClickListener(e -> saveSession());
@@ -122,10 +122,10 @@ public class SessionsView extends VerticalLayout {
             title.addClassNames(LumoUtility.FontWeight.BOLD);
             String info = s.data.format(DateTimeFormatter.ofPattern("dd/MM")) + " ore " + s.orario;
             return new VerticalLayout(title, new Span(info));
-        })).setHeader("Dettagli").setAutoWidth(true);
+        })).setHeader("Details").setAutoWidth(true);
 
         // Colonna Stato
-        grid.addColumn(s -> s.stato).setHeader("Stato");
+        grid.addColumn(s -> s.stato).setHeader("Status");
 
         // Colonna Elimina
         grid.addComponentColumn(s -> {
@@ -133,7 +133,7 @@ public class SessionsView extends VerticalLayout {
             del.addThemeVariants(ButtonVariant.LUMO_ERROR);
             del.addClickListener(e -> confirmDelete(s));
             return del;
-        }).setHeader("Azioni").setWidth("100px").setFlexGrow(0);
+        }).setHeader("Actions").setWidth("100px").setFlexGrow(0);
     }
 
     private void confirmDelete(SessionService.SessionItem s) {

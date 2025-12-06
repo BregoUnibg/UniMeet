@@ -23,7 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.time.format.DateTimeFormatter;
 
 @Route(value = "", layout = MainLayout.class)
-@PageTitle("Dashboard | UniMeet")
+@PageTitle("Home")
 @PermitAll
 public class HomeView extends VerticalLayout {
 
@@ -47,8 +47,8 @@ public class HomeView extends VerticalLayout {
         mainContent.add(createStatsRow());
 
         // Tabs
-        Tab sessioni = new Tab("Le mie Sessioni");
-        Tabs tabs = new Tabs(sessioni, new Tab("Suggeriti"));
+        Tab sessioni = new Tab("My Sessions");
+        Tabs tabs = new Tabs(sessioni, new Tab("Suggested Sessions"));
         tabs.setWidthFull();
         tabs.addClassName(LumoUtility.Margin.Top.MEDIUM);
 
@@ -108,11 +108,11 @@ public class HomeView extends VerticalLayout {
         banner.getStyle().set("box-shadow", "inset 0 1px 1px rgba(255,255,255,0.2), 0 10px 25px -5px rgba(0,0,0,0.3)");
         banner.getStyle().set("position", "relative"); banner.getStyle().set("overflow", "hidden");
 
-        H1 title = new H1("Ciao, " + username + "!");
-        title.addClassNames(LumoUtility.Margin.NONE, LumoUtility.FontWeight.EXTRABOLD);
+        H1 title = new H1("Good to see you, " + username + "!");
+        title.addClassNames(LumoUtility.Margin.NONE, LumoUtility.FontWeight.BOLD);
         title.getStyle().set("font-size", "2.5rem").set("color", "white");
         
-        Span subtitle = new Span("Bentornato su UniMeet.");
+        Span subtitle = new Span("Welcome back on UniMeet.");
         subtitle.addClassNames(LumoUtility.FontSize.LARGE);
         subtitle.getStyle().set("color", "white").set("font-weight", "500");
 
@@ -134,8 +134,7 @@ public class HomeView extends VerticalLayout {
         row.addClassNames(LumoUtility.Gap.MEDIUM, LumoUtility.FlexWrap.WRAP, LumoUtility.Margin.Vertical.MEDIUM);
         
         int count = sessionService.getAll().size();
-        row.add(createCard("Sessioni Attive", String.valueOf(count), VaadinIcon.CLOCK.create(), "primary"));
-        row.add(createCard("Esami Previsti", "0", VaadinIcon.CALENDAR.create(), "contrast"));
+        row.add(createCard("Active Sessions", String.valueOf(count), VaadinIcon.CLOCK.create(), "primary"));
         return row;
     }
 

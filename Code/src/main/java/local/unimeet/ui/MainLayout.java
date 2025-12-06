@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -24,48 +25,49 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 public class MainLayout extends AppLayout {
 
     public MainLayout() {
+    	
+    	//Makes left navbar domnant over header
+    	setPrimarySection(Section.DRAWER);
+    	
+    	createDrawer();
         createHeader();
-        createDrawer();
         getElement().getThemeList().add("no-border");
     }
 
     //create the header when are sitated the bell the aeroplano and the tre liniette for opening and closing the left column
-    
+     
     private void createHeader() {
         DrawerToggle toggle = new DrawerToggle();
         Div spacer = new Div();
-
-        // paper plane Icon
-        Button requestsBtn = new Button(VaadinIcon.PAPERPLANE.create());
-        requestsBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
-        requestsBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
+        spacer.setWidthFull();
         
-        Span reqBadge = new Span("2");
-        reqBadge.getElement().getThemeList().add("badge small error pill");
-        reqBadge.getStyle().set("position", "absolute").set("top", "-3px").set("right", "-3px").set("box-shadow", "0 0 0 2px white"); 
-        Div reqWrapper = new Div(requestsBtn, reqBadge);
-        reqWrapper.getStyle().set("position", "relative").set("margin-right", "20px");
-
         // Bell Icon
-        Button notificationBtn = new Button(VaadinIcon.BELL.create());
+        Button notificationBtn = new Button(LumoIcon.BELL.create());
         notificationBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
         notificationBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
 
-        HorizontalLayout header = new HorizontalLayout(toggle, spacer, reqWrapper, notificationBtn);
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-        header.setWidthFull(); header.expand(spacer);
-        header.addClassNames(LumoUtility.Padding.Vertical.NONE, LumoUtility.Padding.Horizontal.MEDIUM, LumoUtility.BoxShadow.SMALL, LumoUtility.Background.BASE);
-        addToNavbar(header);
+        addToNavbar(toggle, spacer, notificationBtn);
+        
+        
     }
 
     //create the icon where the user can navigate and do the various activity offered by the app 
     
     private void createDrawer() {
         VerticalLayout drawerContent = new VerticalLayout();
-        drawerContent.setSizeFull(); drawerContent.setPadding(false); drawerContent.setSpacing(false);
+        drawerContent.setSizeFull(); 
+        drawerContent.setPadding(false); 
+        drawerContent.setSpacing(false);
         drawerContent.getStyle().set("background-color", "#0f172a").set("color", "white");
         drawerContent.getElement().getThemeList().add("dark");
-
+        
+        //New drawer to will with elements which will have padding in contrast to the footer
+        VerticalLayout drawerTopContent = new VerticalLayout();
+        drawerTopContent.setSizeFull(); 
+        drawerTopContent.setWidthFull();
+        drawerTopContent.setSpacing(false);
+        
+        
         Icon capIcon = VaadinIcon.ACADEMY_CAP.create();
         capIcon.setSize("32px"); capIcon.setColor("white");
         H1 appName = new H1("UniMeet");
@@ -78,20 +80,28 @@ public class MainLayout extends AppLayout {
 
         SideNav nav = new SideNav();
         
-        // --- QUI C'È IL COLLEGAMENTO GIUSTO ---
-        nav.addItem(new SideNavItem("Dashboard", HomeView.class, VaadinIcon.DASHBOARD.create()));
-        nav.addItem(new SideNavItem("Lezioni Amici", HomeView.class, VaadinIcon.GROUP.create())); // Placeholder
-        nav.addItem(new SideNavItem("Gestione Utenti", UsersView.class, VaadinIcon.USERS.create()));
         
-        // QUESTA PUNTA ALLA PAGINA DI GESTIONE (SessionsView)
-        nav.addItem(new SideNavItem("Le mie Sessioni", SessionsView.class, VaadinIcon.BOOK.create())); 
-
+        SideNavItem navHome = new SideNavItem("Home", HomeView.class, VaadinIcon.HOME.create());
+        SideNavItem navUsersManagment = new SideNavItem("Users Managment", UsersView.class, VaadinIcon.USERS.create());
+        SideNavItem navSessions = new SideNavItem("My Sessions", SessionsView.class, VaadinIcon.BOOK.create());
+        
+        nav.addItem(navHome);
+        nav.addItem(navUsersManagment);
+        nav.addItem(navSessions); 
+        
+        
         Div navWrapper = new Div(nav);
+        
+        //Needeed to fill up the navbar and make Items width same size as the navbar
         navWrapper.addClassName(LumoUtility.Padding.Horizontal.MEDIUM);
+        navWrapper.getStyle().set("padding", "0");
+        navWrapper.getStyle().set("border", "0");        
         navWrapper.setWidthFull();
 
         HorizontalLayout footer = createUserProfileFooter();
-        drawerContent.add(branding, navWrapper, footer);
+        
+        drawerTopContent.add(branding, navWrapper);
+        drawerContent.add(drawerTopContent, footer);
         drawerContent.expand(navWrapper);
         addToDrawer(drawerContent);
     }
