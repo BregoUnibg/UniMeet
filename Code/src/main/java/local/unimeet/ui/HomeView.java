@@ -12,6 +12,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
@@ -27,10 +28,8 @@ import java.time.format.DateTimeFormatter;
 @PermitAll
 public class HomeView extends VerticalLayout {
 
-    private final SessionService sessionService;
 
-    public HomeView(SessionService sessionService) {
-        this.sessionService = sessionService;
+    public HomeView() {
         
         addClassName("dashboard-view");
         setPadding(true); 
@@ -47,53 +46,29 @@ public class HomeView extends VerticalLayout {
         mainContent.add(createStatsRow());
 
         // Tabs
-        Tab sessioni = new Tab("My Sessions");
-        Tabs tabs = new Tabs(sessioni, new Tab("Suggested Sessions"));
+        
+        TabSheet tabs = new TabSheet();
+        
+        Div mySessionContent = new Div();
+        Div suggestedSessionContent = new Div();
+        
+        tabs.add("My Sessions", mySessionContent);
+        tabs.add("Suggested Sessions", suggestedSessionContent);
+        
+        //Just a test to see how cards look like
+        mySessionContent.add(new SessionCard()); 
+        mySessionContent.add(new SessionCard()); 
+        suggestedSessionContent.add(new SessionCard());
+        
         tabs.setWidthFull();
         tabs.addClassName(LumoUtility.Margin.Top.MEDIUM);
 
-        Div container = new Div();
-        // QUI CARICHIAMO SOLO LA LISTA, NIENTE TASTI ELIMINA/CREA
-        container.add(createReadOnlyList());
-
-        mainContent.add(tabs, container);
+ 
+        mainContent.add(tabs);
         add(mainContent);
     }
 
-    private Grid<SessionService.SessionItem> createReadOnlyList() {
-        Grid<SessionService.SessionItem> grid = new Grid<>(SessionService.SessionItem.class, false);
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_ROW_STRIPES);
-        
-        grid.addColumn(new ComponentRenderer<>(session -> {
-            Span title = new Span(session.materia);
-            title.addClassNames(LumoUtility.FontWeight.EXTRABOLD, LumoUtility.FontSize.LARGE, LumoUtility.TextColor.HEADER);
-            
-            Icon clock = VaadinIcon.CLOCK.create(); clock.setSize("12px"); clock.setColor("#64748b");
-            String dataStr = session.data.format(DateTimeFormatter.ofPattern("dd MMM")) + " - " + session.orario;
-            Span date = new Span(clock, new Span(dataStr));
-            date.addClassNames(LumoUtility.FontSize.SMALL); date.getStyle().set("color", "#64748b").set("display", "flex").set("align-items", "center").set("gap", "5px");
-
-            VerticalLayout info = new VerticalLayout(title, date);
-            info.setSpacing(false); info.setPadding(false);
-
-            Span badge = new Span(session.stato);
-            String theme = "badge";
-            if(session.stato.equals("Attivo")) theme += " success primary"; else theme += " contrast";
-            badge.getElement().getThemeList().add(theme);
-            badge.getStyle().set("border-radius", "6px");
-
-            HorizontalLayout row = new HorizontalLayout(info, badge);
-            row.setDefaultVerticalComponentAlignment(Alignment.CENTER);
-            row.setWidthFull(); row.expand(info); row.addClassName(LumoUtility.Padding.Vertical.SMALL);
-            return row;
-        })).setHeader("Prossime Attività"); // NESSUNA COLONNA ELIMINA QUI
-
-        grid.setItems(sessionService.getAll());
-        
-        if(sessionService.getAll().isEmpty()) { grid.setHeight("100px"); }
-        
-        return grid;
-    }
+    
 //here it's created the banner in the homeview
     private Component createPremiumBanner() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -133,8 +108,7 @@ public class HomeView extends VerticalLayout {
         row.setWidthFull();
         row.addClassNames(LumoUtility.Gap.MEDIUM, LumoUtility.FlexWrap.WRAP, LumoUtility.Margin.Vertical.MEDIUM);
         
-        int count = sessionService.getAll().size();
-        row.add(createCard("Active Sessions", String.valueOf(count), VaadinIcon.CLOCK.create(), "primary"));
+        row.add(createCard("Active Sessions", String.valueOf(0), VaadinIcon.CLOCK.create(), "primary"));
         return row;
     }
 

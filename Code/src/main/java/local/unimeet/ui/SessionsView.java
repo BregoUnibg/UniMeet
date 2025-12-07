@@ -31,17 +31,14 @@ import java.time.format.DateTimeFormatter;
 @PermitAll
 public class SessionsView extends VerticalLayout {
 
-    private final SessionService sessionService;
-    private final Grid<SessionService.SessionItem> grid = new Grid<>(SessionService.SessionItem.class, false);
-
+    
     private ComboBox<String> materiaSelect;
     private DatePicker datePicker;
     private TimePicker timePicker;
     private ComboBox<String> statoSelect;
 
-    public SessionsView(SessionService sessionService) {
-        this.sessionService = sessionService;
-        
+    public SessionsView() {
+       
         setSizeFull();
         setPadding(true);
         setSpacing(true);
@@ -51,9 +48,6 @@ public class SessionsView extends VerticalLayout {
         add(createCreationCard());
 
         add(new H4("Active Sessions"));
-        configureGrid();
-        add(grid);
-        refreshGrid();
     }
 
     private VerticalLayout createCreationCard() {
@@ -102,10 +96,6 @@ public class SessionsView extends VerticalLayout {
 
     private void saveSession() {
         if (materiaSelect.getValue() != null && datePicker.getValue() != null && timePicker.getValue() != null) {
-            sessionService.add(new SessionService.SessionItem(
-                materiaSelect.getValue(), datePicker.getValue(), timePicker.getValue(), statoSelect.getValue()
-            ));
-            refreshGrid();
             Notification.show("Aggiunto con successo", 2000, Notification.Position.BOTTOM_START).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             materiaSelect.clear();
         } else {
@@ -113,36 +103,13 @@ public class SessionsView extends VerticalLayout {
         }
     }
 
-    private void configureGrid() {
-        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
-        
-        // Colonna Info
-        grid.addColumn(new ComponentRenderer<>(s -> {
-            Span title = new Span(s.materia);
-            title.addClassNames(LumoUtility.FontWeight.BOLD);
-            String info = s.data.format(DateTimeFormatter.ofPattern("dd/MM")) + " ore " + s.orario;
-            return new VerticalLayout(title, new Span(info));
-        })).setHeader("Details").setAutoWidth(true);
+    
 
-        // Colonna Stato
-        grid.addColumn(s -> s.stato).setHeader("Status");
-
-        // Colonna Elimina
-        grid.addComponentColumn(s -> {
-            Button del = new Button(VaadinIcon.TRASH.create());
-            del.addThemeVariants(ButtonVariant.LUMO_ERROR);
-            del.addClickListener(e -> confirmDelete(s));
-            return del;
-        }).setHeader("Actions").setWidth("100px").setFlexGrow(0);
-    }
-
-    private void confirmDelete(SessionService.SessionItem s) {
+    private void confirmDelete() {
         Dialog d = new Dialog();
         d.setHeaderTitle("Elimina Sessione");
-        d.add("Sei sicuro di voler eliminare " + s.materia + "?");
         Button yes = new Button("Elimina", e -> {
-            sessionService.delete(s);
-            refreshGrid();
+           
             d.close();
             Notification.show("Eliminato", 2000, Notification.Position.BOTTOM_START);
         });
@@ -151,5 +118,4 @@ public class SessionsView extends VerticalLayout {
         d.open();
     }
 
-    private void refreshGrid() { grid.setItems(sessionService.getAll()); }
 }
