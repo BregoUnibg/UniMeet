@@ -1,18 +1,48 @@
 package local.unimeet.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import local.unimeet.entity.StudySession;
+import local.unimeet.entity.User;
 import local.unimeet.repository.StudySessionRepository;
 
 @Service
 public class StudySessionService {
 	
 	private final StudySessionRepository studySessionRepository;
+	private final UserService userService;
 	
 	@Autowired
-	public StudySessionService(StudySessionRepository studySessionRepository) {
+	public StudySessionService(StudySessionRepository studySessionRepository, UserService userService) {
 		this.studySessionRepository = studySessionRepository;
+		this.userService = userService;
+	}
+	
+	public StudySession saveStudySession(StudySession studySession) {
+		
+		return this.studySessionRepository.save(studySession);
+		
+	}
+	
+	public List <StudySession>getStudySessionByOwner(String username) {
+		return this.studySessionRepository.findByOwner(userService.getUserByUsername(username));
+	}
+	
+	@Transactional
+	public void addPartecipant(StudySession studySession, String username){
+		
+		User user = userService.getUserByUsername(username);
+		
+		if(studySession.getPartecipants().contains(user) || studySession.getOwner().equals(user))
+			throw new IllegalArgumentException();
+		
+		studySession.addPartecipant(user);
+		
+		
 	}
 	
 		

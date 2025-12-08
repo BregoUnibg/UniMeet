@@ -45,6 +45,10 @@ public class UserService {
 	}
 	
 	
+	public User getUserByUsername(String username) {
+		return this.userRepository.getReferenceById(username);
+	}
+	
 	//More methods to be implemented when needed
 	
 }

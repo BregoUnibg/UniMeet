@@ -61,10 +61,10 @@ public class RegisterView extends VerticalLayout {
         registerButton.getStyle().set("margin-bottom", "25px");        
         loginButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        // 1. Navigation Logic
+        //Navigation Logic
         loginButton.addClickListener(e -> UI.getCurrent().navigate("login"));
 
-        // 2. Registration Logic
+        //Registration Logic
         registerButton.addClickListener(e -> register());
         
         VerticalLayout whiteRegisterBox = new VerticalLayout(createAccountTitle, usernameField, passwordField, confirmPasswordField, registerButton, loginButton);

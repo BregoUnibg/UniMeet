@@ -3,10 +3,14 @@ package local.unimeet.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,7 +57,7 @@ public class StudySession {
 	//This creates a separate tablble in the database that contains
 	//session ids and usernames as it is standsrd to handle many to many realations this way
 	//The join table in question is called session_partecipants
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			  name = "session_participants", 
 			  joinColumns = @JoinColumn(name = "session_id"), 
@@ -63,7 +67,6 @@ public class StudySession {
 	
 	//Empty construvtor needed by JPA
 	public StudySession() {
-		
 	}
 
 	
@@ -165,11 +168,18 @@ public class StudySession {
 	}
 	
 	public void addPartecipant(User partecipant) {
+		if(this.partecipants == null)
+			this.partecipants = new ArrayList <User>();
+		
 		this.partecipants.add(partecipant);
 	}
 	
 	public void removePartecipant(User partecipant) {
 		this.partecipants.remove(partecipant);
+	}
+	
+	public int getCountMembers(){
+		return this.partecipants.size() + 1;
 	}
 
 }

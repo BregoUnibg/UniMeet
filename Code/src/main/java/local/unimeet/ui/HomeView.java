@@ -19,9 +19,20 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
+import local.unimeet.entity.CourseSubject;
+import local.unimeet.entity.SessionType;
+import local.unimeet.entity.StudySession;
+import local.unimeet.entity.User;
+import local.unimeet.security.SecurityService;
+import local.unimeet.service.StudySessionService;
+import local.unimeet.service.UserService;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Route(value = "", layout = MainLayout.class)
 @PageTitle("Home")
@@ -29,8 +40,16 @@ import java.time.format.DateTimeFormatter;
 public class HomeView extends VerticalLayout {
 
 
-    public HomeView() {
+	private StudySessionService studySessionService;
+	private SecurityService securityService;
+	private UserService userService;
+	
+    public HomeView(StudySessionService studySessionService, SecurityService securityService, UserService userService) {
         
+    	this.studySessionService =	studySessionService;
+    	this.securityService = securityService;
+    	this.userService = userService;
+    	
         addClassName("dashboard-view");
         setPadding(true); 
         setSpacing(true);
@@ -49,15 +68,46 @@ public class HomeView extends VerticalLayout {
         
         TabSheet tabs = new TabSheet();
         
+        
+        //TEMP
+        
+        StudySession temp = new StudySession();
+        
+        temp.setUniversity("Universita di Bergamo");
+        temp.setBuilding("A");
+        temp.setRoom("001");
+        temp.setAddress("Via dei cavalli");
+        temp.setType(SessionType.PUBLIC);
+        temp.setSubject(CourseSubject.CALCULUS_I);
+        temp.setDescription("very long and persuasive descipraelfdnasnmdasnkdbaskjdasjd asd ashd ashd ashd ashjd ashd ashd asj dasjhd asj ");
+        temp.setDate(LocalDate.of(2025, 8, 12));
+        temp.setTimeStart(LocalTime.of(9, 30));
+        temp.setTimeEnd(LocalTime.of(10, 30));
+        temp.setOwner(userService.getUserByUsername("brego"));
+        temp.addPartecipant(userService.getUserByUsername("paolo"));
+        
+        this.studySessionService.saveStudySession(temp);
+        
+        //TEMP
+        
         Div mySessionContent = new Div();
         Div suggestedSessionContent = new Div();
         
         tabs.add("My Sessions", mySessionContent);
         tabs.add("Suggested Sessions", suggestedSessionContent);
         
+        
+        List<StudySession> currentOwnerSessions = currentUserOwnerSessions();
+        
+        for(StudySession ss: currentOwnerSessions) {
+        	
+        	mySessionContent.add(new SessionCard(ss));         	
+        	
+        }
+         
+
         //Just a test to see how cards look like
-        mySessionContent.add(new SessionCard()); 
-        mySessionContent.add(new SessionCard()); 
+        suggestedSessionContent.add(new SessionCard());
         suggestedSessionContent.add(new SessionCard());
         
         tabs.setWidthFull();
@@ -68,6 +118,22 @@ public class HomeView extends VerticalLayout {
         add(mainContent);
     }
 
+    
+    /**
+     * Returns every studysession owned by the authenticather user
+     * @return
+     */
+    
+    private List<StudySession> currentUserOwnerSessions(){
+    	
+    	StudySessionService studySer = studySessionService;
+    	SecurityService secSer = securityService;
+    	
+    	return studySer.getStudySessionByOwner(secSer.getAuthenticatedUsername());
+    	
+    	
+    }
+    
     
 //here it's created the banner in the homeview
     private Component createPremiumBanner() {
