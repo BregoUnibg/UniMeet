@@ -70,7 +70,7 @@ public class HomeView extends VerticalLayout {
         
         
         //TEMP
-        
+        /*
         StudySession temp = new StudySession();
         
         temp.setUniversity("Universita di Bergamo");
@@ -85,16 +85,23 @@ public class HomeView extends VerticalLayout {
         temp.setTimeEnd(LocalTime.of(10, 30));
         temp.setOwner(userService.getUserByUsername("brego"));
         temp.addPartecipant(userService.getUserByUsername("paolo"));
+        temp.addPartecipant(userService.getUserByUsername("diego"));
         
         this.studySessionService.saveStudySession(temp);
-        
+        */
         //TEMP
         
         Div mySessionContent = new Div();
         Div suggestedSessionContent = new Div();
         
+        
         tabs.add("My Sessions", mySessionContent);
         tabs.add("Suggested Sessions", suggestedSessionContent);
+        
+        tabs.addClassNames(LumoUtility.Display.FLEX,
+        	    LumoUtility.JustifyContent.CENTER,
+        	    LumoUtility.AlignItems.CENTER
+        );
         
         
         List<StudySession> currentOwnerSessions = currentUserOwnerSessions();
@@ -113,7 +120,8 @@ public class HomeView extends VerticalLayout {
         tabs.setWidthFull();
         tabs.addClassName(LumoUtility.Margin.Top.MEDIUM);
 
- 
+        
+        
         mainContent.add(tabs);
         add(mainContent);
     }

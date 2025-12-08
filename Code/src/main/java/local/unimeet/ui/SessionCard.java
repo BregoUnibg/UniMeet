@@ -11,6 +11,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
+import local.unimeet.entity.CourseSubject;
+import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
 
@@ -19,6 +21,7 @@ public class SessionCard extends Div{
 	public SessionCard() {
 		
 		//Keeping this as a sample
+		//MUST BE DELETED
 		
 		this.setMaxWidth("800px");
 		this.getStyle().set("background-color", "white");
@@ -161,7 +164,7 @@ public class SessionCard extends Div{
 		
 		//Keeping this as a sample
 		
-		this.setMaxWidth("800px");
+		this.setMaxWidth("1000px");
 		this.getStyle().set("background-color", "white");
 		
 		VerticalLayout card = new VerticalLayout();
@@ -178,8 +181,11 @@ public class SessionCard extends Div{
 		
 		//Location
 		VerticalLayout left = new VerticalLayout();
+		//left.setSpacing(false);
 		Span university = new Span (studySession.getUniversity());
+		//university.getStyle().set("margin-bottom", "5px");
 		Span buildingAndRoom = new Span (studySession.getBuilding() + studySession.getRoom());
+		//buildingAndRoom.getStyle().set("margin-bottom", "5px");
 		Span address = new Span (studySession.getAddress());
 		
 		left.add(university, buildingAndRoom, address);
@@ -190,12 +196,13 @@ public class SessionCard extends Div{
 		
 		HorizontalLayout badges = new HorizontalLayout();
 		
-		Span type = new Span(studySession.getType().toString());
+		Span type = new Span(getFormattedSessionType(studySession.getType()));
 		type.getElement().getThemeList().add("badge pill");
 		
-		Span subject = new Span(studySession.getSubject().toString());
+		Span subject = new Span(getFormattedSubjectName(studySession.getSubject()));
 		subject.getElement().getThemeList().add("badge pill");
-		subject.getStyle().setBackgroundColor("red");
+		subject.getStyle().set("color", "#8B0836");
+		subject.getStyle().setBackgroundColor("#FFF0F1");
 		
 		badges.add(type, subject);
 		
@@ -212,11 +219,12 @@ public class SessionCard extends Div{
 		//Time 
 		VerticalLayout right = new VerticalLayout();
 		
-		Span date = new Span(studySession.getDate().getMonth().toString() + " " + studySession.getDate().getDayOfMonth());
+		Span date = new Span(this.getFormattedString(studySession.getDate().getMonth().toString() + " " + studySession.getDate().getDayOfMonth()));
 		Span time = new Span(studySession.getTimeStart() + " - " + studySession.getTimeEnd());
 		
 		Span availableSeats = new Span(studySession.getCountMembers() + "/6");
-		availableSeats.getElement().getThemeList().add("badge success");
+		
+		availableSeats.getElement().getThemeList().add(costumBadgeColor(studySession.getCountMembers(), 6));
 		
 		right.add(date, time, availableSeats);
 		
@@ -249,7 +257,7 @@ public class SessionCard extends Div{
 	    
 	    Button joinButton = new Button("join");
 	    joinButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-	    joinButton.setWidth("150px");
+	    joinButton.setWidth("200px");
 	    
 	    avatarPartecipants.getStyle().set("margin-left", "16px");
 	    joinButton.getStyle().set("margin-left", "16px");
@@ -289,6 +297,67 @@ public class SessionCard extends Div{
 	    //rounded smooth corners
 	    this.getStyle().set("border-radius", "20px");
 	    
+	}
+	
+	/**
+	 * Returns a decently formattted string instead of the default enum.toString () output
+	 * @param subject
+	 * @return
+	 */
+	
+	private String getFormattedSubjectName(CourseSubject subject) {
+		
+		if(subject.equals(CourseSubject.CALCULUS_II))
+			return "Calculus II";
+			
+		return getFormattedString(subject.name());
+		
+	}
+	
+	/**
+	 * Return a decently formatted string instead of the default unum.toString() output
+	 * @param ss
+	 * @return
+	 */
+	
+	private String getFormattedSessionType(SessionType ss) {
+		
+		return getFormattedString(ss.name());
+		
+	}
+	
+	/**
+	 * Returns formatted string
+	 * @param string
+	 * @return
+	 */
+	
+	private String getFormattedString(String string) {
+		
+		String [] words = string.split("_");
+		
+		String output = "";
+		
+		for(String word: words) {
+			output += word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase() + " ";
+		}
+		
+		output.substring(0, output.length()-1);
+		
+		return output;
+		
+		
+	}
+	
+	private String costumBadgeColor(int members, int max) {
+		
+		if(members==max)
+			return "badge error";
+		
+		if((double)members/max >= 0.5)
+			return "badge warning";
+		
+		return "badge success";
 	}
 
 }
