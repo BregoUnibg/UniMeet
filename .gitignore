@@ -1,5 +1,10 @@
 Documents/Diagrams/.settings
 
+#Temporary
+Documents/Diagrams/.project
+Code/.classpath
+Code/.project
+
 Code/.settings
 Code/node_modules
 Code/target
