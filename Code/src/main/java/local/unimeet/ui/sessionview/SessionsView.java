@@ -1,4 +1,4 @@
-package local.unimeet.ui;
+package local.unimeet.ui.sessionview;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -21,6 +21,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
+import local.unimeet.ui.MainLayout;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

@@ -19,6 +19,9 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
+import local.unimeet.ui.sessionview.SessionsView;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
