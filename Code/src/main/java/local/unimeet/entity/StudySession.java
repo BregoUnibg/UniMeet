@@ -24,17 +24,15 @@ import jakarta.persistence.Table;
 @Table(name = "study_session")
 public class StudySession {
 	
-	//First prototype
-	//I Will list strings that will be implemented as classes with //*
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String university;	//*
-	private String building;	//*
-
-	private String room;		//*
-	private String address;		//* part of building
+	
+	//Everything else is obtained by navigating backwords throught the hirarchy tree
+	@ManyToOne
+	@JoinColumn(name="study_table_id", nullable=false)
+	private StudyTable studyTable;
+	
 	private SessionType type;
 	private CourseSubject subject;
 	private String description;
@@ -70,39 +68,31 @@ public class StudySession {
 	}
 
 	
-	
-	public String getUniversity() {
-		return university;
+	public StudyTable getStudyTable() {
+		return studyTable;
+	}
+
+	public void setStudyTable(StudyTable studyTable) {
+		this.studyTable = studyTable;
+	}
+
+
+	public University getUniversity() {
+		return this.getBuilding().getUniversity();
 	}
 	
-	public void setUniversity(String university) {
-		this.university = university;
+	public Building getBuilding() {
+		return this.getRoom().getBuilding();
 	}
 	
-	public String getBuilding() {
-		return building;
-	}
-	
-	public void setBuilding(String building) {
-		this.building = building;
-	}
-	
-	public String getRoom() {
-		return room;
-	}
-	
-	public void setRoom(String room) {
-		this.room = room;
+	public Room getRoom() {
+		return this.studyTable.getRoom();
 	}
 	
 	public String getAddress() {
-		return address;
+		return this.getBuilding().getAddress();
 	}
-	
-	public void setAddress(String address) {
-		this.address = address;
-	}
-	
+
 	public SessionType getType() {
 		return type;
 	}

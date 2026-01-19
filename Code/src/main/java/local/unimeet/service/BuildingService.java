@@ -1,5 +1,7 @@
 package local.unimeet.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -59,6 +61,15 @@ public class BuildingService {
     	
     	return building;
     	
+    }
+    
+    public List<Building> getBuildingsByUniversity(String universityName) {
+        
+        if (!universityRepository.existsById(universityName)) {
+            throw new EntityNotFoundException("University not found with name : " + universityName);
+        }
+
+        return buildingRepository.findByUniversityName(universityName);
     }
 
 }

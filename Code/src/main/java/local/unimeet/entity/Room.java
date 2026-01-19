@@ -40,10 +40,18 @@ public class Room {
 	public Room(){
 	}
 	
+	public long getId() {
+		return id;
+	}
+
 	public void setBuilding(Building building){
 		this.building = building;
 	}
 	
+	public Building getBuilding() {
+		return building;
+	}
+
 	public void addStudyTable(StudyTable studyTable) {
 		studyTables.add(studyTable);
 		studyTable.setRoom(this);

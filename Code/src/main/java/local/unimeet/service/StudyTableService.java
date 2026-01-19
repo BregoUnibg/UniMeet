@@ -1,5 +1,7 @@
 package local.unimeet.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -58,5 +60,14 @@ public class StudyTableService {
 		return studyTable;
 		
 	}
+	
+	public List<StudyTable> getStudyTableByRoom(Long roomId) {
+        
+        if (!roomRepository.existsById(roomId)) {
+            throw new EntityNotFoundException("Room not found with Id : " + roomId);
+        }
+
+        return studyTableRepository.findAllDetailsByRoomId(roomId);
+    }
 	
 }

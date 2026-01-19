@@ -24,7 +24,7 @@ public class StudyTable {
 	private long id;
 	
 	private int number;
-	private int seatsNumber;
+	private int capacity;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id") //creates Foreign Key column
@@ -45,12 +45,12 @@ public class StudyTable {
 		this.number = number;
 	}
 
-	public int getSeatsNumber() {
-		return seatsNumber;
+	public int getCapacity() {
+		return capacity;
 	}
 
-	public void setSeatsNumber(int seatsNumber) {
-		this.seatsNumber = seatsNumber;
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
 	}
 
 	public Room getRoom() {

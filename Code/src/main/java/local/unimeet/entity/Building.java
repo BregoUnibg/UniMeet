@@ -40,7 +40,11 @@ public class Building {
 	
 	public Building(){
 	}
-	
+		
+	public long getId() {
+		return id;
+	}
+
 	public void setUniversity(University university) {
 		this.university = university;
 	}

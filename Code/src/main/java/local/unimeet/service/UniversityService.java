@@ -1,5 +1,7 @@
 package local.unimeet.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -34,6 +36,10 @@ public class UniversityService {
     public University getUniversityByName(String name) {
         return universityRepository.findById(name)
                 .orElseThrow(() -> new EntityNotFoundException("University not found: " + name));
+    }
+    
+    public List<University> getAllUniversities() {
+        return universityRepository.findAll();
     }
     
 }
