@@ -29,8 +29,13 @@ public class StudySessionService {
 	}
 	
 	public List <StudySession>getStudySessionByOwner(String username) {
-		return this.studySessionRepository.findByOwner(userService.getUserByUsername(username));
+		return this.studySessionRepository.findByOwnerWithDetails(username);
 	}
+	
+	public List <StudySession>getAllStudySessions() {
+		return this.studySessionRepository.findAllWithDetails();
+	}
+	
 	
 	@Transactional
 	public void addPartecipant(StudySession studySession, String username){

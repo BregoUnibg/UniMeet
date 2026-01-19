@@ -1,4 +1,4 @@
-package local.unimeet.ui;
+package local.unimeet.ui.sessionview;
 
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.avatar.AvatarGroup.AvatarGroupItem;
@@ -164,7 +164,7 @@ public class SessionCard extends Div{
 		
 		//Keeping this as a sample
 		
-		this.setMaxWidth("1000px");
+		this.setWidth("1000px");
 		this.getStyle().set("background-color", "white");
 		
 		VerticalLayout card = new VerticalLayout();
@@ -182,9 +182,9 @@ public class SessionCard extends Div{
 		//Location
 		VerticalLayout left = new VerticalLayout();
 		//left.setSpacing(false);
-		Span university = new Span (studySession.getUniversity());
+		Span university = new Span (studySession.getUniversity().getName());
 		//university.getStyle().set("margin-bottom", "5px");
-		Span buildingAndRoom = new Span (studySession.getBuilding() + studySession.getRoom());
+		Span buildingAndRoom = new Span (studySession.getBuilding().getName() + studySession.getRoom().getNumber());
 		//buildingAndRoom.getStyle().set("margin-bottom", "5px");
 		Span address = new Span (studySession.getAddress());
 		
@@ -349,6 +349,12 @@ public class SessionCard extends Div{
 		
 	}
 	
+	/**
+	 * Return badge parameter to set color based how many seats are left 
+	 * @param members
+	 * @param max
+	 * @return
+	 */
 	private String costumBadgeColor(int members, int max) {
 		
 		if(members==max)

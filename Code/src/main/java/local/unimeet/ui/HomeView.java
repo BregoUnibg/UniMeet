@@ -26,6 +26,7 @@ import local.unimeet.entity.User;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.StudySessionService;
 import local.unimeet.service.UserService;
+import local.unimeet.ui.sessionview.SessionCard;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -114,8 +115,13 @@ public class HomeView extends VerticalLayout {
          
 
         //Just a test to see how cards look like
-        suggestedSessionContent.add(new SessionCard());
-        suggestedSessionContent.add(new SessionCard());
+        
+        for(StudySession ss: studySessionService.getAllStudySessions()) {
+        	
+        	suggestedSessionContent.add(new SessionCard(ss));         	
+        	
+        }
+        
         
         tabs.setWidthFull();
         tabs.addClassName(LumoUtility.Margin.Top.MEDIUM);
