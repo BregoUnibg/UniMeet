@@ -30,11 +30,11 @@ public class Room {
 	
 	private int number;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "building_id") //creates Foreign Key column
     private Building building;
 	
-	@OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<StudyTable> studyTables = new ArrayList<>();
 	
 	public Room(){
