@@ -26,7 +26,7 @@ public class StudyTable {
 	private int number;
 	private int capacity;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "room_id") //creates Foreign Key column
     private Room room;
 	

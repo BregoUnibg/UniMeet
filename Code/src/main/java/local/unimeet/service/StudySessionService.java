@@ -47,9 +47,15 @@ public class StudySessionService {
 		
 		studySession.addPartecipant(user);
 		
+		studySessionRepository.save(studySession);
 		
 	}
 	
+	public StudySession getStudySessionById(Long id) {
 		
+	    return studySessionRepository.findSessionWithDetailsById(id)
+	            .orElseThrow(() -> new RuntimeException("Session not found with id: " + id));
+	    
+	}	
 	
 }

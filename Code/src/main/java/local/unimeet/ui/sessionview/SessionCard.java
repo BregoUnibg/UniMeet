@@ -1,11 +1,15 @@
 package local.unimeet.ui.sessionview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.avatar.AvatarGroup.AvatarGroupItem;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,10 +19,22 @@ import local.unimeet.entity.CourseSubject;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
+import local.unimeet.security.SecurityService;
+import local.unimeet.service.StudySessionService;
+import local.unimeet.service.UserService;
 
 public class SessionCard extends Div{
 	
-	public SessionCard() {
+	private final SecurityService securityService;
+	private final UserService userService;
+	private final StudySessionService studySessionService;
+	private StudySession studySession;
+	
+	public SessionCard(SecurityService securityService, UserService userService, StudySessionService studySessionService) {
+		
+		this.studySessionService = studySessionService;
+		this.securityService = securityService;
+		this.userService = userService;
 		
 		//Keeping this as a sample
 		//MUST BE DELETED
@@ -119,6 +135,8 @@ public class SessionCard extends Div{
 	    joinButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 	    joinButton.setWidth("150px");
 	    
+	    
+	    
 	    avatarPartecipants.getStyle().set("margin-left", "16px");
 	    joinButton.getStyle().set("margin-left", "16px");
 	    
@@ -160,8 +178,14 @@ public class SessionCard extends Div{
 	}
 	
 	
-	public SessionCard(StudySession studySession) {
+	public SessionCard(Long studySessionId, SecurityService securityService, UserService userService, StudySessionService studySessionService) {
 		
+		this.securityService = securityService;
+		this.userService = userService;
+		this.studySessionService = studySessionService;
+		
+		this.studySession = this.studySessionService.getStudySessionById(studySessionId);
+
 		//Keeping this as a sample
 		
 		this.setWidth("1000px");
@@ -258,6 +282,44 @@ public class SessionCard extends Div{
 	    Button joinButton = new Button("join");
 	    joinButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 	    joinButton.setWidth("200px");
+	    
+	    //Join button logic
+	    
+	    String currentUsername =  this.securityService.getAuthenticatedUsername();
+	    ArrayList<User> studySessionPartecipants =  (ArrayList<User>) studySession.getPartecipantsAndOwner();
+	    
+	    boolean isAlreadyInSession = studySession.getPartecipantsAndOwner().stream()
+                .map(User::getUsername)
+                .anyMatch(name -> name.equals(currentUsername));
+	    
+	    if(isAlreadyInSession) {
+	    	this.lockDownButton(joinButton);
+	    }
+	    
+	    //Needs to be final not to break everything for some reason ??
+	    final int ii = i + 1;
+	    
+	    joinButton.addClickListener(event -> {
+	        try {
+	            studySessionService.addPartecipant(studySession, currentUsername);
+	            
+	            this.lockDownButton(joinButton);
+	            Notification.show("Joined successfully!");
+	            
+	            AvatarGroupItem newAvatar = new AvatarGroupItem(currentUsername);
+	            newAvatar.setColorIndex(ii); 
+	            avatarPartecipants.add(newAvatar);
+	            
+	            availableSeats.setText(studySession.getCountMembers() + "/6");
+	            availableSeats.getElement().getThemeList().add(costumBadgeColor(studySession.getCountMembers(), 6));
+	    		
+	            
+	        } catch (Exception e) {
+	            Notification.show("Error joining session: " + e.getMessage());
+	        }
+	    });
+	    
+	    
 	    
 	    avatarPartecipants.getStyle().set("margin-left", "16px");
 	    joinButton.getStyle().set("margin-left", "16px");
@@ -364,6 +426,16 @@ public class SessionCard extends Div{
 			return "badge warning";
 		
 		return "badge success";
+	}
+	
+	/**
+	 * Used to lock a button and visually make it seem locked
+	 * @param button
+	 */
+	private void lockDownButton(Button button) {
+		
+		button.setEnabled(false);
+		
 	}
 
 }

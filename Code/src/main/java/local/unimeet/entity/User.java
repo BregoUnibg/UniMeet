@@ -63,6 +63,11 @@ public class User {
 
 	    return username.equals(other.getUsername());
 	}
+	
+	@Override
+	public int hashCode() {
+	    return getClass().hashCode();
+	}
 
 }
 	

@@ -7,8 +7,8 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 
 import local.unimeet.entity.Building;
 import local.unimeet.entity.Room;
@@ -98,7 +98,7 @@ public class placeWizzard extends Dialog {
         });
 
         // Navigation: Back Button
-        Button backButton = new Button("Back", VaadinIcon.ARROW_LEFT.create(), e -> showUniversityStep());
+        Button backButton = new Button("Back", LumoIcon.ARROW_LEFT.create(), e -> showUniversityStep());
 
         contentLayout.add(title, subtitle, grid, backButton);
     }
@@ -120,7 +120,7 @@ public class placeWizzard extends Dialog {
         });
 
         // Navigation: Back Button
-        Button backButton = new Button("Back", VaadinIcon.ARROW_LEFT.create(), e -> showBuildingStep());
+        Button backButton = new Button("Back", LumoIcon.ARROW_LEFT.create(), e -> showBuildingStep());
 
         contentLayout.add(title, subtitle, grid, backButton);
     }
@@ -145,7 +145,7 @@ public class placeWizzard extends Dialog {
         });
 
         // Navigation: Back Button
-        Button backButton = new Button("Back", VaadinIcon.ARROW_LEFT.create(), e -> showRoomStep());
+        Button backButton = new Button("Back", LumoIcon.ARROW_LEFT.create(), e -> showRoomStep());
 
         contentLayout.add(title, subtitle, grid, backButton);
     }
