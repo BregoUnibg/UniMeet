@@ -25,6 +25,7 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import local.unimeet.ui.sessionview.SessionsView;
+import local.unimeet.ui.PersonalArea;
 
 public class MainLayout extends AppLayout {
 
