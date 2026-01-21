@@ -77,13 +77,7 @@ public class PersonalArea extends VerticalLayout {
 
 	private HorizontalLayout createAnagrafeSection(UserProfile profile) {
         // Immagine profilo (Placeholder)
-        /*Image profileImg = new Image("https://via.placeholder.com/150", "Foto profilo");
-        profileImg.setWidth("120px");
-        profileImg.setHeight("120px");
-        profileImg.getStyle().set("border", "2px solid #ccc");
-        profileImg.getStyle().set("border-radius", "8px");*/
-		
-		Image profileImg;
+        Image profileImg;
 
 		if (profile.getProfilePicture() != null) {
 		    // Se c'è una foto nel database, creiamo la risorsa dai byte
@@ -92,15 +86,15 @@ public class PersonalArea extends VerticalLayout {
 		    profileImg = new Image(resource, "Foto profilo");
 		} else {
 		    // Altrimenti usiamo il placeholder
-		    profileImg = new Image("https://via.placeholder.com/150", "Foto profilo");
+		    profileImg = new Image("images/default-avatar.jpeg", "Foto profilo predefinita");
 		}
 
-		profileImg.setWidth("120px");
+		profileImg.setWidth("100px");
         profileImg.setHeight("120px");
-		profileImg.setMaxWidth("120px");
-		profileImg.setMaxHeight("120px");
+        profileImg.getStyle().set("border-radius", "8px");
+        profileImg.getStyle().set("object-fit", "cover");
 		profileImg.getStyle().set("border", "2px solid #ccc");
-		profileImg.getStyle().set("border-radius", "8px");
+		
 
         VerticalLayout info = new VerticalLayout();
         info.setSpacing(false);
@@ -114,7 +108,8 @@ public class PersonalArea extends VerticalLayout {
         labelBio.setWidth("150px");
         labelBio.getStyle().set("font-weight", "bold");
         Span bio = new Span((profile.getBio() != null && !profile.getBio().isEmpty()) ? profile.getBio() : "Nessuna biografia inserita.");
-        bio.getStyle().set("white-space", "pre-wrap");
+        //bio.getStyle().set("white-space", "pre-wrap");
+        bio.setWidth("394px");
         info.add(new HorizontalLayout(labelBio, bio));
 
         // Reputazione

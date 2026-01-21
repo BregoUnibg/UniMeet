@@ -59,7 +59,9 @@ public class Delegate implements DelegationInterface {
 		Span l = new Span(label);
         l.setWidth("150px");
         l.getStyle().set("font-weight", "bold");
-        return new HorizontalLayout(l, value);
+        HorizontalLayout h = new HorizontalLayout(l, value);
+        h.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        return h;
 	}
 	
 }

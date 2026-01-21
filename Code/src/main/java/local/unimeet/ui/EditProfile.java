@@ -1,9 +1,16 @@
 package local.unimeet.ui;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -20,12 +27,14 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.dom.Style.AlignItems;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
@@ -154,50 +163,49 @@ public class EditProfile extends VerticalLayout {
         
         binder.readBean(currentProfile);
     }
+
+    // --- LOGICA DI SUPPORTO ---
     
     private HorizontalLayout createAnagrafeSection(UserProfile currentProfile) {
         // Immagine profilo (Placeholder)
-        /*Image profileImg = new Image("https://via.placeholder.com/150", "Foto profilo");
-        profileImg.setWidth("120px");
-        profileImg.setHeight("120px");
-        profileImg.getStyle().set("border", "2px solid #ccc");
-        profileImg.getStyle().set("border-radius", "8px");*/
-    	
-    	// Configura l'anteprima visiva
-    	avatarPreview.setWidth("120px");
+        // Configura l'anteprima visiva
+    	avatarPreview.setWidth("100px");
     	avatarPreview.setHeight("120px");
     	avatarPreview.getStyle().set("border-radius", "8px");
     	avatarPreview.getStyle().set("object-fit", "cover");
     	avatarPreview.getStyle().set("border", "2px solid #ccc");
     	
     	// Carica la foto esistente se presente, altrimenti placeholder
-    	if (currentProfile.getProfilePicture() != null) {
+    	if (currentProfile.getProfilePicture() != null&& currentProfile.getProfilePicture().length > 0) {
     	    updatePreview(currentProfile.getProfilePicture());
     	} else {
-    	    avatarPreview.setSrc("https://via.placeholder.com/150");
+    	    avatarPreview.setSrc("images/default-avatar.jpeg");
     	}
 
     	// Configura l'Upload
     	upload.setAcceptedFileTypes("image/jpeg", "image/png");
-    	upload.setMaxFileSize(1024 * 1024); // Limite 1MB
+    	upload.setMaxFileSize(5 * 1024 * 1024); // Limite 5MB
     	upload.setUploadButton(new Button("Carica nuova foto"));
+    	upload.setWidth("190px");
+    	upload.getStyle().setAlignItems(AlignItems.CENTER);
 
     	upload.addSucceededListener(event -> {
     	    try {
-    	        byte[] bytes = buffer.getInputStream().readAllBytes();
-    	        currentProfile.setProfilePicture(bytes); // Salviamo i byte nell'oggetto
-    	        updatePreview(bytes);             // Aggiorniamo l'anteprima
+    	        byte[] originalBytes = buffer.getInputStream().readAllBytes();
+    	        byte[] optimizedBytes = resizeImage(originalBytes);
+    	        currentProfile.setProfilePicture(optimizedBytes); // Salviamo i byte nell'oggetto
+    	        updatePreview(optimizedBytes); // Aggiorniamo l'anteprima
     	        Notification.show("Foto caricata correttamente!");
     	    } catch (IOException e) {
     	        Notification.show("Errore nel caricamento del file");
     	    }
     	});
     	
-    	removeImgBtn.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_TERTIARY);
+    	removeImgBtn.addThemeVariants(ButtonVariant.LUMO_ERROR);
     	removeImgBtn.addClickListener(e -> {
     		currentProfile.setProfilePicture(null);
-    	    avatarPreview.setSrc("https://via.placeholder.com/150");
-    	    Notification.show("Foto rimossa");
+    	    avatarPreview.setSrc("images/default-avatar.jpeg");
+    	    Notification.show("Foto rimossa. Verrà usata l'immagine predefinita.");
     	});
 
         VerticalLayout info = new VerticalLayout();
@@ -211,15 +219,20 @@ public class EditProfile extends VerticalLayout {
         Span labelBio = new Span("Bio: ");
         labelBio.setWidth("150px");
         labelBio.getStyle().set("font-weight", "bold");
-        info.add(new HorizontalLayout(labelBio, bio));
+        labelBio.getStyle().setPaddingTop("10px");
+        bio.setWidth("394px");
+        HorizontalLayout h = new HorizontalLayout(labelBio, bio);
+        //h.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        info.add(h);
 
         // Reputazione
         double reputetion = currentProfile.getReputation() != null ? currentProfile.getReputation().doubleValue() : 0;
         int totVoters = currentProfile.getTotVoters() != null ? currentProfile.getTotVoters().intValue() : 0;
         info.add(delegate.createDataRow("Reputazione: ", delegate.createReputationBar(reputetion, totVoters)));
 
-        //HorizontalLayout anagrafeLayout = new HorizontalLayout(profileImg, info);
         VerticalLayout imageLayout = new VerticalLayout(avatarPreview, upload, removeImgBtn);
+        imageLayout.setSpacing(true);
+        imageLayout.setPadding(false);
         imageLayout.setAlignItems(Alignment.CENTER);
         HorizontalLayout anagrafeLayout = new HorizontalLayout(imageLayout, info);
         anagrafeLayout.setAlignItems(Alignment.START);
@@ -255,7 +268,10 @@ public class EditProfile extends VerticalLayout {
         HorizontalLayout exams = new HorizontalLayout(passed, pending);
         exams.setWidthFull();
 
-        return new VerticalLayout(courses, exams);
+        VerticalLayout v = new VerticalLayout(courses, exams);
+        v.setPadding(false);
+        
+        return v;
     }
     
     private void configureMenu() {
@@ -374,8 +390,51 @@ public class EditProfile extends VerticalLayout {
         container.setPadding(false);
         return container;
     }
+    
+    private byte[] resizeImage(byte[] originalImage) {
+        try {
+            InputStream is = new ByteArrayInputStream(originalImage);
+            BufferedImage src = ImageIO.read(is);
+            if (src == null) return originalImage;
 
-    // --- LOGICA DI SUPPORTO ---
+            int targetWidth = 120;
+            int targetHeight = 120;
+
+            // Calcoliamo le proporzioni per il ritaglio (crop) centrale
+            int srcWidth = src.getWidth();
+            int srcHeight = src.getHeight();
+            int x = 0, y = 0, width = srcWidth, height = srcHeight;
+
+            if (srcWidth > srcHeight) {
+                width = srcHeight;
+                x = (srcWidth - srcHeight) / 2;
+            } else {
+                height = srcWidth;
+                y = (srcHeight - srcWidth) / 2;
+            }
+
+            // Ritagliamo il quadrato centrale
+            BufferedImage cropped = src.getSubimage(x, y, width, height);
+
+            // Scaliamo a 120x120
+            BufferedImage resized = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = resized.createGraphics();
+            
+            // Alta qualità di rendering
+            g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g2d.drawImage(cropped, 0, 0, targetWidth, targetHeight, null);
+            g2d.dispose();
+
+            // Convertiamo di nuovo in byte[]
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(resized, "jpg", baos);
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return originalImage;
+        }
+    }
     
     private void updatePreview(byte[] bytes) {
         StreamResource resource = new StreamResource("profile-pic", 
