@@ -13,3 +13,6 @@ Code/src/main/frontend/generated/
 Code/data/
 #macos
 .DS_Store
+
+.metadata/
+
