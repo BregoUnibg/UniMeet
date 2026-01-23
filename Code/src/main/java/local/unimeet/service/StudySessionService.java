@@ -47,9 +47,29 @@ public class StudySessionService {
 		
 		studySession.addPartecipant(user);
 		
+		studySessionRepository.save(studySession);
 		
 	}
 	
+	@Transactional
+	public void removePartecipant(StudySession studySession, String username) {
 		
+		User user = userService.getUserByUsername(username);
+		
+		if(!studySession.getPartecipants().contains(user) || studySession.getOwner().equals(user))
+			throw new IllegalArgumentException();
+		
+		studySession.removePartecipant(user);
+		
+		studySessionRepository.save(studySession);
+		
+	}
+	
+	public StudySession getStudySessionById(Long id) {
+		
+	    return studySessionRepository.findSessionWithDetailsById(id)
+	            .orElseThrow(() -> new RuntimeException("Session not found with id: " + id));
+	    
+	}	
 	
 }

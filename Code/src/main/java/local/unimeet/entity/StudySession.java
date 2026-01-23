@@ -29,7 +29,7 @@ public class StudySession {
 	private Long id;
 	
 	//Everything else is obtained by navigating backwords throught the hirarchy tree
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="study_table_id", nullable=false)
 	private StudyTable studyTable;
 	
@@ -46,7 +46,7 @@ public class StudySession {
 	
 	//!!!IMPORTANT!!!!!
 	//Doing tells the database to memorize the external key of the user since it's a separate entity
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="owner_username", nullable=false)
 	private User owner;
 	
@@ -56,6 +56,7 @@ public class StudySession {
 	//session ids and usernames as it is standsrd to handle many to many realations this way
 	//The join table in question is called session_partecipants
 	@ManyToMany(fetch = FetchType.EAGER)
+
 	@JoinTable(
 			  name = "session_participants", 
 			  joinColumns = @JoinColumn(name = "session_id"), 
@@ -155,6 +156,21 @@ public class StudySession {
 	
 	public List<User> getPartecipants() {
 		return partecipants;
+	}
+	
+	public List<User> getPartecipantsAndOwner() {
+		
+		List<User> everybody = new ArrayList<>();
+	    
+	    if (owner != null) {
+	        everybody.add(owner);
+	    }
+	    	   
+	    if (partecipants != null) {
+	        everybody.addAll(partecipants);
+	    }
+	    
+	    return everybody;
 	}
 	
 	public void addPartecipant(User partecipant) {

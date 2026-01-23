@@ -10,6 +10,8 @@ public class User {
 	private String username;
 	private String password;
 	private Role role;
+	@OneToOne(mappedBy = "user")
+    private UserProfile profile;
 	
 	
 	//Empty constructor required by Jpa for every entity in order to create objects
@@ -49,7 +51,17 @@ public class User {
 		this.role = role;
 	}
 	
-	
+	public UserProfile getProfile() {
+		return profile;
+	}
+
+	public void setProfile(UserProfile profile) {
+	    this.profile = profile;
+	    if (profile != null && profile.getUser() != this) {
+	        profile.setUser(this);
+	    }
+	}
+
 	@Override
 	public boolean equals(Object o) {
 	    if (this == o) {
@@ -62,6 +74,11 @@ public class User {
 	    User other = (User) o;
 
 	    return username.equals(other.getUsername());
+	}
+	
+	@Override
+	public int hashCode() {
+	    return getClass().hashCode();
 	}
 
 }

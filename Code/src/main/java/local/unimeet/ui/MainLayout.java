@@ -1,5 +1,8 @@
 package local.unimeet.ui;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -16,14 +19,13 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import local.unimeet.ui.sessionview.SessionsView;
-
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import local.unimeet.ui.PersonalArea;
 
 public class MainLayout extends AppLayout {
 
@@ -116,14 +118,15 @@ public class MainLayout extends AppLayout {
         if (username == null) username = "Studente";
         Avatar avatar = new Avatar(username);
         avatar.addThemeName("xsmall");
-        avatar.getStyle().set("background-color", "white").set("color", "#0f172a"); 
+        avatar.getStyle().set("background-color", "white").set("color", "#0f172a");
         
-        Span nameSpan = new Span(username);
-        nameSpan.addClassNames(LumoUtility.FontWeight.BOLD, LumoUtility.FontSize.SMALL); nameSpan.getStyle().set("color", "white");
+        RouterLink nameLink = new RouterLink(username, PersonalArea.class);
+        nameLink.addClassNames(LumoUtility.FontWeight.BOLD, LumoUtility.FontSize.SMALL); nameLink.getStyle().set("color", "white");
+        
         Span emailSpan = new Span(username + "@uni.it");
         emailSpan.addClassNames(LumoUtility.FontSize.XSMALL); emailSpan.getStyle().set("color", "#e2e8f0"); 
 
-        VerticalLayout userInfo = new VerticalLayout(nameSpan, emailSpan);
+        VerticalLayout userInfo = new VerticalLayout(nameLink, emailSpan);
         userInfo.setSpacing(false); userInfo.setPadding(false);
         
         Button logoutBtn = new Button(VaadinIcon.SIGN_OUT.create());

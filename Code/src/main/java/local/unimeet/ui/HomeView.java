@@ -109,7 +109,7 @@ public class HomeView extends VerticalLayout {
         
         for(StudySession ss: currentOwnerSessions) {
         	
-        	mySessionContent.add(new SessionCard(ss));         	
+        	mySessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService));         	
         	
         }
          
@@ -118,7 +118,7 @@ public class HomeView extends VerticalLayout {
         
         for(StudySession ss: studySessionService.getAllStudySessions()) {
         	
-        	suggestedSessionContent.add(new SessionCard(ss));         	
+        	suggestedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService));         	
         	
         }
         

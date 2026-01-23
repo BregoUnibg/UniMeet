@@ -1,11 +1,15 @@
 package local.unimeet.ui.sessionview;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.vaadin.flow.component.avatar.AvatarGroup;
 import com.vaadin.flow.component.avatar.AvatarGroup.AvatarGroupItem;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,10 +19,22 @@ import local.unimeet.entity.CourseSubject;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
+import local.unimeet.security.SecurityService;
+import local.unimeet.service.StudySessionService;
+import local.unimeet.service.UserService;
 
 public class SessionCard extends Div{
 	
-	public SessionCard() {
+	private final SecurityService securityService;
+	private final UserService userService;
+	private final StudySessionService studySessionService;
+	private StudySession studySession;
+	
+	public SessionCard(SecurityService securityService, UserService userService, StudySessionService studySessionService) {
+		
+		this.studySessionService = studySessionService;
+		this.securityService = securityService;
+		this.userService = userService;
 		
 		//Keeping this as a sample
 		//MUST BE DELETED
@@ -115,9 +131,12 @@ public class SessionCard extends Div{
 		 * */
 		
 		
+	    //Dual Button logic - once I click join I can click leave and vice versa
+	    
 	    Button joinButton = new Button("join");
 	    joinButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 	    joinButton.setWidth("150px");
+	    
 	    
 	    avatarPartecipants.getStyle().set("margin-left", "16px");
 	    joinButton.getStyle().set("margin-left", "16px");
@@ -160,8 +179,14 @@ public class SessionCard extends Div{
 	}
 	
 	
-	public SessionCard(StudySession studySession) {
+	public SessionCard(Long studySessionId, SecurityService securityService, UserService userService, StudySessionService studySessionService) {
 		
+		this.securityService = securityService;
+		this.userService = userService;
+		this.studySessionService = studySessionService;
+		
+		this.studySession = this.studySessionService.getStudySessionById(studySessionId);
+
 		//Keeping this as a sample
 		
 		this.setWidth("1000px");
@@ -247,17 +272,124 @@ public class SessionCard extends Div{
 	    
 	    int i = 2;
 	    
+	    AvatarGroupItem myAvatar = null;
+	    
 	    for (User partecipant: studySession.getPartecipants()) {
 		    String name = partecipant.getUsername();
 		    AvatarGroupItem a = new AvatarGroupItem(name);
 		    a.setColorIndex(i++);
 		    avatarPartecipants.add(a);
+		    
+		    if(this.securityService.getAuthenticatedUsername().equals(partecipant.getUsername())){
+		    	myAvatar = a;
+		    }
+		    
 		}
 	    
 	    
+	    Div buttonWrapper = new Div();
+	    buttonWrapper.setWidth("200px");
+	    
 	    Button joinButton = new Button("join");
 	    joinButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-	    joinButton.setWidth("200px");
+	    joinButton.setWidth("100%");
+	    joinButton.getStyle().set("margin-inline", "0px");
+	    
+	    Button leaveButton = new Button("leave");
+	    leaveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+	    leaveButton.setWidth("100%");
+	    
+	    buttonWrapper.add(joinButton, leaveButton);
+	    
+	    
+	    //Both bust exists but I just render the right one, opnly way to make it owrk in vaadin or html in general it seems
+	    joinButton.setVisible(true);
+	    leaveButton.setVisible(false);
+	    
+	    //Join button logic
+	    
+	    String currentUsername =  this.securityService.getAuthenticatedUsername();
+	    ArrayList<User> studySessionPartecipants =  (ArrayList<User>) studySession.getPartecipantsAndOwner();
+	    
+	    boolean isAlreadyInSession = false;
+	    
+	    //Set button as unavailable is i'm the owner
+	    if(studySession.getOwner().getUsername().equals(currentUsername)) {
+	    		joinButton.setEnabled(false);
+	    		joinButton.setText("Owned");
+	    		joinButton.getStyle().setBackground("Gray");
+	    		leaveButton.setEnabled(false);
+	    		leaveButton.setText("Owned");
+	    		leaveButton.getStyle().setBackground("Gray");
+	    		
+	    }
+
+	    //Can't use equals or contains because of hybernate lazy exception
+	    for(User u: studySessionPartecipants) {
+	    	if(u.getUsername().equals(currentUsername)) {
+	    		isAlreadyInSession = true;
+	    	}
+	    }
+	    
+	    if(isAlreadyInSession){
+	    	joinButton.setVisible(false);
+		    leaveButton.setVisible(true);
+	    }
+	    
+	    //Needs to be final not to break everything for some reason ??
+	    final int ii = i + 1;
+	    
+	    
+	    if(myAvatar == null) {
+	    	myAvatar = new AvatarGroupItem(currentUsername);
+	    	myAvatar.setColorIndex(ii); 
+	    }
+	    
+	    
+	    final AvatarGroupItem myAvatarWrapper = myAvatar;
+	    
+	    joinButton.addClickListener(event -> {
+	        try {
+	            studySessionService.addPartecipant(studySession, currentUsername);
+	            
+	            joinButton.setVisible(false);
+			    leaveButton.setVisible(true);
+	            Notification.show("Joined successfully!");
+	            
+
+	            avatarPartecipants.add(myAvatarWrapper);
+	            
+	            availableSeats.setText(studySession.getCountMembers() + "/6");
+	            availableSeats.getElement().getThemeList().clear();
+	            availableSeats.getElement().getThemeList().add(costumBadgeColor(studySession.getCountMembers(), 6));
+	    		
+	            
+	        } catch (Exception e) {
+	            Notification.show("Error joining session: " + e.getMessage());
+	        }
+	    });
+	    
+	    
+	    leaveButton.addClickListener(event -> {
+	        try {
+	            studySessionService.removePartecipant(studySession, currentUsername);
+	            
+	            joinButton.setVisible(true);
+			    leaveButton.setVisible(false);
+	            Notification.show("Left successfully!");
+	            
+	            avatarPartecipants.remove(myAvatarWrapper);
+	            
+	            availableSeats.setText(studySession.getCountMembers() + "/6");
+	            availableSeats.getElement().getThemeList().clear();
+	            availableSeats.getElement().getThemeList().add(costumBadgeColor(studySession.getCountMembers(), 6));
+	    		
+	            
+	        } catch (Exception e) {
+	            Notification.show("Error joining session: " + e.getMessage());
+	        }
+	    });
+	    
 	    
 	    avatarPartecipants.getStyle().set("margin-left", "16px");
 	    joinButton.getStyle().set("margin-left", "16px");
@@ -275,7 +407,7 @@ public class SessionCard extends Div{
 	    bottomMaskRight.setPadding(false);
 	    
 	    bottomMaskLeft.add(avatarPartecipants);
-	    bottomMaskRight.add(joinButton);
+	    bottomMaskRight.add(buttonWrapper);
 	    
 	    bottom.add(bottomMaskLeft, bottomMaskCenter, bottomMaskRight);
 	    
