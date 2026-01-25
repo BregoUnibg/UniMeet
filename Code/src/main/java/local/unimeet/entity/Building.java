@@ -26,7 +26,7 @@ public class Building {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	
 	private String name;
 	private String address;
@@ -41,9 +41,13 @@ public class Building {
 	public Building(){
 	}
 		
-	public long getId() {
-		return id;
-	}
+	public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
 	public void setUniversity(University university) {
 		this.university = university;

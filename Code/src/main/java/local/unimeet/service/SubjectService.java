@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class SubjectService {
 
 	public Collection<String> getCoursesByLevel(String selectedLevel) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
     

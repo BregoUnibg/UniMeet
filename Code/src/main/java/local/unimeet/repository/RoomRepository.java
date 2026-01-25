@@ -2,19 +2,20 @@ package local.unimeet.repository;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import local.unimeet.entity.Building;
 import local.unimeet.entity.Room;
+import local.unimeet.entity.University;
 
 @Repository
-public interface RoomRepository extends JpaRepository<Room, Long>{
+public interface RoomRepository extends JpaRepository<Room, Long> {
 
-	Optional<Room> findByNumberAndBuilding(int number, Building building);
-	
-	List<Room> findByBuildingId(long buildingId);
+    // Cerca duplicati per Numero
+    Optional<Room> findByNumberAndBuilding(int number, Building building);
+    
+    List<Room> findByBuilding_Id(long buildingId);
+
+    // fatto per il Rettore: trova aule filtrando per Università
+    List<Room> findByBuilding_University(University university);
 }
-
-

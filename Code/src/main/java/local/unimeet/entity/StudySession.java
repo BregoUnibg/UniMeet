@@ -1,24 +1,11 @@
 package local.unimeet.entity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "study_session")
@@ -28,13 +15,18 @@ public class StudySession {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	//Everything else is obtained by navigating backwords throught the hirarchy tree
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="study_table_id", nullable=false)
 	private StudyTable studyTable;
 	
+	@Enumerated(EnumType.STRING)
 	private SessionType type;
-	private CourseSubject subject;
+
+    // MODIFICA: Aggiunto EAGER per poter leggere il nome del corso nella Card
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "study_course_id")
+    private StudyCourse course;
+	
 	private String description;
 	
 	@Column(nullable=false)
@@ -44,139 +36,62 @@ public class StudySession {
 	@Column(nullable=false)
 	private LocalTime timeEnd;
 	
-	//!!!IMPORTANT!!!!!
-	//Doing tells the database to memorize the external key of the user since it's a separate entity
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="owner_username", nullable=false)
 	private User owner;
 	
-	
-	//!!!!!IMPORTANT!!!!!!
-	//This creates a separate tablble in the database that contains
-	//session ids and usernames as it is standsrd to handle many to many realations this way
-	//The join table in question is called session_partecipants
 	@ManyToMany(fetch = FetchType.EAGER)
-
 	@JoinTable(
 			  name = "session_participants", 
 			  joinColumns = @JoinColumn(name = "session_id"), 
 			  inverseJoinColumns = @JoinColumn(name = "username"))	
 	private List <User> partecipants;
 	
-	
-	//Empty construvtor needed by JPA
-	public StudySession() {
-	}
+	public StudySession() {}
 
-	
-	public StudyTable getStudyTable() {
-		return studyTable;
-	}
+    public StudyCourse getCourse() { return course; }
+    public void setCourse(StudyCourse course) { this.course = course; }
 
-	public void setStudyTable(StudyTable studyTable) {
-		this.studyTable = studyTable;
-	}
+	public StudyTable getStudyTable() { return studyTable; }
+	public void setStudyTable(StudyTable studyTable) { this.studyTable = studyTable; }
 
+   
+	public University getUniversity() { return this.getBuilding().getUniversity(); }
+	public Building getBuilding() { return this.getRoom().getBuilding(); }
+	public Room getRoom() { return this.studyTable.getRoom(); }
+	public String getAddress() { return this.getBuilding().getAddress(); }
 
-	public University getUniversity() {
-		return this.getBuilding().getUniversity();
-	}
+	public SessionType getType() { return type; }
+	public void setType(SessionType type) { this.type = type; }
 	
-	public Building getBuilding() {
-		return this.getRoom().getBuilding();
-	}
+	public String getDescription() { return description; }
+	public void setDescription(String description) { this.description = description; }
 	
-	public Room getRoom() {
-		return this.studyTable.getRoom();
-	}
+	public LocalDate getDate() { return date; }
+	public void setDate(LocalDate date) { this.date = date; }
 	
-	public String getAddress() {
-		return this.getBuilding().getAddress();
-	}
-
-	public SessionType getType() {
-		return type;
-	}
+	public LocalTime getTimeStart() { return timeStart; }
+	public void setTimeStart(LocalTime timeStart) { this.timeStart = timeStart; }
 	
-	public void setType(SessionType type) {
-		this.type = type;
-	}
+	public LocalTime getTimeEnd() { return timeEnd; }
+	public void setTimeEnd(LocalTime timeEnd) { this.timeEnd = timeEnd; }
 	
-	public CourseSubject getSubject() {
-		return subject;
-	}
+	public User getOwner() { return owner; }
+	public void setOwner(User owner) { this.owner = owner; }
 	
-	public void setSubject(CourseSubject subject) {
-		this.subject = subject;
-	}
+	public Long getId() { return id; }
 	
-	public String getDescription() {
-		return description;
-	}
-	
-	public void setDescription(String description) {
-		this.description = description;
-	}
-	
-	public LocalDate getDate() {
-		return date;
-	}
-	
-	public void setDate(LocalDate date) {
-		this.date = date;
-	}
-	
-	public LocalTime getTimeStart() {
-		return timeStart;
-	}
-	
-	public void setTimeStart(LocalTime timeStart) {
-		this.timeStart = timeStart;
-	}
-	
-	public LocalTime getTimeEnd() {
-		return timeEnd;
-	}
-	
-	public void setTimeEnd(LocalTime timeEnd) {
-		this.timeEnd = timeEnd;
-	}
-	
-	public User getOwner() {
-		return owner;
-	}
-	
-	public void setOwner(User owner) {
-		this.owner = owner;
-	}
-	
-	public Long getId() {
-		return id;
-	}
-	
-	public List<User> getPartecipants() {
-		return partecipants;
-	}
+	public List<User> getPartecipants() { return partecipants; }
 	
 	public List<User> getPartecipantsAndOwner() {
-		
 		List<User> everybody = new ArrayList<>();
-	    
-	    if (owner != null) {
-	        everybody.add(owner);
-	    }
-	    	   
-	    if (partecipants != null) {
-	        everybody.addAll(partecipants);
-	    }
-	    
+	    if (owner != null) everybody.add(owner);
+	    if (partecipants != null) everybody.addAll(partecipants);
 	    return everybody;
 	}
 	
 	public void addPartecipant(User partecipant) {
-		if(this.partecipants == null)
-			this.partecipants = new ArrayList <User>();
-		
+		if(this.partecipants == null) this.partecipants = new ArrayList <User>();
 		this.partecipants.add(partecipant);
 	}
 	
@@ -185,7 +100,7 @@ public class StudySession {
 	}
 	
 	public int getCountMembers(){
+        if(this.partecipants == null) return 1; 
 		return this.partecipants.size() + 1;
 	}
-
 }

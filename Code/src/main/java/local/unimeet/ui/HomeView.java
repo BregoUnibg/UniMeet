@@ -55,7 +55,7 @@ public class HomeView extends VerticalLayout {
         setPadding(true); 
         setSpacing(true);
 
-        // Banner Premium
+       
         add(createPremiumBanner());
 
         VerticalLayout mainContent = new VerticalLayout();

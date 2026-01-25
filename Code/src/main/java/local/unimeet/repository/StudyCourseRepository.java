@@ -8,11 +8,14 @@ import org.springframework.stereotype.Repository;
 import local.unimeet.entity.DegreeType;
 import local.unimeet.entity.Department;
 import local.unimeet.entity.StudyCourse;
+import local.unimeet.entity.University;
 
 @Repository
 public interface StudyCourseRepository extends JpaRepository<StudyCourse, Long> {
-    // Filtra i corsi in base al dipartimento scelto
-    List<StudyCourse> findByDepartment(Department department);
+	List<StudyCourse> findByDepartment(Department department);
 
-	List<StudyCourse> findByDegreeType(DegreeType degreeType);
+    List<StudyCourse> findByDepartment_University(University university);
+
+   
+    List<StudyCourse> findByDegreeType(DegreeType degreeType);
 }

@@ -2,78 +2,45 @@ package local.unimeet.entity;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import jakarta.persistence.*;
 
 @Entity
-@Table(	name = "room",
-		uniqueConstraints = {
-		@UniqueConstraint(
-		columnNames = {"number", "building_id"}) 
-}
-)
+@Table(name = "room", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"number", "building_id"}) 
+})
 public class Room {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	
-	private int number;
-	
-	@ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "building_id") //creates Foreign Key column
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private int number; // SIAMO TORNATI A INT
+    private int capacity; 
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "building_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) 
     private Building building;
-	
-	@OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-	private List<StudyTable> studyTables = new ArrayList<>();
-	
-	public Room(){
-	}
-	
-	public long getId() {
-		return id;
-	}
+    
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<StudyTable> studyTables = new ArrayList<>();
+    
+    public Room() {}
 
-	public void setBuilding(Building building){
-		this.building = building;
-	}
-	
-	public Building getBuilding() {
-		return building;
-	}
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public void addStudyTable(StudyTable studyTable) {
-		studyTables.add(studyTable);
-		studyTable.setRoom(this);
-	}
-	
-	public void removeStudyTable(StudyTable studyTable) {
-		studyTables.remove(studyTable);
-		studyTable.setRoom(null);
-	}
+    public int getNumber() { return number; }
+    public void setNumber(int number) { this.number = number; }
 
-	public int getNumber() {
-		return number;
-	}
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
 
-	public void setNumber(int number) {
-		this.number = number;
-	}
+    public Building getBuilding() { return building; }
+    public void setBuilding(Building building) { this.building = building; }
 
-	public List<StudyTable> getStudyTables() {
-		return studyTables;
-	}
-	
-	
-	
+    public List<StudyTable> getStudyTables() { return studyTables; }
+    public void setStudyTables(List<StudyTable> studyTables) { this.studyTables = studyTables; }
 }

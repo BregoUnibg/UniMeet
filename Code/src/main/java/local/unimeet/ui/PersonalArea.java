@@ -35,13 +35,13 @@ public class PersonalArea extends VerticalLayout {
     public PersonalArea(ProfileService profileService, UserRepository userRepository, DelegationInterface delegate) {
     	this.delegate = delegate;
     	
-        // Impostazioni generali della pagina
+       
         setSpacing(true);
         setPadding(true);
-        setMaxWidth("800px"); // Teniamo il contenuto centrato e leggibile
+        setMaxWidth("800px"); 
         getElement().getStyle().set("margin", "auto");
         
-        // RECUPERO DATI
+       
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findById(username)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato"));
@@ -49,22 +49,22 @@ public class PersonalArea extends VerticalLayout {
         
         add(new H2("Area personale"));
 
-        // --- SEZIONE ANAGRAFE ---
+     
         add(createAnagrafeSection(profile));
 
-        add(new Hr()); // Linea di separazione
+        add(new Hr()); 
 
-        // --- SEZIONE PERCORSO DI STUDIO ---
+       
         add(new H3("PERCORSO DI STUDIO"));
         add(createStudyPathSection(profile));
 
         add(new Hr());
 
-        // --- SEZIONE CARRIERA (Corsi e Esami) ---
+        // SEZIONE CARRIERA (Corsi e Esami) 
         add(new H3("CARRIERA"));
         add(createCareerSection(profile));
 
-        // --- BOTTONE MODIFICA ---
+      
         Button editButton = new Button("Modifica profilo", e -> getUI().ifPresent(ui -> ui.navigate(EditProfile.class)));
         editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         editButton.getStyle().set("margin-top", "2em");
@@ -76,11 +76,11 @@ public class PersonalArea extends VerticalLayout {
     }
 
 	private HorizontalLayout createAnagrafeSection(UserProfile profile) {
-        // Immagine profilo (Placeholder)
+       
         Image profileImg;
 
 		if (profile.getProfilePicture() != null) {
-		    // Se c'è una foto nel database, creiamo la risorsa dai byte
+		   
 		    StreamResource resource = new StreamResource("profile-pic",
 		            () -> new ByteArrayInputStream(profile.getProfilePicture()));
 		    profileImg = new Image(resource, "Foto profilo");
@@ -108,7 +108,7 @@ public class PersonalArea extends VerticalLayout {
         labelBio.setWidth("150px");
         labelBio.getStyle().set("font-weight", "bold");
         Span bio = new Span((profile.getBio() != null && !profile.getBio().isEmpty()) ? profile.getBio() : "Nessuna biografia inserita.");
-        //bio.getStyle().set("white-space", "pre-wrap");
+        
         bio.setWidth("394px");
         info.add(new HorizontalLayout(labelBio, bio));
 
@@ -186,14 +186,14 @@ public class PersonalArea extends VerticalLayout {
         list.forEach(subject -> 
         	container.add(new Span("• " + subject.getName())));
         
-        container.setSpacing(false); // Avvicina il titolo alla lista
+        container.setSpacing(false);
         container.setPadding(false);
         return container;
     }
     
     private VerticalLayout createLabeledList(String title, String s) {
     	VerticalLayout container = new VerticalLayout(spanBold(title), new Span(s));
-        container.setSpacing(false); // Avvicina il titolo alla lista
+        container.setSpacing(false); 
         container.setPadding(false);
         return container;
     }

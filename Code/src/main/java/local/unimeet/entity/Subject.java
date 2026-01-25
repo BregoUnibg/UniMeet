@@ -14,11 +14,11 @@ public class Subject {
     @Column(nullable = false)
     private String name;
 
-    // L'anno in cui viene erogata la materia (1, 2, 3, 4, 5)
+   
     @Column(nullable = false)
     private Integer studyYear;
 
-    // Relazione: Molte materie appartengono a un Corso di Laurea
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "study_course_id", nullable = false)
     private StudyCourse studyCourse;
@@ -30,7 +30,7 @@ public class Subject {
         this.studyCourse = studyCourse;
     }
 
-    // GETTER E SETTER
+   
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

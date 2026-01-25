@@ -9,52 +9,38 @@ public class User {
 	@Id
 	private String username;
 	private String password;
+	
+    @Enumerated(EnumType.STRING)
 	private Role role;
+    
 	@OneToOne(mappedBy = "user")
     private UserProfile profile;
 	
+    // EAGER è stato messo per  caricare l'università subito, evitando il crash al login perche non so perchè quando mi loggavo come 
+	//admin e poi tornavo a studente mi dava un eccezione hybernate e non mi offriva la session view la home tutto 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "university_name") 
+    private University university;
 	
-	//Empty constructor required by Jpa for every entity in order to create objects
-	public User() {
-	}
+	public User() {}
 	
 	public User(String username, String password, Role role) {
-		
 		this.username = username;
 		this.password = password;
 		this.role = role;
-		
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
 	
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
+	public String getUsername() { return username; }
+	public void setUsername(String username) { this.username = username; }
 	
-	public Role getRole() {
-		return this.role;
-	}
+	public String getPassword() { return password; }
+	public void setPassword(String password) { this.password = password; }
 	
-	public void setRole(Role role){
-		this.role = role;
-	}
+	public Role getRole() { return this.role; }
+	public void setRole(Role role){ this.role = role; }
 	
-	public UserProfile getProfile() {
-		return profile;
-	}
-
+	public UserProfile getProfile() { return profile; }
 	public void setProfile(UserProfile profile) {
 	    this.profile = profile;
 	    if (profile != null && profile.getUser() != this) {
@@ -62,17 +48,14 @@ public class User {
 	    }
 	}
 
+    public University getUniversity() { return university; }
+    public void setUniversity(University university) { this.university = university; }
+
 	@Override
 	public boolean equals(Object o) {
-	    if (this == o) {
-	        return true;
-	    }
-	    if (!(o instanceof User)) { 
-	        return false;
-	    }
-
+	    if (this == o) return true;
+	    if (!(o instanceof User)) return false;
 	    User other = (User) o;
-
 	    return username.equals(other.getUsername());
 	}
 	
@@ -80,6 +63,4 @@ public class User {
 	public int hashCode() {
 	    return getClass().hashCode();
 	}
-
 }
-	

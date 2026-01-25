@@ -1,6 +1,8 @@
 package local.unimeet.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import java.util.Objects;
 
 @Entity
@@ -17,6 +19,7 @@ public class Department {
     // Relazione: Molti dipartimenti appartengono a una Università
     @ManyToOne
     @JoinColumn(name = "university_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) //nSe cancelli l'Uni, cancelli i dipartimenti
     private University university;
 
     public Department() {}
@@ -26,7 +29,7 @@ public class Department {
         this.university = university;
     }
 
-    // GETTER E SETTER
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

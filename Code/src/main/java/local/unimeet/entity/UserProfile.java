@@ -17,7 +17,7 @@ public class UserProfile {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // --- SEZIONE ANAGRAFE ---
+    // anagrafe
     @Lob
     @Column(name = "profile_picture", columnDefinition = "BLOB")
     private byte[] profilePicture;
@@ -32,7 +32,7 @@ public class UserProfile {
     private Double reputation;
     private Integer totVoters;
 
-    // --- SEZIONE PERCORSO DI STUDIO ---
+    // percorso di studio 
     @ManyToOne
     private University university;
 
@@ -47,7 +47,7 @@ public class UserProfile {
 
     private Integer studyYear;
 
-    // --- SEZIONE CARRIERA ---
+    // carrirera
     // Usiamo ManyToMany perché molti studenti possono avere la stessa materia preferita
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "profile_preferred_courses")
@@ -68,7 +68,7 @@ public class UserProfile {
     // Costruttore vuoto obbligatorio
     public UserProfile() {}
 
-    // --- GETTER E SETTER ---
+   
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
@@ -132,8 +132,7 @@ public class UserProfile {
     	return s.substring(0, 1).toUpperCase()+s.substring(1).replace(" ", "").replace("_", " ").toLowerCase();
     }
     
-    // --- EQUALS E HASHCODE ---
-    // Fondamentali per il confronto degli oggetti nel Binder di Vaadin
+   
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

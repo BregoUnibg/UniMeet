@@ -13,9 +13,7 @@ import local.unimeet.entity.Role;
 import local.unimeet.entity.User;
 import local.unimeet.service.UserService;
 
-// --- MODIFICA QUI ---
-// Cambia da "" a "users" (o "admin")
-// Così non va in conflitto con la HomeView
+
 @Route(value = "users", layout = MainLayout.class) 
 @PageTitle("Gestione Utenti")
 @PermitAll

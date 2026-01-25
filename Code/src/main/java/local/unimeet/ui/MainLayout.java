@@ -1,6 +1,7 @@
 package local.unimeet.ui;
 
-import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.Optional;
+
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
 import com.vaadin.flow.component.UI;
@@ -24,54 +25,51 @@ import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
+import local.unimeet.entity.Role;
+import local.unimeet.entity.User;
+import local.unimeet.security.SecurityService;
 import local.unimeet.ui.sessionview.SessionsView;
-import local.unimeet.ui.PersonalArea;
 
 public class MainLayout extends AppLayout {
 
-    public MainLayout() {
-    	
-    	//Makes left navbar domnant over header
-    	setPrimarySection(Section.DRAWER);
-    	
-    	createDrawer();
+    private final SecurityService securityService;
+
+    public MainLayout(SecurityService securityService) {
+        this.securityService = securityService;
+
+        setPrimarySection(Section.DRAWER);
+        createDrawer();
         createHeader();
         getElement().getThemeList().add("no-border");
     }
 
-    //create the header when are sitated the bell the aeroplano and the tre liniette for opening and closing the left column
-     
     private void createHeader() {
         DrawerToggle toggle = new DrawerToggle();
         Div spacer = new Div();
         spacer.setWidthFull();
         
-        // Bell Icon
         Button notificationBtn = new Button(LumoIcon.BELL.create());
         notificationBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
         notificationBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
 
         addToNavbar(toggle, spacer, notificationBtn);
-        
-        
     }
 
-    //create the icon where the user can navigate and do the various activity offered by the app 
-    
     private void createDrawer() {
         VerticalLayout drawerContent = new VerticalLayout();
         drawerContent.setSizeFull(); 
         drawerContent.setPadding(false); 
         drawerContent.setSpacing(false);
+        
+     
         drawerContent.getStyle().set("background-color", "#0f172a").set("color", "white");
         drawerContent.getElement().getThemeList().add("dark");
         
-        //New drawer to will with elements which will have padding in contrast to the footer
+       
         VerticalLayout drawerTopContent = new VerticalLayout();
         drawerTopContent.setSizeFull(); 
         drawerTopContent.setWidthFull();
         drawerTopContent.setSpacing(false);
-        
         
         Icon capIcon = VaadinIcon.ACADEMY_CAP.create();
         capIcon.setSize("32px"); capIcon.setColor("white");
@@ -83,24 +81,44 @@ public class MainLayout extends AppLayout {
         branding.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         branding.setPadding(true); branding.setSpacing(true); branding.addClassName(LumoUtility.Margin.Bottom.MEDIUM);
 
+       
         SideNav nav = new SideNav();
         
+        Optional<User> maybeUser = securityService.getAuthenticatedUser();
         
-        SideNavItem navHome = new SideNavItem("Home", HomeView.class, VaadinIcon.HOME.create());
-        SideNavItem navUsersManagment = new SideNavItem("Users Managment", UsersView.class, VaadinIcon.USERS.create());
-        SideNavItem navSessions = new SideNavItem("My Sessions", SessionsView.class, VaadinIcon.BOOK.create());
-        
-        nav.addItem(navHome);
-        nav.addItem(navUsersManagment);
-        nav.addItem(navSessions); 
-        
-        
+        if (maybeUser.isPresent()) {
+            User user = maybeUser.get();
+            
+            // =========================================================
+            //  SEZIONE ADMIN / RETTORE
+            // =========================================================
+            if (user.getRole() == Role.ADMIN || user.getRole() == Role.UNI_ADMIN) {
+                
+                nav.addItem(new SideNavItem("Dashboard", AdminHomeView.class, VaadinIcon.DASHBOARD.create()));
+
+                nav.addItem(new SideNavItem("Gestione Edifici", AdminBuildingsView.class, VaadinIcon.BUILDING.create()));
+                
+                nav.addItem(new SideNavItem("Gestione Aule", AdminRoomsView.class, VaadinIcon.KEY.create()));
+
+                nav.addItem(new SideNavItem("Gestione Tavoli", AdminTablesView.class, VaadinIcon.TABLE.create()));
+
+                
+                nav.addItem(new SideNavItem("Gestione Corsi", AdminCoursesView.class, VaadinIcon.ACADEMY_CAP.create()));
+
+            } 
+            // =========================================================
+            //  SEZIONE STUDENTE
+            // =========================================================
+            else {
+                nav.addItem(new SideNavItem("Home", HomeView.class, VaadinIcon.HOME.create()));
+                nav.addItem(new SideNavItem("My Sessions", SessionsView.class, VaadinIcon.BOOK.create()));
+                
+            }
+        }
+
         Div navWrapper = new Div(nav);
-        
-        //Needeed to fill up the navbar and make Items width same size as the navbar
         navWrapper.addClassName(LumoUtility.Padding.Horizontal.MEDIUM);
-        navWrapper.getStyle().set("padding", "0");
-        navWrapper.getStyle().set("border", "0");        
+        navWrapper.getStyle().set("padding", "0").set("border", "0");        
         navWrapper.setWidthFull();
 
         HorizontalLayout footer = createUserProfileFooter();
@@ -111,20 +129,21 @@ public class MainLayout extends AppLayout {
         addToDrawer(drawerContent);
     }
 
-    //create the avatar and the email in the left column 
-    
     private HorizontalLayout createUserProfileFooter() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (username == null) username = "Studente";
+        String username = securityService.getAuthenticatedUsername();
+        if (username == null) username = "Ospite";
+        
         Avatar avatar = new Avatar(username);
         avatar.addThemeName("xsmall");
         avatar.getStyle().set("background-color", "white").set("color", "#0f172a");
         
         RouterLink nameLink = new RouterLink(username, PersonalArea.class);
-        nameLink.addClassNames(LumoUtility.FontWeight.BOLD, LumoUtility.FontSize.SMALL); nameLink.getStyle().set("color", "white");
+        nameLink.addClassNames(LumoUtility.FontWeight.BOLD, LumoUtility.FontSize.SMALL); 
+        nameLink.getStyle().set("color", "white");
         
         Span emailSpan = new Span(username + "@uni.it");
-        emailSpan.addClassNames(LumoUtility.FontSize.XSMALL); emailSpan.getStyle().set("color", "#e2e8f0"); 
+        emailSpan.addClassNames(LumoUtility.FontSize.XSMALL); 
+        emailSpan.getStyle().set("color", "#e2e8f0"); 
 
         VerticalLayout userInfo = new VerticalLayout(nameLink, emailSpan);
         userInfo.setSpacing(false); userInfo.setPadding(false);

@@ -23,32 +23,29 @@ public class ProfileService {
     
     @Transactional
     public UserProfile getOrCreateProfile(User user) {
-        // 1. Carichiamo l'utente fresco dal DB per averlo nel "Persistence Context"
+        
         User managedUser = userRepo.findById(user.getUsername())
                 .orElseThrow(() -> new RuntimeException("Utente non trovato"));
 
-        // 2. Controlliamo se lo User ha già il profilo (grazie al mappedBy)
+        
         if (managedUser.getProfile() != null) {
             return managedUser.getProfile();
         }
 
-        // 3. Se non esiste, creiamolo
+       
         UserProfile newProfile = new UserProfile();
         
-        // 4. SINCRONIZZAZIONE BI-DIREZIONALE
-        // Invece di settare l'ID, settiamo la relazione su entrambi i lati
+        
         newProfile.setUser(managedUser);
         newProfile.setReputation(2.5);
         newProfile.setTotVoters(0);
 
-        // 5. Salviamo il profilo
-        // Hibernate ora vedrà managedUser (che ha un ID valido) 
-        // e userà quell'ID per il profilo grazie a @MapsId
+       
         return profileRepo.save(newProfile);
     }
     
     @Transactional
     public void saveProfile(UserProfile profile) {
-        profileRepo.save(profile); // Hibernate riconosce l'ID esistente e aggiorna la riga
+        profileRepo.save(profile); 
     }
 }

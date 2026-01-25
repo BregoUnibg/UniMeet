@@ -50,7 +50,7 @@ public class University {
 		return buildings;
 	}
 	
-	// Fondamentale per far funzionare correttamente le ComboBox di Vaadin
+	
     @Override
     public String toString() {
         return name;

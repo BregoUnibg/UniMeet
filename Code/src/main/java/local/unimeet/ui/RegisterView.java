@@ -23,7 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Route("register")
 @PageTitle("Register")
-@AnonymousAllowed // <--- CRITICAL: Allows public access
+@AnonymousAllowed 
 public class RegisterView extends VerticalLayout {
 
     private final UserService userService;

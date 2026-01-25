@@ -10,6 +10,6 @@ import local.unimeet.entity.University;
 
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
-    // Fondamentale: trova i dipartimenti filtrati per università
+    // trova i dipartimenti filtrati per università
     List<Department> findByUniversity(University university);
 }

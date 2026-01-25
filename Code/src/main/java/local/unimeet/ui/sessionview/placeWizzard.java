@@ -36,7 +36,7 @@ public class placeWizzard extends Dialog {
     private Room selectedRoom;
     private StudyTable selectedStudyTable;
     
-    // UI Container that will be refilled each time
+   
     private final VerticalLayout contentLayout = new VerticalLayout();
 
     public placeWizzard(UniversityService universityService, BuildingService buildingService, RoomService roomService, StudyTableService studyTableService, Consumer<StudyTable> onComplete) {
@@ -48,16 +48,16 @@ public class placeWizzard extends Dialog {
     	
     	this.onComplete = onComplete;
         
-    	// Dialog Settings
+    	
         setModal(true);
         setCloseOnEsc(true);
         setCloseOnOutsideClick(false);
         setWidth("500px");
-        setHeight("600px"); // Fixed height prevents jumping when content changes
+        setHeight("600px");
 
         add(contentLayout);
 
-        // Start at Step 1
+      
         showUniversityStep();
     }
 

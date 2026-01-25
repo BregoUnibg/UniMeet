@@ -1,6 +1,8 @@
 package local.unimeet.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import java.util.Objects;
 
 @Entity
@@ -15,8 +17,9 @@ public class StudyCourse {
     private String name;
 
     // Relazione: Molti corsi appartengono a un Dipartimento
-    @ManyToOne//(fetch = FetchType.LAZY)
+    @ManyToOne 
     @JoinColumn(name = "department_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE) // Se cancelli il dipartimento, cancelli anche i corsi connessi
     private Department department;
 
     // Specifica se è Triennale, Magistrale o Ciclo Unico
@@ -32,7 +35,7 @@ public class StudyCourse {
         this.degreeType = degreeType;
     }
 
-    // GETTER E SETTER
+   
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
