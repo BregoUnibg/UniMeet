@@ -3,6 +3,7 @@ package local.unimeet.entity;
 public enum Role {
 	
 	USER,
-	ADMIN	
+	ADMIN,
+	UNI_ADMIN
 	
 }

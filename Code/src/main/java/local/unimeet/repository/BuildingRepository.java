@@ -15,5 +15,6 @@ public interface BuildingRepository extends JpaRepository<Building, Long>{
 	Optional<Building> findByNameAndUniversity(String name, University university);
 	
 	List<Building> findByUniversityName(String universityName);
-	
+	// Serve per trovare gli edifici passando direttamente l'oggetto Università del Rettore
+    List<Building> findByUniversity(University university);
 }

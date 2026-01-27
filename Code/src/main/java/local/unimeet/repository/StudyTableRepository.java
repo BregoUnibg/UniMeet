@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import local.unimeet.entity.Building;
 import local.unimeet.entity.Room;
 import local.unimeet.entity.StudyTable;
+import local.unimeet.entity.University;
 
 public interface StudyTableRepository extends JpaRepository<StudyTable, Long>{
 	
@@ -24,5 +25,7 @@ public interface StudyTableRepository extends JpaRepository<StudyTable, Long>{
            "JOIN FETCH b.university u " +
            "WHERE r.id = :roomId")
     List<StudyTable> findAllDetailsByRoomId(@Param("roomId") Long roomId);
+
+	List<StudyTable> findByRoom_Building_University(University university);
 	
 }

@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import local.unimeet.entity.Building;
+import local.unimeet.entity.Role;
 import local.unimeet.entity.Room;
+import local.unimeet.entity.User;
 import local.unimeet.repository.BuildingRepository;
 import local.unimeet.repository.RoomRepository;
 
@@ -70,6 +72,26 @@ public class RoomService {
 	        }
 
 	        return roomRepository.findByBuildingId(buildingId);
+	    }
+	 
+	 
+	 public List<Room> getRoomsForUser(User user) {
+	        if (user.getRole() == Role.ADMIN) {
+	            return roomRepository.findAll();
+	        } else if (user.getRole() == Role.UNI_ADMIN) {
+	            return roomRepository.findByBuilding_University(user.getUniversity());
+	        }
+	        return List.of();
+	    }
+	 
+	 
+	  public void saveRoom(Room room) {
+	        if (room == null) return;
+	        roomRepository.save(room);
+	    }
+
+	    public void deleteRoom(Room room) {
+	        roomRepository.delete(room);
 	    }
 	
 }

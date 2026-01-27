@@ -81,5 +81,10 @@ public class User {
 	    return getClass().hashCode();
 	}
 
+	public University getUniversity() {
+		return this.getProfile().getUniversity();
+		
+	}
+
 }
 	
