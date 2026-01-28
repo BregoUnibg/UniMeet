@@ -28,6 +28,9 @@ import local.unimeet.entity.University;
 import local.unimeet.entity.User;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.DataService;
+import local.unimeet.service.DepartmentService;
+import local.unimeet.service.StudyCourseService;
+import local.unimeet.service.UniversityService;
 import local.unimeet.service.UserService;
 
 @Route(value = "admin/courses", layout = MainLayout.class)
@@ -35,19 +38,27 @@ import local.unimeet.service.UserService;
 @RolesAllowed({"ROLE_ADMIN", "ROLE_UNI_ADMIN"})
 public class AdminCoursesView extends VerticalLayout {
 
-    private final DataService dataService;
     private final User currentUser;
     private final UserService userService;
     private final SecurityService securityService;
+    private final DepartmentService departmentService;
+    private final StudyCourseService studyCourseService;
+    private final UniversityService universityService;
     
     private Grid<StudyCourse> grid = new Grid<>(StudyCourse.class, false);
     private TextField searchField = new TextField();
 
     public AdminCoursesView(DataService dataService,
     		SecurityService securityService,
-    		UserService userService) {
-        this.dataService = dataService;
-        this.userService=userService;
+    		UserService userService,
+    		DepartmentService departmentService,
+    		StudyCourseService studyCourseService,
+    		UniversityService universityService) {
+        
+    	this.departmentService = departmentService;
+    	this.studyCourseService = studyCourseService;
+    	this.universityService = universityService;
+    	this.userService=userService;
         this.securityService=securityService;
         this.currentUser = this.userService.getUserByUsername(this.securityService.getAuthenticatedUsername());
 
@@ -141,7 +152,9 @@ public class AdminCoursesView extends VerticalLayout {
                 confirmDialog.setHeaderTitle("Elimina Corso");
                 confirmDialog.add("Eliminare definitivamente '" + course.getName() + "'?");
                 Button confirmBtn = new Button("Elimina", event -> {
-                    dataService.deleteCourse(course);
+                    
+                	this.studyCourseService.deleteStudyCourse(course.getId());
+                	
                     updateList();
                     Notification.show("Corso eliminato");
                     confirmDialog.close();
@@ -157,7 +170,7 @@ public class AdminCoursesView extends VerticalLayout {
 
     private void updateList() {
         String filter = searchField.getValue().toLowerCase();
-        grid.setItems(dataService.getCoursesForUser(currentUser).stream()
+        grid.setItems(studyCourseService.getCoursesForUser(currentUser).stream()
                 .filter(c -> c.getName().toLowerCase().contains(filter) || 
                              (c.getDepartment() != null && c.getDepartment().getName().toLowerCase().contains(filter)))
                 .toList());
@@ -186,7 +199,7 @@ public class AdminCoursesView extends VerticalLayout {
         uniSelect.addValueChangeListener(e -> {
             deptSelect.clear();
             if (e.getValue() != null) {
-                deptSelect.setItems(dataService.getDepartmentsByUniversity(e.getValue()));
+                deptSelect.setItems(departmentService.getDepartmentsByUniversity(e.getValue()));
                 deptSelect.setEnabled(true);
             } else {
                 deptSelect.setEnabled(false);
@@ -196,12 +209,12 @@ public class AdminCoursesView extends VerticalLayout {
         
         if (currentUser.getRole() == Role.ADMIN) {
             // Super Admin: Carica tutte le Università
-            uniSelect.setItems(dataService.findAllUniversities());
+            uniSelect.setItems(universityService.getAllUniversities());
             
             if (course.getDepartment() != null) {
                 uniSelect.setValue(course.getDepartment().getUniversity());
                 // Carichiamo i dipartimenti corrispondenti
-                deptSelect.setItems(dataService.getDepartmentsByUniversity(course.getDepartment().getUniversity()));
+                deptSelect.setItems(departmentService.getDepartmentsByUniversity(course.getDepartment().getUniversity()));
                 deptSelect.setValue(course.getDepartment());
                 deptSelect.setEnabled(true);
             } else {
@@ -216,7 +229,7 @@ public class AdminCoursesView extends VerticalLayout {
             uniSelect.setReadOnly(true);
             
            
-            deptSelect.setItems(dataService.getDepartmentsByUniversity(currentUser.getUniversity()));
+            deptSelect.setItems(departmentService.getDepartmentsByUniversity(currentUser.getUniversity()));
             deptSelect.setEnabled(true);
             
             if (course.getDepartment() != null) {
@@ -231,13 +244,15 @@ public class AdminCoursesView extends VerticalLayout {
             if (deptSelect.getValue() == null || nameField.getValue().isEmpty() || typeSelect.getValue() == null) {
                 Notification.show("Compila tutti i campi!"); return;
             }
-            course.setName(nameField.getValue());
-            course.setDegreeType(typeSelect.getValue());
-            course.setDepartment(deptSelect.getValue());
-            dataService.saveCourse(course);
-            updateList();
-            dialog.close();
-            Notification.show("Corso salvato!");
+            else {
+	            	
+	            this.studyCourseService.createStudyCourse(nameField.getValue(), deptSelect.getValue(), typeSelect.getValue());
+	            
+	            updateList();
+	            dialog.close();
+	            Notification.show("Course Saved");
+	            
+            }
         });
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         
@@ -260,7 +275,7 @@ public class AdminCoursesView extends VerticalLayout {
         uniSelect.setItemLabelGenerator(University::getName);
 
         if (currentUser.getRole() == Role.ADMIN) {
-            uniSelect.setItems(dataService.findAllUniversities());
+            uniSelect.setItems(universityService.getAllUniversities());
         } else {
            
             uniSelect.setItems(currentUser.getUniversity());
@@ -272,11 +287,13 @@ public class AdminCoursesView extends VerticalLayout {
             if (uniSelect.getValue() == null || nameField.getValue().isEmpty()) {
                 Notification.show("Compila tutti i campi!"); return;
             }
-            department.setName(nameField.getValue());
-            department.setUniversity(uniSelect.getValue());
-            dataService.saveDepartment(department);
-            Notification.show("Dipartimento creato!");
-            dialog.close();
+            else {
+            	
+            	departmentService.createDepartment(nameField.getValue(), uniSelect.getValue());
+            	Notification.show("Department Saved");
+            	dialog.close();
+            	
+            }
         });
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         
