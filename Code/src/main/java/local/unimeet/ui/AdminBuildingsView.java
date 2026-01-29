@@ -12,6 +12,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,7 +26,6 @@ import local.unimeet.entity.Building;
 import local.unimeet.entity.Role;
 import local.unimeet.entity.University;
 import local.unimeet.entity.User;
-import local.unimeet.repository.UniversityRepository;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.BuildingService;
 import local.unimeet.service.UniversityService;
@@ -56,7 +56,6 @@ public class AdminBuildingsView extends VerticalLayout {
 
         this.currentUser = this.userService.getUserByUsername(this.securityService.getAuthenticatedUsername());
         setSizeFull();
-        addClassNames("list-view", LumoUtility.Padding.MEDIUM, LumoUtility.Background.CONTRAST_5); 
 
         configureGrid();
         
@@ -75,6 +74,7 @@ public class AdminBuildingsView extends VerticalLayout {
         searchField.setPlaceholder("Cerca edificio...");
         searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
         searchField.setClearButtonVisible(true);
+        searchField.setWidth("500px");
         searchField.setValueChangeMode(ValueChangeMode.LAZY);
         searchField.addValueChangeListener(e -> updateList());
 
@@ -178,7 +178,8 @@ public class AdminBuildingsView extends VerticalLayout {
     private void openDialog(Building building) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Modifica Edificio");
-
+        dialog.setWidth("400px");
+        
         VerticalLayout form = new VerticalLayout();
         TextField nameField = new TextField("Nome");
         TextField addressField = new TextField("Indirizzo");
@@ -201,8 +202,19 @@ public class AdminBuildingsView extends VerticalLayout {
             if (nameField.getValue().isEmpty()) { Notification.show("Inserisci un nome!"); return; }
             building.setName(nameField.getValue());
             building.setAddress(addressField.getValue());
-            if (currentUser.getRole() == Role.ADMIN) building.setUniversity(uniSelect.getValue());
-            else building.setUniversity(currentUser.getUniversity());
+            
+            if (currentUser.getRole() == Role.ADMIN) 
+            	building.setUniversity(uniSelect.getValue());
+            else if (currentUser.getRole() == Role.UNI_ADMIN && currentUser.getUniversity() == null) {
+            	Notification notification = new Notification("Profile is not linked to any university");
+            	notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+            	notification.setDuration(3000);
+            	notification.setPosition(Notification.Position.BOTTOM_START);
+            	notification.open();
+            	return;
+            }
+            else
+            	building.setUniversity(currentUser.getUniversity());
             
             buildingService.saveBuilding(building);
             updateList();

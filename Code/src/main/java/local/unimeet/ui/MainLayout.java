@@ -1,5 +1,7 @@
 package local.unimeet.ui;
 
+import java.util.Optional;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
@@ -25,11 +27,21 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
 import local.unimeet.ui.sessionview.SessionsView;
+import local.unimeet.entity.Role;
+import local.unimeet.entity.User;
+import local.unimeet.security.SecurityService;
+import local.unimeet.service.UserService;
 import local.unimeet.ui.PersonalArea;
 
 public class MainLayout extends AppLayout {
-
-    public MainLayout() {
+	
+	SecurityService securityService;
+	UserService userService;
+	
+    public MainLayout(SecurityService securityService, UserService userService){
+    	
+    	this.securityService = securityService;
+    	this.userService = userService;
     	
     	//Makes left navbar domnant over header
     	setPrimarySection(Section.DRAWER);
@@ -86,13 +98,39 @@ public class MainLayout extends AppLayout {
         SideNav nav = new SideNav();
         
         
-        SideNavItem navHome = new SideNavItem("Home", HomeView.class, VaadinIcon.HOME.create());
-        SideNavItem navUsersManagment = new SideNavItem("Users Managment", UsersView.class, VaadinIcon.USERS.create());
-        SideNavItem navSessions = new SideNavItem("My Sessions", SessionsView.class, VaadinIcon.BOOK.create());
         
-        nav.addItem(navHome);
-        nav.addItem(navUsersManagment);
-        nav.addItem(navSessions); 
+        
+        User currentUser = userService.getUserByUsername(securityService.getAuthenticatedUsername());
+        
+        if (currentUser != null) {
+            
+            // =========================================================
+            //  Admin pages
+            // =========================================================
+            if (currentUser.getRole() == Role.ADMIN || currentUser.getRole() == Role.UNI_ADMIN) {
+                
+                nav.addItem(new SideNavItem("Dashboard", AdminHomeView.class, VaadinIcon.DASHBOARD.create()));
+
+                nav.addItem(new SideNavItem("Gestione Edifici", AdminBuildingsView.class, VaadinIcon.BUILDING.create()));
+                
+                nav.addItem(new SideNavItem("Gestione Aule", AdminRoomsView.class, VaadinIcon.KEY.create()));
+
+                nav.addItem(new SideNavItem("Gestione Tavoli", AdminTablesView.class, VaadinIcon.TABLE.create()));
+
+                
+                nav.addItem(new SideNavItem("Gestione Corsi", AdminCoursesView.class, VaadinIcon.ACADEMY_CAP.create()));
+
+            } 
+            // =========================================================
+            //  User pages
+            // =========================================================
+            else {
+                nav.addItem(new SideNavItem("Home", HomeView.class, VaadinIcon.HOME.create()));
+                nav.addItem(new SideNavItem("My Sessions", SessionsView.class, VaadinIcon.BOOK.create()));
+                
+            }
+        }
+        
         
         
         Div navWrapper = new Div(nav);

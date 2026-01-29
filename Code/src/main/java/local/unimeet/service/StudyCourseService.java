@@ -73,9 +73,13 @@ public class StudyCourseService {
         if (user.getRole() == Role.ADMIN) 
         	return studyCourseRepositoy.findAll();
         
-        else if (user.getRole() == Role.UNI_ADMIN) 
-        	return studyCourseRepositoy.findByUniversity(user.getUniversity());
+        else if (user.getRole() == Role.UNI_ADMIN){ 
         	
+        	//POSSIBLE CRITICAL LOGIC ERROR IN WHOLE DEPARTMENT - UNIVERSITY ENTITY MANAGMENT
+        	return studyCourseRepositoy.findAll();
+             
+        }
+        
         return List.of();
     }
 	

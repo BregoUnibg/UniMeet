@@ -68,6 +68,7 @@ public class AdminTablesView extends VerticalLayout {
         searchField.setPlaceholder("Cerca (es. Tavolo 1)...");
         searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
         searchField.setClearButtonVisible(true);
+        searchField.setWidth("500px");
         searchField.setValueChangeMode(ValueChangeMode.LAZY);
         searchField.addValueChangeListener(e -> updateList());
 
@@ -149,6 +150,7 @@ public class AdminTablesView extends VerticalLayout {
     private void openDialog(StudyTable table) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Modifica Tavolo");
+        dialog.setWidth("400px");
 
         VerticalLayout form = new VerticalLayout();
         IntegerField numberField = new IntegerField("Numero Tavolo");

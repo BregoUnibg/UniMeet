@@ -29,12 +29,11 @@ public class AdminHomeView extends VerticalLayout {
     
     public AdminHomeView(SecurityService securityService, 
     		BuildingService buildingService,
-    		UserService userService,
-    		User currentuser) {
+    		UserService userService) {
         this.securityService = securityService;
         this.userService=userService;
-         this.buildingService = buildingService;
-         this.currentUser = this.userService.getUserByUsername(this.securityService.getAuthenticatedUsername());
+        this.buildingService = buildingService;
+        this.currentUser = this.userService.getUserByUsername(this.securityService.getAuthenticatedUsername());
 
         addClassName("admin-dashboard");
         setPadding(true);

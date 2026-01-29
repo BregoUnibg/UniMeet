@@ -10,7 +10,7 @@ public class User {
 	private String username;
 	private String password;
 	private Role role;
-	@OneToOne(mappedBy = "user")
+	@OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private UserProfile profile;
 	
 	

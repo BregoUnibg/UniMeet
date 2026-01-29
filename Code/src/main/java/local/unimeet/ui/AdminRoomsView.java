@@ -68,6 +68,7 @@ public class AdminRoomsView extends VerticalLayout {
         searchField.setPlaceholder("Cerca (es. 101)...");
         searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
         searchField.setClearButtonVisible(true);
+        searchField.setWidth("500px");
         searchField.setValueChangeMode(ValueChangeMode.LAZY);
         searchField.addValueChangeListener(e -> updateList());
 
@@ -144,6 +145,7 @@ public class AdminRoomsView extends VerticalLayout {
     private void openDialog(Room room) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Modifica Aula " + room.getNumber());
+        dialog.setWidth("400px");
 
         VerticalLayout form = new VerticalLayout();
         IntegerField numberField = new IntegerField("Numero Aula");

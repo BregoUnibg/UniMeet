@@ -78,6 +78,7 @@ public class AdminCoursesView extends VerticalLayout {
         searchField.setPlaceholder("Cerca corso o dipartimento...");
         searchField.setPrefixComponent(VaadinIcon.SEARCH.create());
         searchField.setClearButtonVisible(true);
+        searchField.setWidth("500px");
         searchField.setValueChangeMode(ValueChangeMode.LAZY);
         searchField.addValueChangeListener(e -> updateList());
         searchField.setWidth("300px");
@@ -180,6 +181,7 @@ public class AdminCoursesView extends VerticalLayout {
     private void openCourseDialog(StudyCourse course) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle(course.getId() == null ? "Nuovo Corso di Laurea" : "Modifica Corso");
+        dialog.setWidth("400px");
 
         VerticalLayout form = new VerticalLayout();
         TextField nameField = new TextField("Nome Corso (es. Informatica)");
@@ -266,6 +268,7 @@ public class AdminCoursesView extends VerticalLayout {
     private void openDepartmentDialog(Department department) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Nuovo Dipartimento");
+        dialog.setWidth("400px");
         
         VerticalLayout form = new VerticalLayout();
         TextField nameField = new TextField("Nome Dipartimento");

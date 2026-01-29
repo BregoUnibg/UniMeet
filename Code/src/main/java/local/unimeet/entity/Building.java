@@ -31,7 +31,7 @@ public class Building {
 	private String name;
 	private String address;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "university_id") //creates Foreign Key column
     private University university;
 
