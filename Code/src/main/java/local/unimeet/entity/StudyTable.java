@@ -33,6 +33,12 @@ public class StudyTable {
 	public StudyTable() {
 	}
 	
+	public StudyTable(int number, int capacity, Room room) {
+		this.number = number;
+		this.capacity = capacity;
+		this.room = room;
+	}
+	
 	public void setRoom(Room room) {
 		this.room = room;
 	}

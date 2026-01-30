@@ -16,7 +16,7 @@ import local.unimeet.entity.University;
 public interface StudyCourseRepository extends JpaRepository<StudyCourse, Long> {
     // Filtra i corsi in base al dipartimento scelto
     List<StudyCourse> findByDepartment(Department department);
-    
+    List<StudyCourse> findByName(String name);
 	List<StudyCourse> findByDegreeType(DegreeType degreeType);
 	
 	Optional<StudyCourse> findByNameAndDepartmentAndDegreeType(String name, Department department, DegreeType degreeType);

@@ -40,6 +40,11 @@ public class Room {
 	public Room(){
 	}
 	
+	public Room(int number, Building building){
+		this.number = number;
+		this.building = building;
+	}
+	
 	public long getId() {
 		return id;
 	}

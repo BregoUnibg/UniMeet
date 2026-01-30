@@ -3,15 +3,15 @@ package local.unimeet.entity;
 public enum DegreeName {
 
 	// Corsi Triennali
-    INFORMATICA(DegreeType.TRIENNALE),
-    FISICA(DegreeType.TRIENNALE),
-    MATEMATICA(DegreeType.TRIENNALE),
-    ECONOMIA(DegreeType.TRIENNALE),
+    INFORMATICA(DegreeType.BACHELOR),
+    FISICA(DegreeType.BACHELOR),
+    MATEMATICA(DegreeType.BACHELOR),
+    ECONOMIA(DegreeType.BACHELOR),
     
     // Corsi Magistrali
-    DATA_SCIENCE(DegreeType.MAGISTRALE),
-    CYBERSECURITY(DegreeType.MAGISTRALE),
-    INTELLIGENZA_ARTIFICIALE(DegreeType.MAGISTRALE);
+    DATA_SCIENCE(DegreeType.MASTER),
+    CYBERSECURITY(DegreeType.MASTER),
+    INTELLIGENZA_ARTIFICIALE(DegreeType.MASTER);
 
     private final DegreeType level;
 

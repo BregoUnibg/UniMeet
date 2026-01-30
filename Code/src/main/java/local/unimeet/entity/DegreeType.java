@@ -2,8 +2,8 @@ package local.unimeet.entity;
 
 public enum DegreeType {
 
-	TRIENNALE,
-	MAGISTRALE,
-	CICLO_UNICO
+	BACHELOR,
+	MASTER,
+	SINGLE_CICLE_MASTER
 	
 }

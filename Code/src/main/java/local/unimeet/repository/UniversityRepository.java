@@ -9,6 +9,6 @@ import local.unimeet.entity.University;
 
 @Repository
 public interface UniversityRepository extends JpaRepository<University, String> {
-    // Trova solo le università approvate (per non mostrare subito le proposte "Altro")
     List<University> findBy();
+	List<University> findByName(String name);
 }

@@ -12,4 +12,5 @@ import local.unimeet.entity.Subject;
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
     // La logica per il filtro anno: prendi materie del corso con anno <= a quello scelto
     List<Subject> findByStudyCourseAndStudyYearLessThanEqual(StudyCourse course, Integer year);
+    List<Subject> findByName(String name);
 }	

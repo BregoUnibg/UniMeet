@@ -19,7 +19,7 @@ public class StudyCourse {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    // Specifica se è Triennale, Magistrale o Ciclo Unico
+    // Specifica se è BACHELOR, MASTER o Ciclo Unico
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DegreeType degreeType;

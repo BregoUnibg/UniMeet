@@ -3,6 +3,8 @@ package local.unimeet.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.units.qual.t;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -39,6 +41,12 @@ public class Building {
 	private List<Room> rooms = new ArrayList<>();
 	
 	public Building(){
+	}
+	
+	public Building(String name, String address, University university){
+		this.name = name;
+		this.address = address;
+		this.university = university;
 	}
 		
 	public long getId() {

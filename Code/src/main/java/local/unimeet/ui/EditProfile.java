@@ -27,7 +27,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.orderedlayout.FlexComponent.Alignment;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -52,7 +51,7 @@ import local.unimeet.service.DataService;
 import local.unimeet.service.ProfileService;
 
 @Route(value = "edit-profile", layout = MainLayout.class)
-@PageTitle("Profilo Personale | Edit")
+@PageTitle("Personal Profile | Edit")
 @PermitAll
 public class EditProfile extends VerticalLayout {
 	
@@ -62,26 +61,26 @@ public class EditProfile extends VerticalLayout {
 	
 	private final Binder<UserProfile> binder = new Binder<>(UserProfile.class);
 
-    // Componenti UI
-	// Foto profilo
+	//UI component
+	//Profile picture
 	private Image avatarPreview = new Image();
 	private MemoryBuffer buffer = new MemoryBuffer();
 	private Upload upload = new Upload(buffer);
 	private Button removeImgBtn = new Button("Rimuovi Foto");
 	
-    // Campi Anagrafe
+    //Personal details fields
     private TextField firstName = new TextField();
     private TextField lastName = new TextField();
     private TextArea bio = new TextArea();
     
-    // Percorso di Studio
+    //Study path
     private ComboBox<University> university = new ComboBox<>();
     private ComboBox<Department> department = new ComboBox<>();
     private ComboBox<DegreeType> degreeType = new ComboBox<>();
     private ComboBox<StudyCourse> courseName = new ComboBox<>();
     private ComboBox<Integer> studyYear = new ComboBox<>();
     
-    // Carriera multi-selezione per esami e skill
+    //Career section (Courses and Exams)
     private MultiSelectListBox<Subject> preferredCourses = new MultiSelectListBox<>();
     private MultiSelectListBox<Subject> difficultCourses = new MultiSelectListBox<>();
     private MultiSelectListBox<Subject> passedExams = new MultiSelectListBox<>();
@@ -92,42 +91,42 @@ public class EditProfile extends VerticalLayout {
     	this.dataService = dataService;
     	this.delegate = delegate;
     	
-    	// Impostazioni generali della pagina
+    	//General page settings
         setSpacing(true);
         setPadding(true);
-        setMaxWidth("800px"); // Teniamo il contenuto centrato e leggibile
+        setMaxWidth("800px");
         getElement().getStyle().set("margin", "auto");
         
-    	// --- LOGICA PER RECUPERARE L'UTENTE LOGGATO ---
+    	//Logic to recover the logged user
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findById(username)
                 .orElseThrow(() -> new RuntimeException("Utente non trovato"));
         UserProfile currentProfile = profileService.getOrCreateProfile(currentUser);
         
-        add(new H2("Area personale"));
+        add(new H2("Personal area | Edit"));
         
-        // --- SEZIONE ANAGRAFE ---
+        //--- PERSONAL DETAILS SECTION ---
         add(createAnagrafeSection(currentProfile));
 
-        add(new Hr()); // Linea di separazione
+        add(new Hr());
         
-        // --- SEZIONE PERCORSO DI STUDIO ---
-        add(new H3("PERCORSO DI STUDIO"));
+        //--- STUDY PATH SECTION ---
+        add(new H3("STUDY PATH"));
         add(createStudyPathSection());
 
         add(new Hr());
 
-        // --- SEZIONE CARRIERA (Corsi e Esami) ---
-        add(new H3("CARRIERA"));
+        //--- CAREER SECTION (Courses and Exams) ---
+        add(new H3("CAREER"));
         add(createCareerSection());
         
-        // --- BOTTONE ANNULLA ---
-        Button cancelBtn = new Button("Annulla", e -> getUI().ifPresent(ui -> ui.navigate(PersonalArea.class)));
+        //--- CANCEL BUTTON ---
+        Button cancelBtn = new Button("Cancel", e -> getUI().ifPresent(ui -> ui.navigate(PersonalArea.class)));
         cancelBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         cancelBtn.getStyle().set("margin-top", "2em");
 
-        // --- BOTTONE SALVA ---
-        Button saveButton = new Button("Salva Modifiche", e -> saveProfile(currentProfile));
+        // --- SAVE BUTTON ---
+        Button saveButton = new Button("Save Changes", e -> saveProfile(currentProfile));
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         saveButton.getStyle().set("margin-top", "2em");
         
@@ -136,27 +135,27 @@ public class EditProfile extends VerticalLayout {
         footer.setJustifyContentMode(JustifyContentMode.END);
         add(footer);
         
-        //Configurazione menù a tendina
+        //Drop-down menu configuration
         configureMenu();
         
-        //Logica limite 3 corsi
+        //Limit logic 3 courses
         setupLimitLogic();
         
-        //Logica Esclusione Mutua Corsi e Esami
+        //Mutual Exclusion Logic Courses and Exams
         setupExclusionLogic(preferredCourses, difficultCourses);
         setupExclusionLogic(passedExams, pendingExams);
 
-        // --- CONFIGURA IL BINDING --- (collegamento campi -> oggetto UserProfile)
+        //Binding configurations
         binder.forField(firstName)
-	        .asRequired("Il nome è obbligatorio")
+	        .asRequired("First name is required")
 	        .bind(UserProfile::getFirstName, UserProfile::setFirstName);
 	
 	    binder.forField(lastName)
-	        .asRequired("Il cognome è obbligatorio")
+	        .asRequired("Last name is required")
 	        .bind(UserProfile::getLastName, UserProfile::setLastName);
 	    
 	    binder.forField(bio)
-		    .withValidator(text -> text.length() <= UserProfile.length, "La bio non può superare i " + UserProfile.length + " caratteri")
+		    .withValidator(text -> text.length() <= UserProfile.length, "The biography cannot exceed " + UserProfile.length + " characters")
 		    .bind(UserProfile::getBio, UserProfile::setBio);
 	    
         binder.bindInstanceFields(this);
@@ -164,27 +163,25 @@ public class EditProfile extends VerticalLayout {
         binder.readBean(currentProfile);
     }
 
-    // --- LOGICA DI SUPPORTO ---
-    
+    //Heper methods
     private HorizontalLayout createAnagrafeSection(UserProfile currentProfile) {
-        // Immagine profilo (Placeholder)
-        // Configura l'anteprima visiva
+    	//Profile picture (Placeholder)
+        //Preview configuration
     	avatarPreview.setWidth("100px");
     	avatarPreview.setHeight("120px");
     	avatarPreview.getStyle().set("border-radius", "8px");
     	avatarPreview.getStyle().set("object-fit", "cover");
     	avatarPreview.getStyle().set("border", "2px solid #ccc");
     	
-    	// Carica la foto esistente se presente, altrimenti placeholder
     	if (currentProfile.getProfilePicture() != null&& currentProfile.getProfilePicture().length > 0) {
     	    updatePreview(currentProfile.getProfilePicture());
     	} else {
     	    avatarPreview.setSrc("images/default-avatar.jpeg");
     	}
 
-    	// Configura l'Upload
+    	//Upload configuration
     	upload.setAcceptedFileTypes("image/jpeg", "image/png");
-    	upload.setMaxFileSize(5 * 1024 * 1024); // Limite 5MB
+    	upload.setMaxFileSize(5 * 1024 * 1024); //5MB Limit
     	upload.setUploadButton(new Button("Carica nuova foto"));
     	upload.setWidth("190px");
     	upload.getStyle().setAlignItems(AlignItems.CENTER);
@@ -193,8 +190,8 @@ public class EditProfile extends VerticalLayout {
     	    try {
     	        byte[] originalBytes = buffer.getInputStream().readAllBytes();
     	        byte[] optimizedBytes = resizeImage(originalBytes);
-    	        currentProfile.setProfilePicture(optimizedBytes); // Salviamo i byte nell'oggetto
-    	        updatePreview(optimizedBytes); // Aggiorniamo l'anteprima
+    	        currentProfile.setProfilePicture(optimizedBytes);
+    	        updatePreview(optimizedBytes);
     	        Notification.show("Foto caricata correttamente!");
     	    } catch (IOException e) {
     	        Notification.show("Errore nel caricamento del file");
@@ -212,9 +209,9 @@ public class EditProfile extends VerticalLayout {
         info.setSpacing(false);
         info.setPadding(false);
 
-        // Campi Anagrafe
-        info.add(delegate.createDataRow("Nome: ", firstName));
-        info.add(delegate.createDataRow("Cognome:", lastName));
+        //Personal Data Fields
+        info.add(delegate.createDataRow("Firs Name: ", firstName));
+        info.add(delegate.createDataRow("Last Name:", lastName));
         
         Span labelBio = new Span("Bio: ");
         labelBio.setWidth("150px");
@@ -222,13 +219,12 @@ public class EditProfile extends VerticalLayout {
         labelBio.getStyle().setPaddingTop("10px");
         bio.setWidth("394px");
         HorizontalLayout h = new HorizontalLayout(labelBio, bio);
-        //h.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         info.add(h);
 
-        // Reputazione
+        //Reputation
         double reputetion = currentProfile.getReputation() != null ? currentProfile.getReputation().doubleValue() : 0;
         int totVoters = currentProfile.getTotVoters() != null ? currentProfile.getTotVoters().intValue() : 0;
-        info.add(delegate.createDataRow("Reputazione: ", delegate.createReputationBar(reputetion, totVoters)));
+        info.add(delegate.createDataRow("Reputation: ", delegate.createReputationBar(reputetion, totVoters)));
 
         VerticalLayout imageLayout = new VerticalLayout(avatarPreview, upload, removeImgBtn);
         imageLayout.setSpacing(true);
@@ -244,23 +240,23 @@ public class EditProfile extends VerticalLayout {
         layout.setSpacing(false);
         layout.setPadding(false);
 
-        layout.add(delegate.createDataRow("Università:", university));
-        layout.add(delegate.createDataRow("Dipartimento:", department));
-        layout.add(delegate.createDataRow("Tipo Laurea:", degreeType));
-        layout.add(delegate.createDataRow("Nome Laurea:", courseName));
-        layout.add(delegate.createDataRow("Anno di corso:", studyYear));
+        layout.add(delegate.createDataRow("University:", university));
+        layout.add(delegate.createDataRow("Department:", department));
+        layout.add(delegate.createDataRow("Degree Type:", degreeType));
+        layout.add(delegate.createDataRow("Degree Name:", courseName));
+        layout.add(delegate.createDataRow("Year of Study:", studyYear));
 
         return layout;
     }
 
     private VerticalLayout createCareerSection() {
         // Colonne per Corsi Preferiti e Difficoltà
-    	VerticalLayout pref = createLabeledList("Corsi preferiti:", preferredCourses);
-    	VerticalLayout diff = createLabeledList("Corsi in cui ho difficoltà:", difficultCourses);
+    	VerticalLayout pref = createLabeledList("Preferred courses:", preferredCourses);
+    	VerticalLayout diff = createLabeledList("Difficult courses:", difficultCourses);
     	
         // Colonne per Esami Superati e Da Sostenere
-    	VerticalLayout passed = createLabeledList("Esami superati:", passedExams);
-    	VerticalLayout pending = createLabeledList("Esami da sostenere:", pendingExams);
+    	VerticalLayout passed = createLabeledList("Passed exams:", passedExams);
+    	VerticalLayout pending = createLabeledList("Pending exams:", pendingExams);
         
         HorizontalLayout courses = new HorizontalLayout(pref, diff);
         courses.setWidthFull();
@@ -287,9 +283,7 @@ public class EditProfile extends VerticalLayout {
         		department.clear();
         		department.setEnabled(false);
             } else {
-                // FILTRAGGIO DINAMICO:
-                // Prendiamo tutti i valori di DegreeName e teniamo solo quelli 
-                // che appartengono al livello selezionato
+                //Dynamic filter
                 department.setItems(dataService.findDepartmentsByUniversity(university));
                 department.setEnabled(true);
             }
@@ -315,6 +309,7 @@ public class EditProfile extends VerticalLayout {
         		courseName.clear();
         		courseName.setEnabled(false);
             } else {
+            	//Dynamic filter
             	courseName.setItems(dataService.findCourseByDegreeType(degreeType));
             	courseName.setEnabled(true);
             	studyYear.setItems(updateYearOptions(degreeType));
@@ -327,8 +322,7 @@ public class EditProfile extends VerticalLayout {
         		studyYear.clear();
         		studyYear.setEnabled(false);
             } else {
-                // Comunichiamo pzione fuori corso (gestibile come 0)
-                studyYear.setHelperText("Selezionare 0 se Fuori Corso");
+                studyYear.setHelperText("Select 0 if beyond standard years");
             	studyYear.setEnabled(true);
             }
         });
@@ -341,13 +335,13 @@ public class EditProfile extends VerticalLayout {
                 passedExams.setVisible(false);
                 pendingExams.setVisible(false);
         	} else {
-        		// Chiediamo al service solo le materie dell'anno scelto o degli anni precedenti
+        		//Dynamic filter
                 List<Subject> materieFiltrate = dataService.findSubjects(courseName.getValue(), studyYear);
                 
                 if(materieFiltrate.isEmpty())
-                	Notification.show("Nessuna Materia disponibile", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+                	Notification.show("No subjects available", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
                 else {
-	                // Aggiorniamo le liste grafiche istantaneamente
+	                //Update the graphic lists
 	                preferredCourses.setItems(materieFiltrate);
 	                difficultCourses.setItems(materieFiltrate);
 	                passedExams.setItems(materieFiltrate);
@@ -358,24 +352,22 @@ public class EditProfile extends VerticalLayout {
 	                passedExams.setVisible(true);
 	                pendingExams.setVisible(true);
 	                
-	                Notification.show("Visualizzando materie fino al " + studyYear + "° anno");
+	                Notification.show("Viewing subjects up to year " + studyYear);
                 }
         	}
         });
     }
     
     private void setupLimitLogic() {
-        // Applichiamo la stessa logica a entrambi i componenti
-        addSelectionLimit(preferredCourses, "forza");
-        addSelectionLimit(difficultCourses, "debolezza");
+        addSelectionLimit(preferredCourses, "preferred courses");
+        addSelectionLimit(difficultCourses, "difficult courses");
     }
 
-    // Metodo magico riutilizzabile
     private void addSelectionLimit(MultiSelectListBox<Subject> listBox, String tipo) {
         listBox.addSelectionListener(event -> {
             if (event.getAllSelectedItems().size() > 3) {
-                Notification.show("Puoi selezionare al massimo 3 materie di " + tipo + "!");
-                // Rimuove l'ultimo elemento aggiunto che ha fatto superare il limite
+                Notification.show("You can select a maximum of 3 subjects of " + tipo + "!");
+                //Remove last selection
                 listBox.deselect(event.getAddedSelection().iterator().next());
             }
         });
@@ -386,7 +378,7 @@ public class EditProfile extends VerticalLayout {
         label.getStyle().set("font-weight", "bold");
         
         VerticalLayout container = new VerticalLayout(label, listBox);
-        container.setSpacing(false); // Avvicina il titolo alla lista
+        container.setSpacing(false);
         container.setPadding(false);
         return container;
     }
@@ -400,7 +392,7 @@ public class EditProfile extends VerticalLayout {
             int targetWidth = 120;
             int targetHeight = 120;
 
-            // Calcoliamo le proporzioni per il ritaglio (crop) centrale
+            //Calculate the proportions for the center crop
             int srcWidth = src.getWidth();
             int srcHeight = src.getHeight();
             int x = 0, y = 0, width = srcWidth, height = srcHeight;
@@ -413,19 +405,18 @@ public class EditProfile extends VerticalLayout {
                 y = (srcHeight - srcWidth) / 2;
             }
 
-            // Ritagliamo il quadrato centrale
+            //Center crop
             BufferedImage cropped = src.getSubimage(x, y, width, height);
 
-            // Scaliamo a 120x120
+            //Resized to 120x120
             BufferedImage resized = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = resized.createGraphics();
             
-            // Alta qualità di rendering
             g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             g2d.drawImage(cropped, 0, 0, targetWidth, targetHeight, null);
             g2d.dispose();
 
-            // Convertiamo di nuovo in byte[]
+            //Reconvert in byte[]
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(resized, "jpg", baos);
             return baos.toByteArray();
@@ -446,9 +437,9 @@ public class EditProfile extends VerticalLayout {
         List<Integer> years = new ArrayList<>();
         if (type == null) return years;
         int max = switch (type) {
-            case TRIENNALE -> 3;
-            case MAGISTRALE -> 2;
-            case CICLO_UNICO -> 5;
+            case BACHELOR -> 3;
+            case MASTER -> 2;
+            case SINGLE_CICLE_MASTER -> 5;
         };
         for (int i = 0; i <= max; i++) years.add(i);
         return years;
@@ -456,7 +447,7 @@ public class EditProfile extends VerticalLayout {
 
     private void setupExclusionLogic(MultiSelectListBox<Subject> c1, MultiSelectListBox<Subject> c2) {
         c1.addSelectionListener(e -> {
-            // Se un esame è superato, non può essere da sostenere
+        	//If an exam is preferred/passed, it cannot be difficult/pending
             e.getAllSelectedItems().forEach(item -> c2.deselect(item));
         });
         c2.addSelectionListener(e -> {
@@ -466,29 +457,22 @@ public class EditProfile extends VerticalLayout {
     
     private void saveProfile(UserProfile profile) {
 	    try {
-	        // 1. Tenta di scrivere i dati della UI nell'oggetto 'profile'
-	        // Questo metodo esegue automaticamente anche la validazione dei campi
 	        binder.writeBean(profile);
-	
-	        // 2. Se arriviamo qui, i dati sono validi e l'oggetto è aggiornato.
-	        // Chiamiamo il service per il salvataggio su DB.
 	        profileService.saveProfile(profile);
 	
-	        // 3. Feedback visuale di successo
-	        Notification notification = Notification.show("Profilo aggiornato con successo!", 3000, Notification.Position.TOP_CENTER);
+	        Notification notification = Notification.show("Profile updated successfully!", 3000, Notification.Position.TOP_CENTER);
 	        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
 	
-	        // 4. Navigazione verso la PersonalArea
 	        getUI().ifPresent(ui -> ui.navigate(PersonalArea.class));
 	
 	    } catch (ValidationException e) {
-	        // Questo accade se i dati nella UI non passano i controlli del Binder
-	        Notification.show("Per favore, correggi gli errori nel modulo.", 3000, Notification.Position.MIDDLE)
+	        //UI data failed Binder validation
+	        Notification.show("Please, correct errors in the form.", 3000, Notification.Position.MIDDLE)
 	                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
 	        
 	    } catch (Exception e) {
-	        // Questo accade se c'è un errore tecnico (es. Database offline o errori Hibernate)
-	        Notification.show("Errore tecnico durante il salvataggio: " + e.getMessage(), 5000, Notification.Position.BOTTOM_START)
+	        //Technical error
+	        Notification.show("Technical error while saving: " + e.getMessage(), 5000, Notification.Position.BOTTOM_START)
 	                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
 	    }
     }

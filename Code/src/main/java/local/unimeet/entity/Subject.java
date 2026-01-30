@@ -24,10 +24,10 @@ public class Subject {
     private StudyCourse studyCourse;
     public Subject() {}
 
-    public Subject(String name, Integer year, StudyCourse studyCourse) {
+    public Subject(String name, StudyCourse studyCourse, Integer year) {
         this.name = name;
-        this.studyYear = year;
         this.studyCourse = studyCourse;
+        this.studyYear = year;
     }
 
     // GETTER E SETTER
