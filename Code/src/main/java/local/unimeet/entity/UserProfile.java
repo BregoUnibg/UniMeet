@@ -12,7 +12,7 @@ public class UserProfile {
     @Id
     private String id;
     
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;
@@ -33,7 +33,7 @@ public class UserProfile {
     private Integer totVoters;
 
     // --- SEZIONE PERCORSO DI STUDIO ---
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private University university;
 
     @ManyToOne

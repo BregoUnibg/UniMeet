@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import local.unimeet.entity.Building;
 import local.unimeet.entity.Room;
+import local.unimeet.entity.University;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long>{
@@ -15,6 +16,8 @@ public interface RoomRepository extends JpaRepository<Room, Long>{
 	Optional<Room> findByNumberAndBuilding(int number, Building building);
 	
 	List<Room> findByBuildingId(long buildingId);
+	
+    List<Room> findByBuilding_University(University university);
 }
 
 

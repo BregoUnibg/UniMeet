@@ -10,7 +10,7 @@ public class User {
 	private String username;
 	private String password;
 	private Role role;
-	@OneToOne(mappedBy = "user")
+	@OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private UserProfile profile;
 	
 	
@@ -79,6 +79,11 @@ public class User {
 	@Override
 	public int hashCode() {
 	    return getClass().hashCode();
+	}
+
+	public University getUniversity() {
+		return this.getProfile().getUniversity();
+		
 	}
 
 }

@@ -46,7 +46,7 @@ public class UserService {
 	
 	
 	public User getUserByUsername(String username) {
-		return this.userRepository.getReferenceById(username);
+		return this.userRepository.findById(username).orElse(null);
 	}
 	
 	//More methods to be implemented when needed
