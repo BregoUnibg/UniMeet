@@ -119,8 +119,8 @@ public class AdminCoursesView extends VerticalLayout {
 
         grid.addComponentColumn(course -> {
             Span badge = new Span(course.getDegreeType() != null ? course.getDegreeType().name() : "-");
-            if(course.getDegreeType() == DegreeType.TRIENNALE) badge.getElement().getThemeList().add("badge");
-            else if(course.getDegreeType() == DegreeType.MAGISTRALE) badge.getElement().getThemeList().add("badge success");
+            if(course.getDegreeType() == DegreeType.BACHELOR) badge.getElement().getThemeList().add("badge");
+            else if(course.getDegreeType() == DegreeType.MASTER) badge.getElement().getThemeList().add("badge success");
             else badge.getElement().getThemeList().add("badge contrast");
             return badge;
         }).setHeader("Livello").setAutoWidth(true);
