@@ -19,7 +19,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
-import local.unimeet.entity.CourseSubject;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;

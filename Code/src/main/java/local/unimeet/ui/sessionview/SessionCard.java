@@ -14,8 +14,6 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-
-import local.unimeet.entity.CourseSubject;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
@@ -224,7 +222,7 @@ public class SessionCard extends Div{
 		Span type = new Span(getFormattedSessionType(studySession.getType()));
 		type.getElement().getThemeList().add("badge pill");
 		
-		Span subject = new Span(getFormattedSubjectName(studySession.getSubject()));
+		Span subject = new Span(getFormattedString(studySession.getSubject().getName()));
 		subject.getElement().getThemeList().add("badge pill");
 		subject.getStyle().set("color", "#8B0836");
 		subject.getStyle().setBackgroundColor("#FFF0F1");
@@ -431,20 +429,6 @@ public class SessionCard extends Div{
 	    
 	}
 	
-	/**
-	 * Returns a decently formattted string instead of the default enum.toString () output
-	 * @param subject
-	 * @return
-	 */
-	
-	private String getFormattedSubjectName(CourseSubject subject) {
-		
-		if(subject.equals(CourseSubject.CALCULUS_II))
-			return "Calculus II";
-			
-		return getFormattedString(subject.name());
-		
-	}
 	
 	/**
 	 * Return a decently formatted string instead of the default unum.toString() output

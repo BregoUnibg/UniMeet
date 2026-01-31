@@ -34,7 +34,11 @@ public class StudySession {
 	private StudyTable studyTable;
 	
 	private SessionType type;
-	private CourseSubject subject;
+	
+	@ManyToOne(fetch = FetchType.EAGER) 
+    @JoinColumn(name = "subject_id")
+	private Subject subject;
+	
 	private String description;
 	
 	@Column(nullable=false)
@@ -102,11 +106,11 @@ public class StudySession {
 		this.type = type;
 	}
 	
-	public CourseSubject getSubject() {
+	public Subject getSubject() {
 		return subject;
 	}
 	
-	public void setSubject(CourseSubject subject) {
+	public void setSubject(Subject subject) {
 		this.subject = subject;
 	}
 	
