@@ -23,6 +23,7 @@ import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
 import local.unimeet.security.SecurityService;
+import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudySessionService;
 import local.unimeet.service.UserService;
 import local.unimeet.ui.sessionview.SessionCard;
@@ -42,12 +43,14 @@ public class HomeView extends VerticalLayout {
 
 	private StudySessionService studySessionService;
 	private SecurityService securityService;
+	private SessionInvitationService sessionInvitationService;
 	private UserService userService;
 	
-    public HomeView(StudySessionService studySessionService, SecurityService securityService, UserService userService) {
+    public HomeView(StudySessionService studySessionService, SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService) {
         
     	this.studySessionService =	studySessionService;
     	this.securityService = securityService;
+    	this.sessionInvitationService = sessionInvitationService;
     	this.userService = userService;
     	
         addClassName("dashboard-view");
@@ -108,7 +111,7 @@ public class HomeView extends VerticalLayout {
         
         for(StudySession ss: currentOwnerSessions) {
         	
-        	mySessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService));         	
+        	mySessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
         	
         }
          
@@ -117,7 +120,7 @@ public class HomeView extends VerticalLayout {
         
         for(StudySession ss: studySessionService.getAllStudySessions()) {
         	
-        	suggestedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService));         	
+        	suggestedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
         	
         }
         

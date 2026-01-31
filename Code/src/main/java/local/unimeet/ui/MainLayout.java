@@ -38,10 +38,14 @@ public class MainLayout extends AppLayout {
 	SecurityService securityService;
 	UserService userService;
 	
+	private NotificationDrawer notificationDrawer;
+	
     public MainLayout(SecurityService securityService, UserService userService){
     	
     	this.securityService = securityService;
     	this.userService = userService;
+    	
+    	this.notificationDrawer = new NotificationDrawer();
     	
     	//Makes left navbar domnant over header
     	setPrimarySection(Section.DRAWER);
@@ -62,7 +66,8 @@ public class MainLayout extends AppLayout {
         Button notificationBtn = new Button(LumoIcon.BELL.create());
         notificationBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
         notificationBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
-
+        notificationBtn.addClickListener(e -> notificationDrawer.open());
+        
         addToNavbar(toggle, spacer, notificationBtn);
         
         
