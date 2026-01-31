@@ -55,8 +55,8 @@ public class SessionsView extends VerticalLayout {
     private TextArea description;
     private Button placeWizzardButton;
     private StudyTable selectedStudyTable;
-    private StudySessionService studySessionService;
     
+    private final StudySessionService studySessionService;
     private final UniversityService universityService;
 	private final BuildingService buildingService;
 	private final RoomService roomService;
@@ -225,6 +225,15 @@ public class SessionsView extends VerticalLayout {
         	endTime.getValue() != null &&
         	selectedStudyTable != null) {
         	
+        	//Checking for date overlapp
+        	
+        	if(!this.studySessionService.isTableAvailableGivenDateAndTime(selectedStudyTable.getId(), datePicker.getValue(), startTime.getValue(), endTime.getValue())) {
+        		
+        		Notification.show("Selected table is already booked in selected period", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        		return;
+        		
+        	}
+        	
         	//Creating the acutal StudySession
         	
         	StudySession newStudySession = new StudySession();
@@ -241,7 +250,7 @@ public class SessionsView extends VerticalLayout {
         	//Saving study session to database
         	this.studySessionService.saveStudySession(newStudySession);
         	
-            Notification.show("Aggiunto con successo", 2000, Notification.Position.BOTTOM_START).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            Notification.show("Added succesfully", 2000, Notification.Position.BOTTOM_START).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             courseSelect.clear();
             datePicker.clear();
             startTime.clear();
@@ -251,8 +260,9 @@ public class SessionsView extends VerticalLayout {
             selectedStudyTable = null;
             
             
-        } else {
-            Notification.show("Compila tutti i campi", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+        else {
+            Notification.show("Please fill all fields", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }
 

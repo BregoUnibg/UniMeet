@@ -1,5 +1,8 @@
 package local.unimeet.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +73,39 @@ public class StudySessionService {
 	    return studySessionRepository.findSessionWithDetailsById(id)
 	            .orElseThrow(() -> new RuntimeException("Session not found with id: " + id));
 	    
-	}	
+	}
+	
+	public List <StudySession> getStudySessionsByDate(LocalDate date){
+		
+		return this.studySessionRepository.findByDate(date);
+		
+	}
+	
+	public List <StudySession> getStudySessionsByDateAndTableId(LocalDate date, Long tableId){
+		
+		return this.studySessionRepository.findByDateAndStudyTableId(date, tableId);
+		
+	}
+	
+	/**
+	 * Checks for overlapping study session booked on the passed table
+	 * @param table
+	 */
+	public boolean isTableAvailableGivenDateAndTime(Long studyTableId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+		
+		
+		ArrayList <StudySession> sessions = (ArrayList<StudySession>) this.getStudySessionsByDateAndTableId(date, studyTableId);
+		
+		
+		for(StudySession s: sessions) {
+			
+			if(s.getTimeStart().isBefore(endTime) && s.getTimeEnd().isAfter(startTime))
+				return false;			
+			
+		}
+		
+		return true;
+		 
+	}
 	
 }
