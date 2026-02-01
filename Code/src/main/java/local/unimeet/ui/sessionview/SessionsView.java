@@ -5,12 +5,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.DescriptionList.Description;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -18,28 +14,27 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.timepicker.TimePicker;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import jakarta.annotation.security.PermitAll;
-import local.unimeet.entity.CourseSubject;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.StudyTable;
+import local.unimeet.entity.Subject;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.BuildingService;
 import local.unimeet.service.RoomService;
 import local.unimeet.service.StudySessionService;
 import local.unimeet.service.StudyTableService;
+import local.unimeet.service.SubjectService;
 import local.unimeet.service.UniversityService;
 import local.unimeet.service.UserService;
 import local.unimeet.ui.MainLayout;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+
 //this class have the purpose of design how the section of the dashboard looks like
 @Route(value = "sessions", layout = MainLayout.class)
 @PageTitle("Le mie Sessioni | UniMeet")
@@ -47,7 +42,7 @@ import java.time.format.DateTimeFormatter;
 public class SessionsView extends VerticalLayout {
 
     
-    private ComboBox<CourseSubject> courseSelect;
+    private ComboBox<Subject> courseSelect;
     private ComboBox<SessionType> visibilitySelect;
     private DatePicker datePicker;
     private TimePicker startTime;
@@ -55,17 +50,18 @@ public class SessionsView extends VerticalLayout {
     private TextArea description;
     private Button placeWizzardButton;
     private StudyTable selectedStudyTable;
-    private StudySessionService studySessionService;
     
+    private final StudySessionService studySessionService;
     private final UniversityService universityService;
 	private final BuildingService buildingService;
 	private final RoomService roomService;
 	private final StudyTableService studyTableService;
 	private final SecurityService securityService;
 	private final UserService userService;
+	private final SubjectService subjectService;
 	
     
-    public SessionsView(UniversityService universityService, BuildingService buildingService, RoomService roomService, StudyTableService studyTableService, StudySessionService studySessionService, SecurityService securityService, UserService userService) {
+    public SessionsView(UniversityService universityService, BuildingService buildingService, RoomService roomService, StudyTableService studyTableService, StudySessionService studySessionService, SecurityService securityService, UserService userService, SubjectService subjectService) {
        
     	this.universityService = universityService;
     	this.buildingService = buildingService;
@@ -74,7 +70,7 @@ public class SessionsView extends VerticalLayout {
     	this.studySessionService = studySessionService;
     	this.securityService = securityService;
     	this.userService = userService;
-    	
+    	this.subjectService = subjectService;
     	
         setSizeFull();
         setPadding(true);
@@ -93,8 +89,8 @@ public class SessionsView extends VerticalLayout {
         card.setSpacing(true);
 
         // Course & Type
-        courseSelect = new ComboBox<CourseSubject>("Course");
-        courseSelect.setItems(CourseSubject.values());
+        courseSelect = new ComboBox<Subject>("Course");
+        courseSelect.setItems(this.subjectService.getAllSubjects());
         courseSelect.setPlaceholder("Course");
         courseSelect.setWidthFull();
         
@@ -225,6 +221,15 @@ public class SessionsView extends VerticalLayout {
         	endTime.getValue() != null &&
         	selectedStudyTable != null) {
         	
+        	//Checking for date overlapp
+        	
+        	if(!this.studySessionService.isTableAvailableGivenDateAndTime(selectedStudyTable.getId(), datePicker.getValue(), startTime.getValue(), endTime.getValue())) {
+        		
+        		Notification.show("Selected table is already booked in selected period", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        		return;
+        		
+        	}
+        	
         	//Creating the acutal StudySession
         	
         	StudySession newStudySession = new StudySession();
@@ -241,7 +246,7 @@ public class SessionsView extends VerticalLayout {
         	//Saving study session to database
         	this.studySessionService.saveStudySession(newStudySession);
         	
-            Notification.show("Aggiunto con successo", 2000, Notification.Position.BOTTOM_START).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            Notification.show("Added succesfully", 2000, Notification.Position.BOTTOM_START).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             courseSelect.clear();
             datePicker.clear();
             startTime.clear();
@@ -251,8 +256,9 @@ public class SessionsView extends VerticalLayout {
             selectedStudyTable = null;
             
             
-        } else {
-            Notification.show("Compila tutti i campi", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        }
+        else {
+            Notification.show("Please fill all fields", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
         }
     }
 

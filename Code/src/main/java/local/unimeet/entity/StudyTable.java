@@ -62,5 +62,9 @@ public class StudyTable {
 	public Room getRoom() {
 		return room;
 	}
+
+	public long getId() {
+		return id;
+	}
 	
 }

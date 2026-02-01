@@ -1,5 +1,8 @@
 package local.unimeet.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +50,9 @@ public class StudySessionService {
 		if(studySession.getParticipants().contains(user) || studySession.getOwner().equals(user))
 			throw new IllegalArgumentException();
 		
+		if((studySession.getPartecipants().size()+1) >= studySession.getStudyTable().getCapacity())
+			throw new IllegalStateException();
+			
 		studySession.addPartecipant(user);
 		
 		studySessionRepository.save(studySession);
@@ -76,6 +82,39 @@ public class StudySessionService {
 	
 	public List<StudySession> findSessions(SessionSearchCriteria criteria) {
 	    return studySessionRepository.findAll(SearchSpecifications.searchSessions(criteria));
+  }
+  
+  public List <StudySession> getStudySessionsByDate(LocalDate date){
+		
+		return this.studySessionRepository.findByDate(date);
+		
+	}
+	
+	public List <StudySession> getStudySessionsByDateAndTableId(LocalDate date, Long tableId){
+		
+		return this.studySessionRepository.findByDateAndStudyTableId(date, tableId);
+		
+	}
+	
+	/**
+	 * Checks for overlapping study session booked on the passed table
+	 * @param table
+	 */
+	public boolean isTableAvailableGivenDateAndTime(Long studyTableId, LocalDate date, LocalTime startTime, LocalTime endTime) {
+		
+		
+		ArrayList <StudySession> sessions = (ArrayList<StudySession>) this.getStudySessionsByDateAndTableId(date, studyTableId);
+		
+		
+		for(StudySession s: sessions) {
+			
+			if(s.getTimeStart().isBefore(endTime) && s.getTimeEnd().isAfter(startTime))
+				return false;			
+			
+		}
+		
+		return true;
+		 
 	}
 	
 }
