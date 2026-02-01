@@ -12,6 +12,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
@@ -60,6 +61,7 @@ public class SessionsView extends VerticalLayout {
     private Button placeWizzardButton;
     private StudyTable selectedStudyTable;
     
+    Details details;
     private VerticalLayout sessionCardsContainer = new VerticalLayout();
     
     private final StudySessionService studySessionService;
@@ -102,7 +104,7 @@ public class SessionsView extends VerticalLayout {
         add(createSessionCardsContainer());
     }
 
-	private VerticalLayout createCreationCard() {
+	private Details createCreationCard() {
         VerticalLayout card = new VerticalLayout();
         card.addClassNames(LumoUtility.Background.BASE, LumoUtility.Padding.LARGE, LumoUtility.BorderRadius.LARGE, LumoUtility.BoxShadow.SMALL);
         card.setSpacing(true);
@@ -183,11 +185,15 @@ public class SessionsView extends VerticalLayout {
         
         // Configure Start Time
         startTime.setStep(Duration.ofMinutes(60));
-        startTime.setValue(LocalTime.of(9, 0)); // Default start
+        startTime.setMin(LocalTime.of(8, 0));
+        startTime.setMax(LocalTime.of(21, 0));
+        startTime.setValue(LocalTime.of(8, 0)); // Default start
 
         // Configure End Time
         endTime.setStep(Duration.ofMinutes(60));
-        endTime.setValue(LocalTime.of(10, 0)); // Default end
+        endTime.setMin(LocalTime.of(9, 0));
+        endTime.setMax(LocalTime.of(22, 0));
+        endTime.setValue(LocalTime.of(9, 0)); // Default end
 
         
         
@@ -201,7 +207,7 @@ public class SessionsView extends VerticalLayout {
             if (start != null) {
                 // Option A: Set min value for end time (Standard)
                 // Users can't scroll to earlier times in the second picker
-                endTime.setMin(start);
+                endTime.setMin(start.plusMinutes(60));
                 
                 // Option B: Auto-adjust End Time if it's now invalid
                 if (end != null && end.isBefore(start)) {
@@ -232,7 +238,12 @@ public class SessionsView extends VerticalLayout {
         saveBtn.addClickListener(e -> saveSession());
 
         card.add(row1, row2, row3, description, saveBtn);
-        return card;
+        
+        details = new Details(new H4("Create your session"), card);
+        
+	    details.setOpened(true);
+	    details.setWidthFull();
+        return details;
     }
 
     private void saveSession() {
@@ -269,13 +280,16 @@ public class SessionsView extends VerticalLayout {
         	
             Notification.show("Added succesfully", 2000, Notification.Position.BOTTOM_START).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             courseSelect.clear();
-            datePicker.clear();
-            startTime.clear();
-            endTime.clear();
+            visibilitySelect.setValue(SessionType.PUBLIC);
+            datePicker.setValue(LocalDate.now());
             placeWizzardButton.setText("Place");
+            startTime.setValue(LocalTime.of(8, 0));
+            endTime.setValue(LocalTime.of(9, 0));
             description.clear();
             selectedStudyTable = null;
             
+            details.setOpened(false);
+            performMySessionSearch();
             
         }
         else {

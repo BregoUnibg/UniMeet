@@ -10,11 +10,13 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -26,7 +28,7 @@ import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource; // Per le immagini se servono
+import com.vaadin.flow.server.StreamResource;
 
 import jakarta.annotation.security.PermitAll;
 import local.unimeet.dto.SessionSearchCriteria;
@@ -80,6 +82,7 @@ public class SearchView extends VerticalLayout {
     private ComboBox<Building> sessionBuilding = new ComboBox<>("Building");
     private ComboBox<Room> sessionRoom = new ComboBox<>("Room");
     private Checkbox onlyAvailable = new Checkbox("Only available seats");
+    Details SessionDetails;
     private Button searchSessionBtn = new Button("Find sessions", VaadinIcon.SEARCH.create());
 
     //--- USERS UI ---
@@ -93,6 +96,7 @@ public class SearchView extends VerticalLayout {
     private ComboBox<StudyCourse> userCourse = new ComboBox<>("Degree Name");
     private ComboBox<Subject> skillFilter = new ComboBox<>("Skills (Subject)");
     private NumberField minReputation = new NumberField("Min Reputation (0-5)");
+    Details UserDetails;
     private Button searchUserBtn = new Button("Find users", VaadinIcon.SEARCH.create());
 
     public SearchView(StudySessionService sessionService, ProfileService profileService, BuildingService buildingService, UniversityService universityService,
@@ -253,9 +257,14 @@ public class SearchView extends VerticalLayout {
         scroller.setSizeFull();
         scroller.setScrollDirection(Scroller.ScrollDirection.VERTICAL);
         
-        H3 resultsTitle = new H3("Search Results");
-
-        VerticalLayout layout = new VerticalLayout(filters, actions, resultsTitle, scroller);
+        SessionDetails = new Details(new H4("Filter Sessions"), filters, actions);
+        
+        SessionDetails.setOpened(true);
+        SessionDetails.setWidthFull();
+        
+        H4 resultsTitle = new H4("Search Results");
+        
+        VerticalLayout layout = new VerticalLayout(SessionDetails, resultsTitle, scroller);
         layout.setSizeFull();
         layout.setPadding(false);
         
@@ -281,10 +290,10 @@ public class SearchView extends VerticalLayout {
 
         //Handling "Zero result"
         if (results.isEmpty()) {
-            Div noResults = new Div();
             noResults.setText("No sessions found matching these criteria.");
             sessionCardsContainer.add(noResults);
         } else {
+        	SessionDetails.setOpened(false);
             //SessionCard creation
             for (StudySession session : results) {
                 SessionCard card = new SessionCard(session.getId(), securityService, userService, sessionService, sessionInvitationService);
@@ -352,9 +361,14 @@ public class SearchView extends VerticalLayout {
 
         configureUserGrid();
         
-        H3 resultsTitle = new H3("Search Result");
+        UserDetails = new Details(new H4("Filter User"), filters, actions);
+        
+        UserDetails.setOpened(true);
+        UserDetails.setWidthFull();
+        
+        H4 resultsTitle = new H4("Search Result");
 
-        userPage.add(filters, actions, resultsTitle, userGrid);
+        userPage.add(UserDetails, resultsTitle, userGrid);
         userPage.setSizeFull();
         userPage.setPadding(false);
     }
@@ -423,6 +437,7 @@ public class SearchView extends VerticalLayout {
             userPage.add(noResults);
             userPage.setHorizontalComponentAlignment(Alignment.CENTER, noResults);
         } else {
+        	UserDetails.setOpened(false);
         	//Show the results
         	userGrid.setVisible(true);
         	userPage.remove(noResults);
