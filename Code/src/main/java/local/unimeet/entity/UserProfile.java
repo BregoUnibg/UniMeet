@@ -17,7 +17,7 @@ public class UserProfile {
     @JoinColumn(name = "user_id")
     private User user;
 
-    // --- SEZIONE ANAGRAFE ---
+    //--- PERSONAL DETAILS SECTION ---
     @Lob
     @Column(name = "profile_picture", columnDefinition = "BLOB")
     private byte[] profilePicture;
@@ -32,7 +32,7 @@ public class UserProfile {
     private Double reputation;
     private Integer totVoters;
 
-    // --- SEZIONE PERCORSO DI STUDIO ---
+    //--- STUDY PATH SECTION ---
     @ManyToOne(fetch = FetchType.EAGER)
     private University university;
 
@@ -47,8 +47,7 @@ public class UserProfile {
 
     private Integer studyYear;
 
-    // --- SEZIONE CARRIERA ---
-    // Usiamo ManyToMany perché molti studenti possono avere la stessa materia preferita
+    //--- CAREER SECTION ---
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "profile_preferred_courses")
     private Set<Subject> preferredCourses = new HashSet<>();
@@ -65,60 +64,152 @@ public class UserProfile {
     @JoinTable(name = "profile_pending_exams")
     private Set<Subject> pendingExams = new HashSet<>();
 
-    // Costruttore vuoto obbligatorio
     public UserProfile() {}
 
-    // --- GETTER E SETTER ---
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    //--- GETTER AND SETTER ---
+    public String getId() {
+		return id;
+	}
 
-    public User getUser() { return user; }
-    public void setUser(User user) { this.user = user; }
-    
-    public byte[] getProfilePicture() { return profilePicture; }
-    public void setProfilePicture(byte[] profilePicture) { this.profilePicture = profilePicture; }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
+	public User getUser() {
+		return user;
+	}
 
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
+	public void setUser(User user) {
+		this.user = user;
+	}
 
-    public String getBio() { return bio; }
-    public void setBio(String bio) { this.bio = bio; }
-    
-    public Double getReputation() { return reputation; }
-    public void setReputation(Double reputation) { this.reputation = reputation; }
-    
-    public Integer getTotVoters() { return totVoters; }
-    public void setTotVoters(Integer totVoters) { this.totVoters = totVoters; }
+	public byte[] getProfilePicture() {
+		return profilePicture;
+	}
 
-    public University getUniversity() { return university; }
-    public void setUniversity(University university) { this.university = university; }
+	public void setProfilePicture(byte[] profilePicture) {
+		this.profilePicture = profilePicture;
+	}
 
-    public Department getDepartment() { return department; }
-    public void setDepartment(Department department) { this.department = department; }
+	public String getFirstName() {
+		return firstName;
+	}
 
-    public DegreeType getDegreeType() { return degreeType; }
-    public void setDegreeType(DegreeType degreeType) { this.degreeType = degreeType; }
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
 
-    public StudyCourse getCourseName() { return courseName; }
-    public void setCourseName(StudyCourse courseName) { this.courseName = courseName; }
+	public String getLastName() {
+		return lastName;
+	}
 
-    public Integer getStudyYear() { return studyYear; }
-    public void setStudyYear(Integer studyYear) { this.studyYear = studyYear; }
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 
-    public Set<Subject> getPreferredCourses() { return preferredCourses; }
-    public void setPreferredCourses(Set<Subject> preferredCourses) { this.preferredCourses = preferredCourses; }
+	public String getBio() {
+		return bio;
+	}
 
-    public Set<Subject> getDifficultCourses() { return difficultCourses; }
-    public void setDifficultCourses(Set<Subject> difficultCourses) { this.difficultCourses = difficultCourses; }
+	public void setBio(String bio) {
+		this.bio = bio;
+	}
 
-    public Set<Subject> getPassedExams() { return passedExams; }
-    public void setPassedExams(Set<Subject> passedExams) { this.passedExams = passedExams; }
+	public Double getReputation() {
+		return reputation;
+	}
 
-    public Set<Subject> getPendingExams() { return pendingExams; }
-    public void setPendingExams(Set<Subject> pendingExams) { this.pendingExams = pendingExams; }
+	public void setReputation(Double reputation) {
+		this.reputation = reputation;
+	}
+
+	public Integer getTotVoters() {
+		return totVoters;
+	}
+
+	public void setTotVoters(Integer totVoters) {
+		this.totVoters = totVoters;
+	}
+
+	public University getUniversity() {
+		return university;
+	}
+
+	public void setUniversity(University university) {
+		this.university = university;
+	}
+
+	public Department getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(Department department) {
+		this.department = department;
+	}
+
+	public DegreeType getDegreeType() {
+		return degreeType;
+	}
+
+	public void setDegreeType(DegreeType degreeType) {
+		this.degreeType = degreeType;
+	}
+
+	public StudyCourse getCourseName() {
+		return courseName;
+	}
+
+	public void setCourseName(StudyCourse courseName) {
+		this.courseName = courseName;
+	}
+
+	public Integer getStudyYear() {
+		return studyYear;
+	}
+
+	public void setStudyYear(Integer studyYear) {
+		this.studyYear = studyYear;
+	}
+
+	public Set<Subject> getPreferredCourses() {
+		return preferredCourses;
+	}
+
+	public void setPreferredCourses(Set<Subject> preferredCourses) {
+		this.preferredCourses = preferredCourses;
+	}
+
+	public Set<Subject> getDifficultCourses() {
+		return difficultCourses;
+	}
+
+	public void setDifficultCourses(Set<Subject> difficultCourses) {
+		this.difficultCourses = difficultCourses;
+	}
+
+	public Set<Subject> getPassedExams() {
+		return passedExams;
+	}
+
+	public void setPassedExams(Set<Subject> passedExams) {
+		this.passedExams = passedExams;
+	}
+
+	public Set<Subject> getPendingExams() {
+		return pendingExams;
+	}
+
+	public void setPendingExams(Set<Subject> pendingExams) {
+		this.pendingExams = pendingExams;
+	}
+
+	public static int getLength() {
+		return length;
+	}
+
+	private String stringNormalization(String s) {
+    	return s.substring(0, 1).toUpperCase()+s.substring(1).replace(" ", "").replace("_", " ").toLowerCase();
+    }
 
     @PrePersist
     @PreUpdate
@@ -128,12 +219,8 @@ public class UserProfile {
         if (bio != null) bio = bio.trim();
     }
     
-    private String stringNormalization(String s) {
-    	return s.substring(0, 1).toUpperCase()+s.substring(1).replace(" ", "").replace("_", " ").toLowerCase();
-    }
-    
-    // --- EQUALS E HASHCODE ---
-    // Fondamentali per il confronto degli oggetti nel Binder di Vaadin
+    //--- EQUALS E HASHCODE ---
+    //Essential for object comparison in Vaadin Binder
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

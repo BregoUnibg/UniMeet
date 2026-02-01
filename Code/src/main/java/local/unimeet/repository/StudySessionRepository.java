@@ -4,13 +4,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
 
-public interface StudySessionRepository extends JpaRepository <StudySession, String>{
+public interface StudySessionRepository extends JpaRepository <StudySession, String> , JpaSpecificationExecutor<StudySession> {
 	
 	
 	List<StudySession> findByOwner(User owner);
@@ -22,7 +23,7 @@ public interface StudySessionRepository extends JpaRepository <StudySession, Str
 	           "LEFT JOIN FETCH r.building b " +
 	           "LEFT JOIN FETCH b.university u " +
 	           "LEFT JOIN FETCH s.owner o " +       
-	           "LEFT JOIN FETCH s.partecipants p " + 
+	           "LEFT JOIN FETCH s.participants p " + 
 	           "WHERE s.owner.username = :username")
 	List<StudySession> findByOwnerWithDetails(@Param("username") String username);
 	
@@ -32,7 +33,7 @@ public interface StudySessionRepository extends JpaRepository <StudySession, Str
 	           "LEFT JOIN FETCH r.building b " +
 	           "LEFT JOIN FETCH b.university u " +
 	           "LEFT JOIN FETCH s.owner o " +      
-	           "LEFT JOIN FETCH s.partecipants p")
+	           "LEFT JOIN FETCH s.participants p")
 	List<StudySession> findAllWithDetails();
 	
 	@Query("SELECT DISTINCT s FROM StudySession s " +
@@ -41,7 +42,7 @@ public interface StudySessionRepository extends JpaRepository <StudySession, Str
 		       "LEFT JOIN FETCH r.building b " +
 		       "LEFT JOIN FETCH b.university u " +
 		       "LEFT JOIN FETCH s.owner o " +
-		       "LEFT JOIN FETCH s.partecipants p " +
+		       "LEFT JOIN FETCH s.participants p " +
 		       "WHERE s.id = :sessionId")
 	Optional<StudySession> findSessionWithDetailsById(@Param("sessionId") Long sessionId);
 	

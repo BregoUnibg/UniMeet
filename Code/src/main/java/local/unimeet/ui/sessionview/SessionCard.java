@@ -109,11 +109,11 @@ public class SessionCard extends Div{
 		
 		
 		//Student avatar Icons and join button
-		AvatarGroup avatarPartecipants = new AvatarGroup();
+		AvatarGroup avatarParticipants = new AvatarGroup();
 		
 	    AvatarGroupItem avatar = new AvatarGroupItem("Jhon Deer");
 	    avatar.setColorIndex(1);
-	    avatarPartecipants.add(avatar);
+	    avatarParticipants.add(avatar);
 	    
 	    
 		/*
@@ -138,7 +138,7 @@ public class SessionCard extends Div{
 	    joinButton.setWidth("150px");
 	    
 	    
-	    avatarPartecipants.getStyle().set("margin-left", "16px");
+	    avatarParticipants.getStyle().set("margin-left", "16px");
 	    joinButton.getStyle().set("margin-left", "16px");
 	    
 	    VerticalLayout bottomMaskLeft = new VerticalLayout();
@@ -153,7 +153,7 @@ public class SessionCard extends Div{
 	    bottomMaskCenter.setPadding(false);
 	    bottomMaskRight.setPadding(false);
 	    
-	    bottomMaskLeft.add(avatarPartecipants);
+	    bottomMaskLeft.add(avatarParticipants);
 	    bottomMaskRight.add(joinButton);
 	    
 	    bottom.add(bottomMaskLeft, bottomMaskCenter, bottomMaskRight);
@@ -189,7 +189,8 @@ public class SessionCard extends Div{
 
 		//Keeping this as a sample
 		
-		this.setWidth("1000px");
+		this.setWidth("100%");
+		this.setMaxWidth("1000px");
 		this.getStyle().set("background-color", "white");
 		
 		VerticalLayout card = new VerticalLayout();
@@ -264,21 +265,21 @@ public class SessionCard extends Div{
 		
 		
 		//Student avatar Icons and join button
-		AvatarGroup avatarPartecipants = new AvatarGroup();
+		AvatarGroup avatarParticipants = new AvatarGroup();
 		
 	    AvatarGroupItem avatar = new AvatarGroupItem(studySession.getOwner().getUsername());
 	    avatar.setColorIndex(1);
-	    avatarPartecipants.add(avatar);
+	    avatarParticipants.add(avatar);
 	    
 	    int i = 2;
 	    
 	    AvatarGroupItem myAvatar = null;
 	    
-	    for (User partecipant: studySession.getPartecipants()) {
+	    for (User partecipant: studySession.getParticipants()) {
 		    String name = partecipant.getUsername();
 		    AvatarGroupItem a = new AvatarGroupItem(name);
 		    a.setColorIndex(i++);
-		    avatarPartecipants.add(a);
+		    avatarParticipants.add(a);
 		    
 		    if(this.securityService.getAuthenticatedUsername().equals(partecipant.getUsername())){
 		    	myAvatar = a;
@@ -309,7 +310,7 @@ public class SessionCard extends Div{
 	    //Join button logic
 	    
 	    String currentUsername =  this.securityService.getAuthenticatedUsername();
-	    ArrayList<User> studySessionPartecipants =  (ArrayList<User>) studySession.getPartecipantsAndOwner();
+	    ArrayList<User> studySessionParticipants =  (ArrayList<User>) studySession.getParticipantsAndOwner();
 	    
 	    boolean isAlreadyInSession = false;
 	    
@@ -325,7 +326,7 @@ public class SessionCard extends Div{
 	    }
 
 	    //Can't use equals or contains because of hybernate lazy exception
-	    for(User u: studySessionPartecipants) {
+	    for(User u: studySessionParticipants) {
 	    	if(u.getUsername().equals(currentUsername)) {
 	    		isAlreadyInSession = true;
 	    	}
@@ -357,7 +358,7 @@ public class SessionCard extends Div{
 	            Notification.show("Joined successfully!");
 	            
 
-	            avatarPartecipants.add(myAvatarWrapper);
+	            avatarParticipants.add(myAvatarWrapper);
 	            
 	            availableSeats.setText(studySession.getCountMembers() + "/6");
 	            availableSeats.getElement().getThemeList().clear();
@@ -378,7 +379,7 @@ public class SessionCard extends Div{
 			    leaveButton.setVisible(false);
 	            Notification.show("Left successfully!");
 	            
-	            avatarPartecipants.remove(myAvatarWrapper);
+	            avatarParticipants.remove(myAvatarWrapper);
 	            
 	            availableSeats.setText(studySession.getCountMembers() + "/6");
 	            availableSeats.getElement().getThemeList().clear();
@@ -391,7 +392,7 @@ public class SessionCard extends Div{
 	    });
 	    
 	    
-	    avatarPartecipants.getStyle().set("margin-left", "16px");
+	    avatarParticipants.getStyle().set("margin-left", "16px");
 	    joinButton.getStyle().set("margin-left", "16px");
 	    
 	    VerticalLayout bottomMaskLeft = new VerticalLayout();
@@ -406,7 +407,7 @@ public class SessionCard extends Div{
 	    bottomMaskCenter.setPadding(false);
 	    bottomMaskRight.setPadding(false);
 	    
-	    bottomMaskLeft.add(avatarPartecipants);
+	    bottomMaskLeft.add(avatarParticipants);
 	    bottomMaskRight.add(buttonWrapper);
 	    
 	    bottom.add(bottomMaskLeft, bottomMaskCenter, bottomMaskRight);
