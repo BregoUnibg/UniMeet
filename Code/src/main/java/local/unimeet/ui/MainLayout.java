@@ -1,6 +1,6 @@
 package local.unimeet.ui;
 
-import java.util.Optional;
+import java.io.ByteArrayInputStream;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
@@ -22,28 +22,35 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.VaadinServletRequest;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 
-import local.unimeet.ui.sessionview.SessionsView;
 import local.unimeet.entity.Role;
 import local.unimeet.entity.User;
+import local.unimeet.entity.UserProfile;
+import local.unimeet.repository.UserRepository;
 import local.unimeet.security.SecurityService;
+import local.unimeet.service.ProfileService;
 import local.unimeet.service.UserService;
-import local.unimeet.ui.PersonalArea;
+import local.unimeet.ui.sessionview.SessionsView;
 
 public class MainLayout extends AppLayout {
 	
 	SecurityService securityService;
 	UserService userService;
+	ProfileService profileService;
+	UserRepository userRepository;
 	
 	private NotificationDrawer notificationDrawer;
 	
-    public MainLayout(SecurityService securityService, UserService userService){
+    public MainLayout(SecurityService securityService, UserService userService, UserRepository userRepository, ProfileService profileService){
     	
     	this.securityService = securityService;
     	this.userService = userService;
+    	this.profileService = profileService;
+    	this.userRepository = userRepository;
     	
     	this.notificationDrawer = new NotificationDrawer();
     	
@@ -100,45 +107,39 @@ public class MainLayout extends AppLayout {
         branding.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
         branding.setPadding(true); branding.setSpacing(true); branding.addClassName(LumoUtility.Margin.Bottom.MEDIUM);
 
-        SideNav nav = new SideNav();
-        
-        
-        
+        Div navWrapper = new Div();
         
         User currentUser = userService.getUserByUsername(securityService.getAuthenticatedUsername());
         
         if (currentUser != null) {
+            // =========================================================
+            //  User pages
+            // =========================================================
+        	SideNav userNav = new SideNav("Menu Principale"); // Il titolo appare sopra gli elementi
+            userNav.setCollapsible(true);
+            userNav.addItem(new SideNavItem("Home", HomeView.class, VaadinIcon.HOME.create()));
+            userNav.addItem(new SideNavItem("My Sessions", SessionsView.class, VaadinIcon.BOOK.create()));
+            userNav.addItem(new SideNavItem("Search", SearchView.class, VaadinIcon.SEARCH.create()));
+            
+            navWrapper.add(userNav);
             
             // =========================================================
             //  Admin pages
             // =========================================================
             if (currentUser.getRole() == Role.ADMIN || currentUser.getRole() == Role.UNI_ADMIN) {
+            	SideNav adminNav = new SideNav("Amministrazione");
+                adminNav.setCollapsible(true);
+                adminNav.setExpanded(false);
                 
-                nav.addItem(new SideNavItem("Dashboard", AdminHomeView.class, VaadinIcon.DASHBOARD.create()));
+                adminNav.addItem(new SideNavItem("Dashboard", AdminHomeView.class, VaadinIcon.DASHBOARD.create()));
+                adminNav.addItem(new SideNavItem("Buildings", AdminBuildingsView.class, VaadinIcon.BUILDING.create()));
+                adminNav.addItem(new SideNavItem("Room", AdminRoomsView.class, VaadinIcon.KEY.create()));
+                adminNav.addItem(new SideNavItem("Tables", AdminTablesView.class, VaadinIcon.TABLE.create()));
+                adminNav.addItem(new SideNavItem("Courses", AdminCoursesView.class, VaadinIcon.ACADEMY_CAP.create()));
 
-                nav.addItem(new SideNavItem("Gestione Edifici", AdminBuildingsView.class, VaadinIcon.BUILDING.create()));
-                
-                nav.addItem(new SideNavItem("Gestione Aule", AdminRoomsView.class, VaadinIcon.KEY.create()));
-
-                nav.addItem(new SideNavItem("Gestione Tavoli", AdminTablesView.class, VaadinIcon.TABLE.create()));
-
-                
-                nav.addItem(new SideNavItem("Gestione Corsi", AdminCoursesView.class, VaadinIcon.ACADEMY_CAP.create()));
-
+                navWrapper.add(adminNav);
             } 
-            // =========================================================
-            //  User pages
-            // =========================================================
-            else {
-                nav.addItem(new SideNavItem("Home", HomeView.class, VaadinIcon.HOME.create()));
-                nav.addItem(new SideNavItem("My Sessions", SessionsView.class, VaadinIcon.BOOK.create()));
-                
-            }
         }
-        
-        
-        
-        Div navWrapper = new Div(nav);
         
         //Needeed to fill up the navbar and make Items width same size as the navbar
         navWrapper.addClassName(LumoUtility.Padding.Horizontal.MEDIUM);
@@ -162,6 +163,16 @@ public class MainLayout extends AppLayout {
         Avatar avatar = new Avatar(username);
         avatar.addThemeName("xsmall");
         avatar.getStyle().set("background-color", "white").set("color", "#0f172a");
+        if (username != null) {
+        	User currentUser = userRepository.findById(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            UserProfile currentProfile = profileService.getOrCreateProfile(currentUser);
+        	if (currentProfile.getProfilePicture() != null && currentProfile.getProfilePicture().length > 0) {
+                StreamResource resource = new StreamResource("avatar", 
+                    () -> new ByteArrayInputStream(currentProfile.getProfilePicture()));
+                avatar.setImageResource(resource);
+            }
+        }       
         
         RouterLink nameLink = new RouterLink(username, PersonalArea.class);
         nameLink.addClassNames(LumoUtility.FontWeight.BOLD, LumoUtility.FontSize.SMALL); nameLink.getStyle().set("color", "white");

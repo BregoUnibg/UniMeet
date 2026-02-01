@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import local.unimeet.dto.SessionSearchCriteria;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
 import local.unimeet.repository.StudySessionRepository;
+import local.unimeet.repository.specifications.SearchSpecifications;
 
 @Service
 public class StudySessionService {
@@ -45,7 +47,7 @@ public class StudySessionService {
 		
 		User user = userService.getUserByUsername(username);
 		
-		if(studySession.getPartecipants().contains(user) || studySession.getOwner().equals(user))
+		if(studySession.getParticipants().contains(user) || studySession.getOwner().equals(user))
 			throw new IllegalArgumentException();
 		
 		if((studySession.getPartecipants().size()+1) >= studySession.getStudyTable().getCapacity())
@@ -62,7 +64,7 @@ public class StudySessionService {
 		
 		User user = userService.getUserByUsername(username);
 		
-		if(!studySession.getPartecipants().contains(user) || studySession.getOwner().equals(user))
+		if(!studySession.getParticipants().contains(user) || studySession.getOwner().equals(user))
 			throw new IllegalArgumentException();
 		
 		studySession.removePartecipant(user);
@@ -78,7 +80,11 @@ public class StudySessionService {
 	    
 	}
 	
-	public List <StudySession> getStudySessionsByDate(LocalDate date){
+	public List<StudySession> findSessions(SessionSearchCriteria criteria) {
+	    return studySessionRepository.findAll(SearchSpecifications.searchSessions(criteria));
+  }
+  
+  public List <StudySession> getStudySessionsByDate(LocalDate date){
 		
 		return this.studySessionRepository.findByDate(date);
 		

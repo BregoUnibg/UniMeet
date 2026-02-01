@@ -58,14 +58,15 @@ public class StudySession {
 	//!!!!!IMPORTANT!!!!!!
 	//This creates a separate tablble in the database that contains
 	//session ids and usernames as it is standsrd to handle many to many realations this way
-	//The join table in question is called session_partecipants
+	//The join table in question is called session_participants
 	@ManyToMany(fetch = FetchType.EAGER)
 
 	@JoinTable(
 			  name = "session_participants", 
 			  joinColumns = @JoinColumn(name = "session_id"), 
 			  inverseJoinColumns = @JoinColumn(name = "username"))	
-	private List <User> partecipants;
+	private List <User> participants;
+	private int maxParticipants;
 	
 	
 	//Empty construvtor needed by JPA
@@ -158,11 +159,11 @@ public class StudySession {
 		return id;
 	}
 	
-	public List<User> getPartecipants() {
-		return partecipants;
+	public List<User> getParticipants() {
+		return participants;
 	}
 	
-	public List<User> getPartecipantsAndOwner() {
+	public List<User> getParticipantsAndOwner() {
 		
 		List<User> everybody = new ArrayList<>();
 	    
@@ -170,26 +171,38 @@ public class StudySession {
 	        everybody.add(owner);
 	    }
 	    	   
-	    if (partecipants != null) {
-	        everybody.addAll(partecipants);
+	    if (participants != null) {
+	        everybody.addAll(participants);
 	    }
 	    
 	    return everybody;
 	}
 	
-	public void addPartecipant(User partecipant) {
-		if(this.partecipants == null)
-			this.partecipants = new ArrayList <User>();
+	public void addPartecipant(User participants) {
+		if(this.participants == null)
+			this.participants = new ArrayList <User>();
 		
-		this.partecipants.add(partecipant);
+		this.participants.add(participants);
 	}
 	
-	public void removePartecipant(User partecipant) {
-		this.partecipants.remove(partecipant);
+	public void removePartecipant(User participants) {
+		this.participants.remove(participants);
 	}
 	
 	public int getCountMembers(){
-		return this.partecipants.size() + 1;
+		return this.participants.size() + 1;
 	}
+
+
+	public int getMaxParticipants() {
+		return maxParticipants;
+	}
+
+
+	public void setMaxParticipants(int maxParticipants) {
+		this.maxParticipants = maxParticipants;
+	}
+	
+	
 
 }

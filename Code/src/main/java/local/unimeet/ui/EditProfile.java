@@ -100,7 +100,7 @@ public class EditProfile extends VerticalLayout {
     	//Logic to recover the logged user
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findById(username)
-                .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         UserProfile currentProfile = profileService.getOrCreateProfile(currentUser);
         
         add(new H2("Personal area | Edit"));
