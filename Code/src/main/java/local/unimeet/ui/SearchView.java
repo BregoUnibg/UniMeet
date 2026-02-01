@@ -1,6 +1,7 @@
 package local.unimeet.ui;
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.vaadin.flow.component.avatar.Avatar;
@@ -149,6 +150,41 @@ public class SearchView extends VerticalLayout {
     // SESSIONS SECTION
     // ==========================================
     private VerticalLayout createSessionPage() {
+    	//Perform the data's logic
+        LocalDate today = LocalDate.now();
+        fromDate.setMin(today);
+        fromDate.setValue(today);
+        toDate.setMin(today);
+        
+        fromDate.addValueChangeListener(e -> {
+            LocalDate selectedFrom = e.getValue();
+
+            if (selectedFrom != null) {
+                //A: If the user has chosen a "From" date, the "To" date must start from there
+                toDate.setMin(selectedFrom);
+
+                // B: Consistency check
+                // If the user selected a "From" date, the "To" date must start from there. If the user had already selected a "To" date that is now
+                // before the new "From" date, we delete it to avoid logical errors.
+                if (toDate.getValue() != null && toDate.getValue().isBefore(selectedFrom)) {
+                    toDate.clear();
+                }
+            } else {
+                // C: If the user deletes the "From" date, the "To" date returns to having
+            	// the only constraint being "Today" (not the past)
+                toDate.setMin(today);
+            }
+        });
+        
+        toDate.addValueChangeListener(e -> {
+            LocalDate selectedTo = e.getValue();
+            if (selectedTo != null) {
+                fromDate.setMax(selectedTo);
+            } else {
+                fromDate.setMax(null);
+            }
+        });
+    	
     	//Set what to see in the ComboBoxes
     	sessionBuilding.setItemLabelGenerator(Building::getName);
     	sessionRoom.setItemLabelGenerator(room -> String.valueOf(room.getNumber()));
@@ -192,9 +228,18 @@ public class SearchView extends VerticalLayout {
         searchSessionBtn.addClickListener(e -> performSessionSearch());
         
         Button resetBtn = new Button("Reset", e -> {
-            sessionSubject.clear(); fromDate.clear(); toDate.clear(); 
-            sessionUni.clear(); onlyAvailable.clear();
+            sessionSubject.clear();
+            fromDate.clear();
+            toDate.clear(); 
+            sessionUni.clear();
+            onlyAvailable.clear();
             sessionCardsContainer.removeAll();
+            LocalDate now = LocalDate.now();
+            fromDate.setMin(now);
+            fromDate.setMax(null);
+            fromDate.setValue(now);
+            toDate.setMin(now);
+            toDate.setMax(null);
         });
         
         HorizontalLayout actions = new HorizontalLayout(searchSessionBtn, resetBtn);

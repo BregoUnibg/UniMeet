@@ -124,7 +124,9 @@ public class SessionsView extends VerticalLayout {
 
         // Date & Place
         datePicker = new DatePicker("Date");
-        datePicker.setValue(LocalDate.now());
+        LocalDate now = LocalDate.now();
+        datePicker.setValue(now);
+        datePicker.setMin(now);
         datePicker.setWidthFull();
         
         placeWizzardButton = new Button("Place");
