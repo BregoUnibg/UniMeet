@@ -25,7 +25,7 @@ public class SessionInvitationService {
     @Transactional
     public void sendInvite(StudySession session, User userToInvite) {
         
-        if (session.getPartecipants().contains(userToInvite)) {
+        if (session.getParticipants().contains(userToInvite)) {
             throw new IllegalStateException("User is already in the session!");
         }
         if (invitationRepository.existsBySessionAndInvitee(session, userToInvite)) {

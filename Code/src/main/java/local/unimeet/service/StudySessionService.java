@@ -50,7 +50,7 @@ public class StudySessionService {
 		if(studySession.getParticipants().contains(user) || studySession.getOwner().equals(user))
 			throw new IllegalArgumentException();
 		
-		if((studySession.getPartecipants().size()+1) >= studySession.getStudyTable().getCapacity())
+		if((studySession.getParticipants().size()+1) >= studySession.getStudyTable().getCapacity())
 			throw new IllegalStateException();
 			
 		studySession.addPartecipant(user);

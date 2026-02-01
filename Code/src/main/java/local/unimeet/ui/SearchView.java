@@ -43,6 +43,7 @@ import local.unimeet.service.BuildingService;
 import local.unimeet.service.DepartmentService;
 import local.unimeet.service.ProfileService;
 import local.unimeet.service.RoomService;
+import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudyCourseService;
 import local.unimeet.service.StudySessionService; // Assumi che esista
 import local.unimeet.service.SubjectService;
@@ -63,6 +64,7 @@ public class SearchView extends VerticalLayout {
     private final DepartmentService departmentService;
     private final StudyCourseService studyCourseService;
     private final SubjectService subjectService;
+    private final SessionInvitationService sessionInvitationService;
     
     private final SecurityService securityService;
     private final UserService userService;
@@ -94,7 +96,7 @@ public class SearchView extends VerticalLayout {
 
     public SearchView(StudySessionService sessionService, ProfileService profileService, BuildingService buildingService, UniversityService universityService,
     				  RoomService roomService, DepartmentService departmentService, StudyCourseService studyCourseService, SubjectService subjectService,
-    				  SecurityService securityService, UserService userService) {
+    				  SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService) {
         this.sessionService = sessionService;
         this.profileService = profileService;
         this.buildingService = buildingService;
@@ -106,6 +108,7 @@ public class SearchView extends VerticalLayout {
         
         this.securityService = securityService;
         this.userService = userService;
+        this.sessionInvitationService = sessionInvitationService;
 
         setSizeFull();
         setSpacing(true);
@@ -239,7 +242,7 @@ public class SearchView extends VerticalLayout {
         } else {
             //SessionCard creation
             for (StudySession session : results) {
-                SessionCard card = new SessionCard(session.getId(), securityService, userService, sessionService);
+                SessionCard card = new SessionCard(session.getId(), securityService, userService, sessionService, sessionInvitationService);
                 
                 sessionCardsContainer.add(card);
             }

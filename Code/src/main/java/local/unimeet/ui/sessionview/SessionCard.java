@@ -187,7 +187,7 @@ public class SessionCard extends Div{
 	    }
 
 	    //Can't use contains because of hybernate lazy exception
-	    for(User u: studySessionPartecipants) {
+	    for(User u: studySessionParticipants) {
 	    	if(u.getUsername().equals(currentUsername)) {
 	    		isAlreadyInSession = true;
 	    	}
@@ -304,7 +304,7 @@ public class SessionCard extends Div{
 	    }
 	    
 	    
-	    avatarPartecipants.getStyle().set("margin-left", "16px");
+	    avatarParticipants.getStyle().set("margin-left", "16px");
 	    joinButton.getStyle().set("margin-left", "16px");
 	    
 	    VerticalLayout bottomMaskLeft = new VerticalLayout();
