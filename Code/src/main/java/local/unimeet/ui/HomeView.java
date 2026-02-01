@@ -1,8 +1,12 @@
 package local.unimeet.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
@@ -11,29 +15,23 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
 import jakarta.annotation.security.PermitAll;
-import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
+import local.unimeet.entity.Subject;
 import local.unimeet.entity.User;
+import local.unimeet.entity.UserProfile;
+import local.unimeet.repository.UserRepository;
 import local.unimeet.security.SecurityService;
+import local.unimeet.service.ProfileService;
 import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudySessionService;
 import local.unimeet.service.UserService;
 import local.unimeet.ui.sessionview.SessionCard;
-
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Route(value = "", layout = MainLayout.class)
 @PageTitle("Home")
@@ -41,17 +39,22 @@ import java.util.List;
 public class HomeView extends VerticalLayout {
 
 
-	private StudySessionService studySessionService;
-	private SecurityService securityService;
-	private SessionInvitationService sessionInvitationService;
-	private UserService userService;
+	private final StudySessionService studySessionService;
+	private final SecurityService securityService;
+	private final SessionInvitationService sessionInvitationService;
+	private final UserService userService;
+	private final ProfileService profileService;
+	private final UserRepository userRepository;
 	
-    public HomeView(StudySessionService studySessionService, SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService) {
+    public HomeView(StudySessionService studySessionService, SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService,
+    				ProfileService profileService, UserRepository userRepository) {
         
     	this.studySessionService =	studySessionService;
     	this.securityService = securityService;
     	this.sessionInvitationService = sessionInvitationService;
     	this.userService = userService;
+    	this.profileService = profileService;
+    	this.userRepository = userRepository;
     	
         addClassName("dashboard-view");
         setPadding(true); 
@@ -65,7 +68,7 @@ public class HomeView extends VerticalLayout {
         mainContent.setSpacing(true);
 
         // Stats
-        mainContent.add(createStatsRow());
+        //mainContent.add(createStatsRow());
 
         // Tabs
         
@@ -94,11 +97,11 @@ public class HomeView extends VerticalLayout {
         */
         //TEMP
         
-        Div mySessionContent = new Div();
+        Div friendSessionContent = new Div();
         Div suggestedSessionContent = new Div();
         
         
-        tabs.add("My Sessions", mySessionContent);
+        tabs.add("Friends' Sessions", friendSessionContent);
         tabs.add("Suggested Sessions", suggestedSessionContent);
         
         tabs.addClassNames(LumoUtility.Display.FLEX,
@@ -107,18 +110,18 @@ public class HomeView extends VerticalLayout {
         );
         
         
-        List<StudySession> currentOwnerSessions = currentUserOwnerSessions();
+        /*List<StudySession> currentUserFriendsSessions = currentUserFriendsSessions();
         
-        for(StudySession ss: currentOwnerSessions) {
+        for(StudySession ss: currentUserFriendsSessions) {
         	
-        	mySessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	friendSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
         	
-        }
+        }*/
          
 
-        //Just a test to see how cards look like
+        List<StudySession> currentUserSaggestedSessions = currentUserSaggestedSessions();
         
-        for(StudySession ss: studySessionService.getAllStudySessions()) {
+        for(StudySession ss: currentUserSaggestedSessions) {
         	
         	suggestedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
         	
@@ -133,21 +136,50 @@ public class HomeView extends VerticalLayout {
         mainContent.add(tabs);
         add(mainContent);
     }
+    
+    private UserProfile getCurrentProfile() {
+    	String username = SecurityContextHolder.getContext().getAuthentication().getName();
+    	User currentUser = userRepository.findById(username)
+    	    .orElseThrow(() -> new RuntimeException("Utente non trovato"));
+    	return profileService.getOrCreateProfile(currentUser);
+    }
 
     
     /**
-     * Returns every studysession owned by the authenticather user
+     * Returns every studysession owned by the friends of the authenticather user
      * @return
      */
     
-    private List<StudySession> currentUserOwnerSessions(){
+    /*private List<StudySession> currentUserFriendsSessions(){
+    	/*StudySessionService studySer = studySessionService;
+    	SecurityService secSer = securityService;
     	
+    	//Prendo lista di tutti gli utenti
+    	Set<UserProfile> friends = getCurrentProfile().getFriends();
+    	
+    	List<StudySession> sessions = new ArrayList<StudySession>();
+    	
+    	for(UserProfile owner : friends) {
+    		sessions.addAll(studySer.getStudySessionByOwner(owner.getUser().getUsername()));
+    	}
+    	
+    	return sessions;
+    }*/
+    
+    private List<StudySession> currentUserSaggestedSessions(){
     	StudySessionService studySer = studySessionService;
     	SecurityService secSer = securityService;
     	
-    	return studySer.getStudySessionByOwner(secSer.getAuthenticatedUsername());
+    	//Prendo lista di tutti gli utenti
+    	Set<Subject> pendingExams = getCurrentProfile().getPendingExams();
     	
+    	List<StudySession> sessions = new ArrayList<StudySession>();
     	
+    	for(Subject s : pendingExams) {
+    		sessions.addAll(studySer.getStudySessionBySubject(s));
+    	}
+    	
+    	return sessions;
     }
     
     
@@ -183,17 +215,6 @@ public class HomeView extends VerticalLayout {
         banner.add(textContainer, decorationIcon); banner.expand(textContainer);
         return banner;
     }
-
-    //here it's created the banner where we keep track of the users profile statistics
-    private Component createStatsRow() {
-        HorizontalLayout row = new HorizontalLayout();
-        row.setWidthFull();
-        row.addClassNames(LumoUtility.Gap.MEDIUM, LumoUtility.FlexWrap.WRAP, LumoUtility.Margin.Vertical.MEDIUM);
-        
-        row.add(createCard("Active Sessions", String.valueOf(0), VaadinIcon.CLOCK.create(), "primary"));
-        return row;
-    }
-
     
     private VerticalLayout createCard(String l, String v, Component i, String c) {
         VerticalLayout card = new VerticalLayout();

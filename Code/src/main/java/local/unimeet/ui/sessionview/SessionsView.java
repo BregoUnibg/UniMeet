@@ -1,22 +1,33 @@
 package local.unimeet.ui.sessionview;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.Scroller;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.timepicker.TimePicker;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
 import jakarta.annotation.security.PermitAll;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
@@ -25,15 +36,13 @@ import local.unimeet.entity.Subject;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.BuildingService;
 import local.unimeet.service.RoomService;
+import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudySessionService;
 import local.unimeet.service.StudyTableService;
 import local.unimeet.service.SubjectService;
 import local.unimeet.service.UniversityService;
 import local.unimeet.service.UserService;
 import local.unimeet.ui.MainLayout;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 //this class have the purpose of design how the section of the dashboard looks like
 @Route(value = "sessions", layout = MainLayout.class)
@@ -51,6 +60,8 @@ public class SessionsView extends VerticalLayout {
     private Button placeWizzardButton;
     private StudyTable selectedStudyTable;
     
+    private VerticalLayout sessionCardsContainer = new VerticalLayout();
+    
     private final StudySessionService studySessionService;
     private final UniversityService universityService;
 	private final BuildingService buildingService;
@@ -59,9 +70,13 @@ public class SessionsView extends VerticalLayout {
 	private final SecurityService securityService;
 	private final UserService userService;
 	private final SubjectService subjectService;
+	private final StudySessionService sessionService;
+	private final SessionInvitationService sessionInvitationService;
 	
     
-    public SessionsView(UniversityService universityService, BuildingService buildingService, RoomService roomService, StudyTableService studyTableService, StudySessionService studySessionService, SecurityService securityService, UserService userService, SubjectService subjectService) {
+    public SessionsView(UniversityService universityService, BuildingService buildingService, RoomService roomService, StudyTableService studyTableService,
+    					StudySessionService studySessionService, SecurityService securityService, UserService userService, SubjectService subjectService,
+    					StudySessionService sessionService, SessionInvitationService sessionInvitationService) {
        
     	this.universityService = universityService;
     	this.buildingService = buildingService;
@@ -71,6 +86,8 @@ public class SessionsView extends VerticalLayout {
     	this.securityService = securityService;
     	this.userService = userService;
     	this.subjectService = subjectService;
+    	this.sessionService = sessionService;
+    	this.sessionInvitationService = sessionInvitationService;
     	
         setSizeFull();
         setPadding(true);
@@ -80,10 +97,12 @@ public class SessionsView extends VerticalLayout {
 
         add(createCreationCard());
 
-        add(new H4("Active Sessions"));
+        add(new H4("My Active Sessions"));
+        
+        add(createSessionCardsContainer());
     }
 
-    private VerticalLayout createCreationCard() {
+	private VerticalLayout createCreationCard() {
         VerticalLayout card = new VerticalLayout();
         card.addClassNames(LumoUtility.Background.BASE, LumoUtility.Padding.LARGE, LumoUtility.BorderRadius.LARGE, LumoUtility.BoxShadow.SMALL);
         card.setSpacing(true);
@@ -262,8 +281,6 @@ public class SessionsView extends VerticalLayout {
         }
     }
 
-    
-
     private void confirmDelete() {
         Dialog d = new Dialog();
         d.setHeaderTitle("Elimina Sessione");
@@ -275,6 +292,45 @@ public class SessionsView extends VerticalLayout {
         yes.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
         d.getFooter().add(new Button("Annulla", e -> d.close()), yes);
         d.open();
+    }
+
+    private Component createSessionCardsContainer() {
+    	sessionCardsContainer.setPadding(false);
+        sessionCardsContainer.setSpacing(true);
+        sessionCardsContainer.setWidthFull();
+        sessionCardsContainer.setDefaultHorizontalComponentAlignment(Alignment.CENTER);
+        
+        Scroller scroller = new Scroller(sessionCardsContainer);
+        scroller.setSizeFull();
+        scroller.setScrollDirection(Scroller.ScrollDirection.VERTICAL);
+        
+        performMySessionSearch();
+        
+		return scroller;
+	}
+    
+    private void performMySessionSearch() {
+    	String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        
+    	//Get the list of results from the Service
+        List<StudySession> results = sessionService.getStudySessionByOwner(username);
+
+        //Clean old results
+        sessionCardsContainer.removeAll();
+
+        //Handling "Zero result"
+        if (results.isEmpty()) {
+            Div noResults = new Div();
+            noResults.setText("You don't own any sessions.");
+            sessionCardsContainer.add(noResults);
+        } else {
+            //SessionCard creation
+            for (StudySession session : results) {
+                SessionCard card = new SessionCard(session.getId(), securityService, userService, sessionService, sessionInvitationService);
+                
+                sessionCardsContainer.add(card);
+            }
+        }
     }
 
 }

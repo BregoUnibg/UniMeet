@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
@@ -67,13 +68,41 @@ public class PersonalArea extends VerticalLayout implements HasUrlParameter<Stri
     }
     
     private void buildLayout() {
+    	boolean isOwner = SecurityContextHolder.getContext().getAuthentication().getName().equals(currentProfile.getUser().getUsername());
+    	
     	//General page settings
         setSpacing(true);
         setPadding(true);
         setMaxWidth("800px");
         getElement().getStyle().set("margin", "auto");
         
-        add(new H2("Personal area"));
+        H2 pageTitol = new H2("Personal area");
+        pageTitol.getStyle().set("margin", "0");
+        
+        HorizontalLayout titleFrindButton = new HorizontalLayout();
+        titleFrindButton.setWidthFull();
+        titleFrindButton.setAlignItems(Alignment.CENTER);
+        titleFrindButton.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        
+        //Friendship buttons
+        Div buttonWrapper = new Div();
+	    
+	    Button addFriendButton = new Button("Add Friend");
+	    addFriendButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+	    addFriendButton.setVisible(!isOwner);
+	    
+	    Button removeFriendButton = new Button("Remove Friend");
+	    removeFriendButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+	    removeFriendButton.setVisible(!isOwner);
+	    
+	    buttonWrapper.add(addFriendButton, removeFriendButton);
+	    
+	    //Both must exists but I just render the right one, only way to make it work in vaadin or html in general it seems
+	    addFriendButton.setVisible(!isOwner && true);
+	    removeFriendButton.setVisible(false);
+	    
+	    titleFrindButton.add(pageTitol, buttonWrapper);
+	    add(titleFrindButton);
 
         //--- PERSONAL DETAILS SECTION ---
         add(createAnagrafeSection(currentProfile));
@@ -91,7 +120,6 @@ public class PersonalArea extends VerticalLayout implements HasUrlParameter<Stri
         add(createCareerSection(currentProfile));
 
         //--- EDIT BUTTON ---
-        boolean isOwner = SecurityContextHolder.getContext().getAuthentication().getName().equals(currentProfile.getUser().getUsername());
         Button editButton = new Button("Edit Profile", e -> getUI().ifPresent(ui -> ui.navigate(EditProfile.class)));
         editButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         editButton.getStyle().set("margin-top", "2em");

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import local.unimeet.dto.UserSearchCriteria;
+import local.unimeet.entity.Subject;
 import local.unimeet.entity.User;
 import local.unimeet.entity.UserProfile;
 import local.unimeet.repository.UserProfileRepository;

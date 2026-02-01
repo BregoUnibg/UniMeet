@@ -1,6 +1,7 @@
 package local.unimeet.repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import local.unimeet.entity.StudySession;
+import local.unimeet.entity.Subject;
 import local.unimeet.entity.User;
 
 @Repository
@@ -23,6 +25,7 @@ public interface StudySessionRepository extends JpaRepository <StudySession, Lon
 	
 	List<StudySession> findByDateAndStudyTableId(LocalDate date, Long studyTableId);
 	
+	List <StudySession> findBySubject(Subject subject);
 	
 	//Needed to avoid LazyInitializationException
 	@Query("SELECT DISTINCT s FROM StudySession s " +
@@ -54,6 +57,8 @@ public interface StudySessionRepository extends JpaRepository <StudySession, Lon
 		       "LEFT JOIN FETCH s.participants p " +
 		       "WHERE s.id = :sessionId")
 	Optional<StudySession> findSessionWithDetailsById(@Param("sessionId") Long sessionId);
+
+	
 	
 	
 }

@@ -3,6 +3,7 @@ package local.unimeet.service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import local.unimeet.dto.SessionSearchCriteria;
 import local.unimeet.entity.StudySession;
+import local.unimeet.entity.Subject;
 import local.unimeet.entity.User;
 import local.unimeet.repository.StudySessionRepository;
 import local.unimeet.repository.specifications.SearchSpecifications;
@@ -115,6 +117,10 @@ public class StudySessionService {
 		
 		return true;
 		 
+	}
+
+	public List <StudySession> getStudySessionBySubject(Subject s) {
+		return studySessionRepository.findBySubject(s);
 	}
 	
 }
