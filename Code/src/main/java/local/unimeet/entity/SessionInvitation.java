@@ -26,9 +26,6 @@ public class SessionInvitation {
     @JoinColumn(name = "invitee_username", nullable = false)
     private User invitee;
 
-    @Enumerated(EnumType.STRING)
-    private InvitationStatus status = InvitationStatus.PENDING;
-
     private LocalDateTime sentAtDateTime = LocalDateTime.now();
     
     public SessionInvitation() {
@@ -49,14 +46,6 @@ public class SessionInvitation {
 
 	public void setInvitee(User invitee) {
 		this.invitee = invitee;
-	}
-
-	public InvitationStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(InvitationStatus status) {
-		this.status = status;
 	}
 
 	public LocalDateTime getSentAtDateTime() {

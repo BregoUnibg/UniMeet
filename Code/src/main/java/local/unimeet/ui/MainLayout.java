@@ -32,7 +32,9 @@ import local.unimeet.entity.User;
 import local.unimeet.entity.UserProfile;
 import local.unimeet.repository.UserRepository;
 import local.unimeet.security.SecurityService;
+import local.unimeet.service.ColleagueRequestService;
 import local.unimeet.service.ProfileService;
+import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.UserService;
 import local.unimeet.ui.sessionview.SessionsView;
 
@@ -41,18 +43,20 @@ public class MainLayout extends AppLayout {
 	SecurityService securityService;
 	UserService userService;
 	ProfileService profileService;
-	UserRepository userRepository;
+	SessionInvitationService sessionInvitationService;
+	ColleagueRequestService colleagueReqeustService;
 	
-	private NotificationDrawer notificationDrawer;
+	private NotificationPanel notificationPanel;
 	
-    public MainLayout(SecurityService securityService, UserService userService, UserRepository userRepository, ProfileService profileService){
+    public MainLayout(SecurityService securityService, UserService userService, ProfileService profileService, SessionInvitationService sessionInvitationService, ColleagueRequestService colleagueRequestService){
     	
     	this.securityService = securityService;
     	this.userService = userService;
     	this.profileService = profileService;
-    	this.userRepository = userRepository;
+    	this.sessionInvitationService = sessionInvitationService;
+    	this.colleagueReqeustService = colleagueRequestService;
     	
-    	this.notificationDrawer = new NotificationDrawer();
+    	this.notificationPanel= new NotificationPanel(this.userService.getUserByUsername(this.securityService.getAuthenticatedUsername()), sessionInvitationService, this.colleagueReqeustService);
     	
     	//Makes left navbar domnant over header
     	setPrimarySection(Section.DRAWER);
@@ -60,6 +64,9 @@ public class MainLayout extends AppLayout {
     	createDrawer();
         createHeader();
         getElement().getThemeList().add("no-border");
+        
+        getElement().appendChild(notificationPanel.getElement());
+        
     }
 
     //create the header when are sitated the bell the aeroplano and the tre liniette for opening and closing the left column
@@ -73,7 +80,7 @@ public class MainLayout extends AppLayout {
         Button notificationBtn = new Button(LumoIcon.BELL.create());
         notificationBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ICON);
         notificationBtn.getStyle().set("color", "#0f172a").set("font-size", "1.3rem");
-        notificationBtn.addClickListener(e -> notificationDrawer.open());
+        notificationBtn.addClickListener(e -> notificationPanel.toggle());
         
         addToNavbar(toggle, spacer, notificationBtn);
         
@@ -164,8 +171,7 @@ public class MainLayout extends AppLayout {
         avatar.addThemeName("xsmall");
         avatar.getStyle().set("background-color", "white").set("color", "#0f172a");
         if (username != null) {
-        	User currentUser = userRepository.findById(username)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        	User currentUser = userService.getUserByUsername(username);
             UserProfile currentProfile = profileService.getOrCreateProfile(currentUser);
         	if (currentProfile.getProfilePicture() != null && currentProfile.getProfilePicture().length > 0) {
                 StreamResource resource = new StreamResource("avatar", 

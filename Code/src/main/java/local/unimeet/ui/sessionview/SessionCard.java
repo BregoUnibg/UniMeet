@@ -185,6 +185,9 @@ public class SessionCard extends Div{
 	    		leaveButton.getStyle().setBackground("Gray");
 	    		
 	    }
+	    
+	    if(studySession.getType().equals(SessionType.PRIVATE))
+	    	joinButton.setEnabled(false);
 
 	    //Can't use contains because of hybernate lazy exception
 	    for(User u: studySessionParticipants) {
@@ -290,7 +293,7 @@ public class SessionCard extends Div{
 
 		        }catch(Exception e) {
 		        	
-		        	Notification.show("Unsuccesfully invited" + e.getMessage());
+		        	Notification.show("Unsuccesfully invited: " + e.getMessage());
 		        	userPopover.close();
 		        	
 		        }

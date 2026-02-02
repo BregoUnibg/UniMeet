@@ -1,5 +1,8 @@
 package local.unimeet.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +15,14 @@ public class User {
 	private Role role;
 	@OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private UserProfile profile;
+	
+	@ManyToMany
+    @JoinTable(
+        name = "user_colleagues", 
+        joinColumns = @JoinColumn(name = "user_id"), 
+        inverseJoinColumns = @JoinColumn(name = "colleague_id")
+    )
+    private Set<User> colleagues = new HashSet<>();
 	
 	
 	//Empty constructor required by Jpa for every entity in order to create objects
@@ -85,6 +96,20 @@ public class User {
 		return this.getProfile().getUniversity();
 		
 	}
+	
+	public void addColleague(User user) {
+        this.colleagues.add(user);
+        user.getColleagues().add(this);
+    }
+	
+	public void removeColleague(User user) {
+	    this.colleagues.remove(user);
+	    user.getColleagues().remove(this);
+	}
+
+    public Set<User> getColleagues() {
+        return colleagues;
+    }
 
 }
 	

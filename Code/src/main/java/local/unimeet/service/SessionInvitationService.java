@@ -1,9 +1,10 @@
 package local.unimeet.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
-import local.unimeet.entity.InvitationStatus;
 import local.unimeet.entity.SessionInvitation;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
@@ -28,14 +29,18 @@ public class SessionInvitationService {
         if (session.getParticipants().contains(userToInvite)) {
             throw new IllegalStateException("User is already in the session!");
         }
+        
         if (invitationRepository.existsBySessionAndInvitee(session, userToInvite)) {
-            throw new IllegalStateException("Invite already sent!");
+            throw new IllegalStateException("User allready has a pending invite!");
         }
-
+        
+        if (session.getOwner().equals(userToInvite)) {
+            throw new IllegalStateException("You own the session!");
+        }
+        
         SessionInvitation invite = new SessionInvitation();
         invite.setSession(session);
         invite.setInvitee(userToInvite);
-        invite.setStatus(InvitationStatus.PENDING);
         
         invitationRepository.save(invite);
     }
@@ -52,8 +57,7 @@ public class SessionInvitationService {
         sessionRepository.save(session);
 
         //Close Invitation
-        invite.setStatus(InvitationStatus.ACCEPTED);
-        invitationRepository.save(invite);
+        this.invitationRepository.deleteById(invitationId);
     }
 
     
@@ -61,7 +65,13 @@ public class SessionInvitationService {
         SessionInvitation invite = invitationRepository.findById(invitationId)
             .orElseThrow();
             
-        invite.setStatus(InvitationStatus.REJECTED);
-        invitationRepository.save(invite);
+        invitationRepository.deleteById(invitationId);
+    }
+    
+    /**
+     * Returns a list of pending invitations for a specific user.
+     */
+    public List<SessionInvitation> getPendingInvitationsByInvitee(User invitee) {
+        return invitationRepository.findByInvitee(invitee);
     }
 }

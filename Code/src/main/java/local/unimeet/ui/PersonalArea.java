@@ -1,6 +1,7 @@
 package local.unimeet.ui;
 
 import java.io.ByteArrayInputStream;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEvent;
@@ -27,7 +29,10 @@ import local.unimeet.entity.Subject;
 import local.unimeet.entity.User;
 import local.unimeet.entity.UserProfile;
 import local.unimeet.repository.UserRepository;
+import local.unimeet.security.SecurityService;
+import local.unimeet.service.ColleagueRequestService;
 import local.unimeet.service.ProfileService;
+import local.unimeet.service.UserService;
 
 @Route(value = "personal-area", layout = MainLayout.class)
 @PageTitle("Personal Profile")
@@ -36,13 +41,17 @@ public class PersonalArea extends VerticalLayout implements HasUrlParameter<Stri
 	
 	private UserProfile currentProfile;
     private final ProfileService profileService;
-    private final UserRepository userRepository;
+    private final UserService userService;
 	private final DelegationInterface delegate;
+	private final ColleagueRequestService colleagueRequestService;
+	private final SecurityService securityService;
 
-    public PersonalArea(ProfileService profileService, UserRepository userRepository, DelegationInterface delegate) {
+    public PersonalArea(ProfileService profileService, UserService userService, DelegationInterface delegate, ColleagueRequestService colleagueRequestService, SecurityService securityService) {
     	this.profileService = profileService;
-        this.userRepository = userRepository;
+        this.userService= userService;
     	this.delegate = delegate;
+    	this.colleagueRequestService = colleagueRequestService;
+    	this.securityService = securityService;
     }
     
     @Override
@@ -59,7 +68,8 @@ public class PersonalArea extends VerticalLayout implements HasUrlParameter<Stri
         }
 
         //Load profile from database
-        userRepository.findById(targetUsername).ifPresentOrElse(user -> {
+        Optional.ofNullable(userService.getUserByUsername(targetUsername))
+        .ifPresentOrElse(user -> {
             this.currentProfile = profileService.getOrCreateProfile(user);
             buildLayout();
         }, () -> {
@@ -84,26 +94,88 @@ public class PersonalArea extends VerticalLayout implements HasUrlParameter<Stri
         titleFrindButton.setAlignItems(Alignment.CENTER);
         titleFrindButton.setJustifyContentMode(JustifyContentMode.BETWEEN);
         
+        
+        
+        
         //Friendship buttons
         Div buttonWrapper = new Div();
 	    
-	    Button addFriendButton = new Button("Add Friend");
-	    addFriendButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-	    addFriendButton.setVisible(!isOwner);
+	    Button addColleagueButton = new Button("Add");
+	    addColleagueButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+	    addColleagueButton.setVisible(!isOwner);
 	    
-	    Button removeFriendButton = new Button("Remove Friend");
-	    removeFriendButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
-	    removeFriendButton.setVisible(!isOwner);
+	    Button removeColleagueButton = new Button("Remove");
+	    removeColleagueButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+	    removeColleagueButton.setVisible(!isOwner);
 	    
-	    buttonWrapper.add(addFriendButton, removeFriendButton);
+	    buttonWrapper.add(addColleagueButton, removeColleagueButton);
 	    
 	    //Both must exists but I just render the right one, only way to make it work in vaadin or html in general it seems
-	    addFriendButton.setVisible(!isOwner && true);
-	    removeFriendButton.setVisible(false);
+	    addColleagueButton.setVisible(!isOwner);
+	    removeColleagueButton.setVisible(false);
+	    
+	    addColleagueButton.setEnabled(!isOwner);
+	    removeColleagueButton.setEnabled(!isOwner);
+	    
+	    User currentUser = this.userService.getUserByUsername(this.securityService.getAuthenticatedUsername());
+	    User profileUser = this.currentProfile.getUser();
+	    
+	    
+	    //If request is pengind see addColleague but can't interract with it
+	    if(this.colleagueRequestService.isRequestPending(currentUser, profileUser)) {
+	    	addColleagueButton.setEnabled(false);
+	    }
+	    
+	    
+	    //If they area colleagues enable removeColleague Button
+	    if(this.colleagueRequestService.areColleagues(currentUser, profileUser)){
+	    	addColleagueButton.setVisible(false);
+		    removeColleagueButton.setVisible(true);
+	    }
+	    
+	    
+	    	
+	    addColleagueButton.addClickListener(event -> {
+	        try {
+	            
+	        	this.colleagueRequestService.sendRequest(currentUser, profileUser);
+	            Notification.show("Request Succesfully sent to: " + profileUser.getUsername());
+	            
+	            addColleagueButton.setEnabled(false);
+	            
+	            
+	        } catch (Exception e) {
+	            Notification.show("Error sending reqeust: " + e.getMessage());
+	        }
+	    });
+	    
+	    
+	    removeColleagueButton.addClickListener(event -> {
+	        try {
+	            
+	        	this.colleagueRequestService.removeColleague(currentUser, profileUser);
+	        	Notification.show("You are no longer colleagues");
+	            
+	            addColleagueButton.setVisible(true);
+	            removeColleagueButton.setVisible(false);
+	            removeColleagueButton.setEnabled(false);
+	            
+	            
+	        } catch (Exception e) {
+	            Notification.show("Error: " + e.getMessage());
+	        }
+	        
+	    });
+	    
+	    //IMPLEMENT SECURITYSERVICE AND MANAGE FIREND REQUESTS WHEN CLICKING ADD ADD REMOVE FRIENDS BUTTON
+	    //IF REQEUST IS PENDING BUTTONS ARE DISABLED
+	    
 	    
 	    titleFrindButton.add(pageTitol, buttonWrapper);
 	    add(titleFrindButton);
 
+	    
+	    
         //--- PERSONAL DETAILS SECTION ---
         add(createAnagrafeSection(currentProfile));
 

@@ -123,4 +123,9 @@ public class StudySessionService {
 		return studySessionRepository.findBySubject(s);
 	}
 	
+	public List<StudySession> getStudySessionsByParticipant(String username) {
+		
+	    return this.studySessionRepository.findByParticipantsUsername(username);
+	    
+	}
 }

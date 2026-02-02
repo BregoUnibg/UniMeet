@@ -46,6 +46,7 @@ public class HomeView extends VerticalLayout {
 	private final ProfileService profileService;
 	private final UserRepository userRepository;
 	
+	
     public HomeView(StudySessionService studySessionService, SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService,
     				ProfileService profileService, UserRepository userRepository) {
         
@@ -55,6 +56,7 @@ public class HomeView extends VerticalLayout {
     	this.userService = userService;
     	this.profileService = profileService;
     	this.userRepository = userRepository;
+    	
     	
         addClassName("dashboard-view");
         setPadding(true); 
@@ -66,6 +68,7 @@ public class HomeView extends VerticalLayout {
         VerticalLayout mainContent = new VerticalLayout();
         mainContent.setPadding(false); 
         mainContent.setSpacing(true);
+        mainContent.setWidthFull();
 
         // Stats
         //mainContent.add(createStatsRow());
@@ -97,10 +100,36 @@ public class HomeView extends VerticalLayout {
         */
         //TEMP
         
+
+        Div joinedSessionContent = new Div();
         Div friendSessionContent = new Div();
         Div suggestedSessionContent = new Div();
         
+        joinedSessionContent.setWidth("1200px");
+        joinedSessionContent.addClassNames(
+        	    LumoUtility.Display.FLEX,          
+        	    LumoUtility.JustifyContent.CENTER  
         
+        		);
+        
+        friendSessionContent.setWidth("1200px");
+        friendSessionContent.addClassNames(
+        	    LumoUtility.Display.FLEX,          
+        	    LumoUtility.JustifyContent.CENTER  
+        
+        		);
+        
+        
+        suggestedSessionContent.setWidth("1200px");
+        suggestedSessionContent.addClassNames(
+        	    LumoUtility.Display.FLEX,          
+        	    LumoUtility.JustifyContent.CENTER  
+        
+        		);
+        
+        
+        
+        tabs.add("Joined Sessions", joinedSessionContent);
         tabs.add("Friends' Sessions", friendSessionContent);
         tabs.add("Suggested Sessions", suggestedSessionContent);
         
@@ -108,6 +137,14 @@ public class HomeView extends VerticalLayout {
         	    LumoUtility.JustifyContent.CENTER,
         	    LumoUtility.AlignItems.CENTER
         );
+        
+        List<StudySession> currentUserJoinedSessions = this.studySessionService.getStudySessionsByParticipant(this.securityService.getAuthenticatedUsername());
+        
+        for(StudySession ss: currentUserJoinedSessions) {
+        	
+        	joinedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	
+        }
         
         
         /*List<StudySession> currentUserFriendsSessions = currentUserFriendsSessions();

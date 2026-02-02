@@ -58,7 +58,7 @@ public interface StudySessionRepository extends JpaRepository <StudySession, Lon
 		       "WHERE s.id = :sessionId")
 	Optional<StudySession> findSessionWithDetailsById(@Param("sessionId") Long sessionId);
 
-	
-	
+	// Finds sessions where the 'participants' list contains a User with the given 'username'
+	List<StudySession> findByParticipantsUsername(String username);
 	
 }
