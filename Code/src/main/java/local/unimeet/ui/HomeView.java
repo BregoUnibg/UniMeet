@@ -13,6 +13,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -27,6 +28,7 @@ import local.unimeet.entity.User;
 import local.unimeet.entity.UserProfile;
 import local.unimeet.repository.UserRepository;
 import local.unimeet.security.SecurityService;
+import local.unimeet.service.ColleagueRequestService;
 import local.unimeet.service.ProfileService;
 import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudySessionService;
@@ -44,11 +46,12 @@ public class HomeView extends VerticalLayout {
 	private final SessionInvitationService sessionInvitationService;
 	private final UserService userService;
 	private final ProfileService profileService;
+	private final ColleagueRequestService colleagueRequestService; 
 	private final UserRepository userRepository;
 	
 	
     public HomeView(StudySessionService studySessionService, SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService,
-    				ProfileService profileService, UserRepository userRepository) {
+    				ProfileService profileService, UserRepository userRepository, ColleagueRequestService colleagueReqeustService) {
         
     	this.studySessionService =	studySessionService;
     	this.securityService = securityService;
@@ -56,6 +59,7 @@ public class HomeView extends VerticalLayout {
     	this.userService = userService;
     	this.profileService = profileService;
     	this.userRepository = userRepository;
+    	this.colleagueRequestService = colleagueReqeustService;
     	
     	
         addClassName("dashboard-view");
@@ -101,36 +105,27 @@ public class HomeView extends VerticalLayout {
         //TEMP
         
 
-        Div joinedSessionContent = new Div();
-        Div friendSessionContent = new Div();
-        Div suggestedSessionContent = new Div();
+        VerticalLayout joinedSessionContent = new VerticalLayout();
+        VerticalLayout colleaguesSessionContent = new VerticalLayout();
+        VerticalLayout suggestedSessionContent = new VerticalLayout();
         
         joinedSessionContent.setWidth("1200px");
-        joinedSessionContent.addClassNames(
-        	    LumoUtility.Display.FLEX,          
-        	    LumoUtility.JustifyContent.CENTER  
+        joinedSessionContent.setHeightFull();
+        joinedSessionContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         
-        		);
-        
-        friendSessionContent.setWidth("1200px");
-        friendSessionContent.addClassNames(
-        	    LumoUtility.Display.FLEX,          
-        	    LumoUtility.JustifyContent.CENTER  
-        
-        		);
+        colleaguesSessionContent.setWidth("1200px");
+        colleaguesSessionContent.setHeightFull();
+        colleaguesSessionContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         
         
         suggestedSessionContent.setWidth("1200px");
-        suggestedSessionContent.addClassNames(
-        	    LumoUtility.Display.FLEX,          
-        	    LumoUtility.JustifyContent.CENTER  
-        
-        		);
+        suggestedSessionContent.setHeightFull();
+        suggestedSessionContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         
         
         
         tabs.add("Joined Sessions", joinedSessionContent);
-        tabs.add("Friends' Sessions", friendSessionContent);
+        tabs.add("Colleagues' Sessions", colleaguesSessionContent);
         tabs.add("Suggested Sessions", suggestedSessionContent);
         
         tabs.addClassNames(LumoUtility.Display.FLEX,
@@ -146,6 +141,14 @@ public class HomeView extends VerticalLayout {
         	
         }
         
+        
+        List<StudySession> colleagueSessions = this.studySessionService.getSessionsFromColleagues(this.securityService.getAuthenticatedUsername());
+        
+        for(StudySession ss: colleagueSessions) {
+        	
+        	colleaguesSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	
+        }
         
         /*List<StudySession> currentUserFriendsSessions = currentUserFriendsSessions();
         
@@ -166,6 +169,7 @@ public class HomeView extends VerticalLayout {
         
         
         tabs.setWidthFull();
+        tabs.setHeightFull();
         tabs.addClassName(LumoUtility.Margin.Top.MEDIUM);
 
         

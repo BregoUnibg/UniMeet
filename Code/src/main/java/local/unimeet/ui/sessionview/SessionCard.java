@@ -55,7 +55,7 @@ public class SessionCard extends Div{
 		card.setSpacing(false);
 		
 		top.setWidthFull();
-		top.setMaxHeight("150px");
+		top.setMaxHeight("200px");
 		bottom.setWidthFull();
 		bottom.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
 		
@@ -85,6 +85,16 @@ public class SessionCard extends Div{
 		subject.getStyle().set("color", "#8B0836");
 		subject.getStyle().setBackgroundColor("#FFF0F1");
 		
+		subject.addClassNames(
+			    LumoUtility.TextOverflow.ELLIPSIS,
+			    LumoUtility.Whitespace.NOWRAP,
+			    LumoUtility.Overflow.HIDDEN
+			);
+		subject.getStyle().set("max-width", "350px");
+		subject.getStyle().set("display", "inline-block");
+		
+		
+		
 		badges.add(type, subject);
 		
 		Span description = new Span(studySession.getDescription());
@@ -109,12 +119,11 @@ public class SessionCard extends Div{
 		
 		right.add(date, time, availableSeats);
 		
-		
 
 		
 		//Make it so left and right pane take up 1/4 of the total lenght each
-		left.setWidth("25%");
-		center.setWidth("50%");
+		left.setWidth("30%");
+		center.setWidth("45%");
 		right.setWidth("25%");
 		top.add(left, center, right);
 		

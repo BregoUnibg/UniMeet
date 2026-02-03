@@ -128,4 +128,19 @@ public class StudySessionService {
 	    return this.studySessionRepository.findByParticipantsUsername(username);
 	    
 	}
+	
+	@Transactional 
+	public List<StudySession> getSessionsFromColleagues(String username) {
+	    
+		User user = userService.getUserByUsername(username);
+	    
+	    List<StudySession> allSessions = new ArrayList<>();
+	    
+	    for (User colleague : user.getColleagues()) {
+	        allSessions.addAll(this.getStudySessionByOwner(colleague.getUsername()));
+	    }
+	    
+	    return allSessions;
+	}
+	
 }
