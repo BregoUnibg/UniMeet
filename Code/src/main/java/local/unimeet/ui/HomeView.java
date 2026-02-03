@@ -33,6 +33,7 @@ import local.unimeet.repository.UserRepository;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.ColleagueRequestService;
 import local.unimeet.service.ProfileService;
+import local.unimeet.service.ReviewService;
 import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudySessionService;
 import local.unimeet.service.UserService;
@@ -50,11 +51,12 @@ public class HomeView extends VerticalLayout {
 	private final UserService userService;
 	private final ProfileService profileService;
 	private final ColleagueRequestService colleagueRequestService; 
+	private final ReviewService reviewService;
 	private final UserRepository userRepository;
 	
 	
     public HomeView(StudySessionService studySessionService, SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService,
-    				ProfileService profileService, UserRepository userRepository, ColleagueRequestService colleagueReqeustService) {
+    				ProfileService profileService, UserRepository userRepository, ColleagueRequestService colleagueReqeustService, ReviewService reviewService) {
         
     	this.studySessionService =	studySessionService;
     	this.securityService = securityService;
@@ -63,7 +65,7 @@ public class HomeView extends VerticalLayout {
     	this.profileService = profileService;
     	this.userRepository = userRepository;
     	this.colleagueRequestService = colleagueReqeustService;
-    	
+    	this.reviewService = reviewService;
     	
         addClassName("dashboard-view");
         setPadding(true); 
@@ -140,7 +142,7 @@ public class HomeView extends VerticalLayout {
         
         for(StudySession ss: currentUserJoinedSessions) {
         	
-        	scheduledSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	scheduledSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService, reviewService));         	
         	
         }
         
@@ -149,7 +151,7 @@ public class HomeView extends VerticalLayout {
         
         for(StudySession ss: colleagueSessions) {
         	
-        	colleaguesSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	colleaguesSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService, reviewService));         	
         	
         }
         
@@ -158,7 +160,7 @@ public class HomeView extends VerticalLayout {
         
         for(StudySession ss: currentUserSaggestedSessions) {
         	
-        	suggestedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	suggestedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService, reviewService));         	
         	
         }
         
@@ -167,7 +169,7 @@ public class HomeView extends VerticalLayout {
         
         for(StudySession ss: currentUserEndedSessions) {
         	
-        	endedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	endedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService, reviewService));         	
         	
         }
         
@@ -288,7 +290,8 @@ public class HomeView extends VerticalLayout {
             this.securityService, 
             this.userService, 
             this.studySessionService, 
-            this.sessionInvitationService
+            this.sessionInvitationService,
+            this.reviewService
         );
 
         // Styling to make it pop

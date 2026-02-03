@@ -37,6 +37,7 @@ import local.unimeet.entity.Subject;
 import local.unimeet.exception.StudentBusyElsewhereException;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.BuildingService;
+import local.unimeet.service.ReviewService;
 import local.unimeet.service.RoomService;
 import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudySessionService;
@@ -61,6 +62,7 @@ public class SessionsView extends VerticalLayout {
     private TextArea description;
     private Button placeWizzardButton;
     private StudyTable selectedStudyTable;
+    private ReviewService reviewService;
     
     Details details;
     private VerticalLayout sessionCardsContainer = new VerticalLayout();
@@ -79,7 +81,7 @@ public class SessionsView extends VerticalLayout {
     
     public SessionsView(UniversityService universityService, BuildingService buildingService, RoomService roomService, StudyTableService studyTableService,
     					StudySessionService studySessionService, SecurityService securityService, UserService userService, SubjectService subjectService,
-    					StudySessionService sessionService, SessionInvitationService sessionInvitationService) {
+    					StudySessionService sessionService, SessionInvitationService sessionInvitationService, ReviewService reviewService) {
        
     	this.universityService = universityService;
     	this.buildingService = buildingService;
@@ -91,6 +93,7 @@ public class SessionsView extends VerticalLayout {
     	this.subjectService = subjectService;
     	this.sessionService = sessionService;
     	this.sessionInvitationService = sessionInvitationService;
+    	this.reviewService = reviewService;
     	
         setSizeFull();
         setPadding(true);
@@ -355,7 +358,7 @@ public class SessionsView extends VerticalLayout {
         } else {
             //SessionCard creation
             for (StudySession session : results) {
-                SessionCard card = new SessionCard(session.getId(), securityService, userService, sessionService, sessionInvitationService);
+                SessionCard card = new SessionCard(session.getId(), securityService, userService, sessionService, sessionInvitationService, reviewService);
                 
                 sessionCardsContainer.add(card);
             }

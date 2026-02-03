@@ -45,6 +45,7 @@ import local.unimeet.security.SecurityService;
 import local.unimeet.service.BuildingService;
 import local.unimeet.service.DepartmentService;
 import local.unimeet.service.ProfileService;
+import local.unimeet.service.ReviewService;
 import local.unimeet.service.RoomService;
 import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudyCourseService;
@@ -68,6 +69,7 @@ public class SearchView extends VerticalLayout {
     private final StudyCourseService studyCourseService;
     private final SubjectService subjectService;
     private final SessionInvitationService sessionInvitationService;
+    private final ReviewService reviewService;
     
     private final SecurityService securityService;
     private final UserService userService;
@@ -101,7 +103,7 @@ public class SearchView extends VerticalLayout {
 
     public SearchView(StudySessionService sessionService, ProfileService profileService, BuildingService buildingService, UniversityService universityService,
     				  RoomService roomService, DepartmentService departmentService, StudyCourseService studyCourseService, SubjectService subjectService,
-    				  SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService) {
+    				  SecurityService securityService, UserService userService, SessionInvitationService sessionInvitationService, ReviewService reviewService) {
         this.sessionService = sessionService;
         this.profileService = profileService;
         this.buildingService = buildingService;
@@ -110,6 +112,7 @@ public class SearchView extends VerticalLayout {
         this.departmentService = departmentService;
         this.studyCourseService = studyCourseService;
         this.subjectService = subjectService;
+        this.reviewService = reviewService;
         
         this.securityService = securityService;
         this.userService = userService;
@@ -296,7 +299,7 @@ public class SearchView extends VerticalLayout {
         	SessionDetails.setOpened(false);
             //SessionCard creation
             for (StudySession session : results) {
-                SessionCard card = new SessionCard(session.getId(), securityService, userService, sessionService, sessionInvitationService);
+                SessionCard card = new SessionCard(session.getId(), securityService, userService, sessionService, sessionInvitationService, reviewService);
                 
                 sessionCardsContainer.add(card);
             }
@@ -406,11 +409,9 @@ public class SearchView extends VerticalLayout {
                  getUI().ifPresent(ui -> ui.navigate(PersonalArea.class, profile.getUser().getUsername()));
             });
             
-            Button followBtn = new Button("Follow");
-            followBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-            followBtn.addClickListener(e -> Notification.show("You start to follow " + profile.getUser().getUsername()));
+           
             
-            return new HorizontalLayout(viewProfileBtn, followBtn);
+            return new HorizontalLayout(viewProfileBtn);
         }).setHeader("Actions");
         
         userGrid.setSizeFull();

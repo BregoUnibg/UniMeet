@@ -29,8 +29,8 @@ public class UserProfile {
     @Column(length = length)
     private String bio;
     
-    private Double reputation;
-    private Integer totVoters;
+    private Double reputation = 0.0;
+    private Integer totVoters = 0;
 
     //--- STUDY PATH SECTION ---
     @ManyToOne(fetch = FetchType.EAGER)
@@ -66,6 +66,35 @@ public class UserProfile {
 
     public UserProfile() {}
 
+    /**
+     * Updates the weighted average of the user's reputation.
+     * @param score The new score (1-5)
+     */
+    public void addReviewRating(int score) {
+        
+    	if (score < 1 || score > 5) {
+            throw new IllegalArgumentException("Score must be between 1 and 5");
+        }
+
+        // Handle nulls safely (legacy data or new profiles)
+        if (this.reputation == null) 
+        	this.reputation = 0.0;
+        
+        if (this.totVoters == null) 
+        	this.totVoters = 0;
+
+        double currentTotalScore = this.reputation * this.totVoters;
+        
+        currentTotalScore += score;
+        
+        this.totVoters++;
+        
+        this.reputation = currentTotalScore / this.totVoters;
+        this.reputation = Math.round(this.reputation * 100.0) / 100.0;
+        
+    }
+    
+    
     //--- GETTER AND SETTER ---
     public String getId() {
 		return id;
