@@ -2,11 +2,15 @@ package local.unimeet.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
@@ -64,9 +68,24 @@ public class HomeView extends VerticalLayout {
         addClassName("dashboard-view");
         setPadding(true); 
         setSpacing(true);
-
+        
+        setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
+        
         // Banner Premium
         add(createPremiumBanner());
+        
+        
+        //Optional: live session happening now in which current user is part of
+        String currentUsername = securityService.getAuthenticatedUsername();
+        Optional<StudySession> liveSession = studySessionService.getCurrentActiveSession(currentUsername);
+
+        if (liveSession.isPresent()) {
+            
+        	add(createLiveSessionSection(liveSession.get()));
+            
+        }
+                
+        
 
         VerticalLayout mainContent = new VerticalLayout();
         mainContent.setPadding(false); 
@@ -80,37 +99,16 @@ public class HomeView extends VerticalLayout {
         
         TabSheet tabs = new TabSheet();
         
-        
-        //TEMP
-        /*
-        StudySession temp = new StudySession();
-        
-        temp.setUniversity("Universita di Bergamo");
-        temp.setBuilding("A");
-        temp.setRoom("001");
-        temp.setAddress("Via dei cavalli");
-        temp.setType(SessionType.PUBLIC);
-        temp.setSubject(CourseSubject.CALCULUS_I);
-        temp.setDescription("very long and persuasive descipraelfdnasnmdasnkdbaskjdasjd asd ashd ashd ashd ashjd ashd ashd asj dasjhd asj ");
-        temp.setDate(LocalDate.of(2025, 8, 12));
-        temp.setTimeStart(LocalTime.of(9, 30));
-        temp.setTimeEnd(LocalTime.of(10, 30));
-        temp.setOwner(userService.getUserByUsername("brego"));
-        temp.addPartecipant(userService.getUserByUsername("paolo"));
-        temp.addPartecipant(userService.getUserByUsername("diego"));
-        
-        this.studySessionService.saveStudySession(temp);
-        */
-        //TEMP
-        
 
-        VerticalLayout joinedSessionContent = new VerticalLayout();
+        VerticalLayout scheduledSessionContent = new VerticalLayout();
         VerticalLayout colleaguesSessionContent = new VerticalLayout();
         VerticalLayout suggestedSessionContent = new VerticalLayout();
+        VerticalLayout endedSessionContent = new VerticalLayout();
         
-        joinedSessionContent.setWidth("1200px");
-        joinedSessionContent.setHeightFull();
-        joinedSessionContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
+        
+        scheduledSessionContent.setWidth("1200px");
+        scheduledSessionContent.setHeightFull();
+        scheduledSessionContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         
         colleaguesSessionContent.setWidth("1200px");
         colleaguesSessionContent.setHeightFull();
@@ -122,21 +120,27 @@ public class HomeView extends VerticalLayout {
         suggestedSessionContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         
         
+        endedSessionContent.setWidth("1200px");
+        endedSessionContent.setHeightFull();
+        endedSessionContent.setDefaultHorizontalComponentAlignment(FlexComponent.Alignment.CENTER);
         
-        tabs.add("Joined Sessions", joinedSessionContent);
+        
+        
+        tabs.add("Scheduled Sessions", scheduledSessionContent);
         tabs.add("Colleagues' Sessions", colleaguesSessionContent);
         tabs.add("Suggested Sessions", suggestedSessionContent);
+        tabs.add("Ended Sessions", endedSessionContent);
         
         tabs.addClassNames(LumoUtility.Display.FLEX,
         	    LumoUtility.JustifyContent.CENTER,
         	    LumoUtility.AlignItems.CENTER
         );
         
-        List<StudySession> currentUserJoinedSessions = this.studySessionService.getStudySessionsByParticipant(this.securityService.getAuthenticatedUsername());
+        List<StudySession> currentUserJoinedSessions = this.studySessionService.getMyScheduledSessions(this.securityService.getAuthenticatedUsername());
         
         for(StudySession ss: currentUserJoinedSessions) {
         	
-        	joinedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	scheduledSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
         	
         }
         
@@ -149,20 +153,21 @@ public class HomeView extends VerticalLayout {
         	
         }
         
-        /*List<StudySession> currentUserFriendsSessions = currentUserFriendsSessions();
-        
-        for(StudySession ss: currentUserFriendsSessions) {
-        	
-        	friendSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
-        	
-        }*/
-         
 
         List<StudySession> currentUserSaggestedSessions = currentUserSaggestedSessions();
         
         for(StudySession ss: currentUserSaggestedSessions) {
         	
         	suggestedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
+        	
+        }
+        
+        
+        List<StudySession> currentUserEndedSessions = this.studySessionService.getMyEndedSessions(this.securityService.getAuthenticatedUsername());
+        
+        for(StudySession ss: currentUserEndedSessions) {
+        	
+        	endedSessionContent.add(new SessionCard(ss.getId(), securityService, userService, studySessionService, sessionInvitationService));         	
         	
         }
         
@@ -265,4 +270,34 @@ public class HomeView extends VerticalLayout {
         card.add(i, new H3(v), new Span(l));
         return card;
     }
+    
+    private Component createLiveSessionSection(StudySession session) {
+        VerticalLayout liveContainer = new VerticalLayout();
+        liveContainer.setWidth("100%");
+        liveContainer.setMaxWidth("1100px");
+        liveContainer.setAlignItems(FlexComponent.Alignment.CENTER);
+        liveContainer.addClassNames(LumoUtility.Margin.Top.LARGE, LumoUtility.Margin.Bottom.LARGE);
+
+        // Header Text
+        H3 liveTitle = new H3("🔴 Happening Now");
+        liveTitle.addClassNames(LumoUtility.TextColor.ERROR, LumoUtility.Margin.Bottom.SMALL);
+
+        // The Card (Re-using your SessionCard)
+        SessionCard activeCard = new SessionCard(
+            session.getId(), 
+            this.securityService, 
+            this.userService, 
+            this.studySessionService, 
+            this.sessionInvitationService
+        );
+
+        // Styling to make it pop
+        activeCard.getStyle().set("box-shadow", "0 0 15px rgba(0, 0, 0, 0.1)");
+        activeCard.getStyle().set("border", "2px solid var(--lumo-error-color)");
+        activeCard.setWidthFull();
+
+        liveContainer.add(liveTitle, activeCard);
+        return liveContainer;
+    }
+    
 }

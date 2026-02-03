@@ -262,8 +262,8 @@ public class SessionsView extends VerticalLayout {
         	newStudySession.setType(this.visibilitySelect.getValue());
         	newStudySession.setDate(this.datePicker.getValue());
         	newStudySession.setStudyTable(this.selectedStudyTable);
-        	newStudySession.setTimeStart(this.startTime.getValue());
-        	newStudySession.setTimeEnd(this.endTime.getValue());
+        	newStudySession.setStartTime(this.startTime.getValue());
+        	newStudySession.setEndTime(this.endTime.getValue());
         	newStudySession.setDescription(this.description.getValue());
         	newStudySession.setOwner(this.userService.getUserByUsername(this.securityService.getAuthenticatedUsername()));
         	
@@ -342,7 +342,7 @@ public class SessionsView extends VerticalLayout {
     	String username = SecurityContextHolder.getContext().getAuthentication().getName();
         
     	//Get the list of results from the Service
-        List<StudySession> results = sessionService.getStudySessionByOwner(username);
+        List<StudySession> results = sessionService.getUpcomingOwnedSessions(username);
 
         //Clean old results
         sessionCardsContainer.removeAll();

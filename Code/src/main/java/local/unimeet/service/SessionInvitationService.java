@@ -43,7 +43,7 @@ public class SessionInvitationService {
             throw new IllegalStateException("You own the session!");
         }
         
-        if(!this.studySessionService.isUserAvailableGivenDateAndTime(userToInvite.getUsername(), session.getDate(), session.getTimeStart(), session.getTimeEnd())) {
+        if(!this.studySessionService.isUserAvailableGivenDateAndTime(userToInvite.getUsername(), session.getDate(), session.getStartTime(), session.getEndTime())) {
         	throw new StudentBusyElsewhereException();
         }
         

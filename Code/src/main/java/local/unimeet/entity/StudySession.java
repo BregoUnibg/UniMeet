@@ -44,9 +44,9 @@ public class StudySession {
 	@Column(nullable=false)
 	private LocalDate date;
 	@Column(nullable=false)
-	private LocalTime timeStart; 
+	private LocalTime startTime; 
 	@Column(nullable=false)
-	private LocalTime timeEnd;
+	private LocalTime endTime;
 	
 	//!!!IMPORTANT!!!!!
 	//Doing tells the database to memorize the external key of the user since it's a separate entity
@@ -73,6 +73,26 @@ public class StudySession {
 	public StudySession() {
 	}
 
+	
+	/**
+	 * Returns the status of the session
+	 * @return
+	 */
+	public StudySessionStatus getStatus() {
+        LocalDateTime now = LocalDateTime.now();
+        
+        LocalDateTime startDateTime = LocalDateTime.of(this.date, this.startTime);
+        LocalDateTime endDateTime = LocalDateTime.of(this.date, this.endTime);
+
+        if (now.isBefore(startDateTime)) {
+            return StudySessionStatus.UPCOMING;
+        } else if (now.isAfter(endDateTime)) {
+            return StudySessionStatus.ENDED;
+        } else {
+            return StudySessionStatus.IN_PROGRESS;
+        }
+    }
+	
 	
 	public StudyTable getStudyTable() {
 		return studyTable;
@@ -131,20 +151,20 @@ public class StudySession {
 		this.date = date;
 	}
 	
-	public LocalTime getTimeStart() {
-		return timeStart;
+	public LocalTime getStartTime() {
+		return startTime;
 	}
 	
-	public void setTimeStart(LocalTime timeStart) {
-		this.timeStart = timeStart;
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
 	}
 	
-	public LocalTime getTimeEnd() {
-		return timeEnd;
+	public LocalTime getEndTime() {
+		return endTime;
 	}
 	
-	public void setTimeEnd(LocalTime timeEnd) {
-		this.timeEnd = timeEnd;
+	public void setEndTime(LocalTime endTime) {
+		this.endTime = endTime;
 	}
 	
 	public User getOwner() {

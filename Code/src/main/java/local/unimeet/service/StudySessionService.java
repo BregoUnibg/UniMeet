@@ -5,12 +5,14 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import local.unimeet.dto.SessionSearchCriteria;
+import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.Subject;
 import local.unimeet.entity.User;
@@ -39,18 +41,18 @@ public class StudySessionService {
 	public StudySession saveStudySession(StudySession studySession) {
 		
 		//Checking for bad date time selection
-		if(studySession.getTimeStart().isAfter(studySession.getTimeEnd()) || 
+		if(studySession.getStartTime().isAfter(studySession.getEndTime()) || 
 				studySession.getDate().isBefore(LocalDate.now()) || 
-				(studySession.getDate().isEqual(LocalDate.now()) && studySession.getTimeStart().isBefore(LocalTime.now()))){
+				(studySession.getDate().isEqual(LocalDate.now()) && studySession.getStartTime().isBefore(LocalTime.now()))){
 			throw new IllegalArgumentException();
 		}
 		
 		//Checking for date overlapp
-		if(!this.isTableAvailableGivenDateAndTime(studySession.getStudyTable().getId(), studySession.getDate(), studySession.getTimeStart(), studySession.getTimeEnd())){
+		if(!this.isTableAvailableGivenDateAndTime(studySession.getStudyTable().getId(), studySession.getDate(), studySession.getStartTime(), studySession.getEndTime())){
 			throw new IllegalStateException();
 		}
 		
-		if(!this.isUserAvailableGivenDateAndTime(studySession.getOwner().getUsername(), studySession.getDate(), studySession.getTimeStart(), studySession.getTimeEnd())) {
+		if(!this.isUserAvailableGivenDateAndTime(studySession.getOwner().getUsername(), studySession.getDate(), studySession.getStartTime(), studySession.getEndTime())) {
 			throw new StudentBusyElsewhereException();
 		}
 		
@@ -80,7 +82,7 @@ public class StudySessionService {
 			throw new IllegalStateException();
 		
 		//User cannot participate in two sessions at the same tim, checks if user is allready in a session
-		if(!this.isUserAvailableGivenDateAndTime(username, studySession.getDate(), studySession.getTimeStart(), studySession.getTimeEnd())) {
+		if(!this.isUserAvailableGivenDateAndTime(username, studySession.getDate(), studySession.getStartTime(), studySession.getEndTime())) {
 			throw new StudentBusyElsewhereException();
 		}
 		
@@ -141,7 +143,7 @@ public class StudySessionService {
 		
 		for(StudySession s: sessions) {
 			
-			if(s.getTimeStart().isBefore(endTime) && s.getTimeEnd().isAfter(startTime))
+			if(s.getStartTime().isBefore(endTime) && s.getEndTime().isAfter(startTime))
 				return false;			
 			
 		}
@@ -160,7 +162,7 @@ public class StudySessionService {
 	    
 	    for (StudySession s : userSessions) {	        
 	        
-	    	if (s.getTimeStart().isBefore(endTime) && s.getTimeEnd().isAfter(startTime)) {
+	    	if (s.getStartTime().isBefore(endTime) && s.getEndTime().isAfter(startTime)) {
 	            return false;
 	        }
 	    }
@@ -181,15 +183,24 @@ public class StudySessionService {
 	@Transactional 
 	public List<StudySession> getSessionsFromColleagues(String username) {
 	    
-		User user = userService.getUserByUsername(username);
-	    
-	    List<StudySession> allSessions = new ArrayList<>();
-	    
-	    for (User colleague : user.getColleagues()) {
-	        allSessions.addAll(this.getStudySessionByOwner(colleague.getUsername()));
-	    }
-	    
-	    return allSessions;
+	    return this.studySessionRepository.findUpcomingSessionsByColleaguesAndType(username, SessionType.PUBLIC);
+	}
+	
+	public List<StudySession> getMyScheduledSessions(String username) {
+	    return studySessionRepository.findAllMyUpcomingSchedule(username);
+	}
+	
+	public List<StudySession> getMyEndedSessions(String username) {
+	    return studySessionRepository.findAllMyEndedHistory(username);
+	}
+	
+	public List<StudySession> getUpcomingOwnedSessions(String username) {
+	    return studySessionRepository.findUpcomingOwnedSessions(username);
+	}
+	
+	public Optional<StudySession> getCurrentActiveSession(String username) {
+	    List<StudySession> active = studySessionRepository.findActiveSessionsForUser(username);
+	    return active.stream().findFirst();
 	}
 	
 }

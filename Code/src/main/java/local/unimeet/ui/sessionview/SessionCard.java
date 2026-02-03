@@ -114,7 +114,7 @@ public class SessionCard extends Div{
 		VerticalLayout right = new VerticalLayout();
 		
 		Span date = new Span(this.getFormattedString(studySession.getDate().getMonth().toString() + " " + studySession.getDate().getDayOfMonth()));
-		Span time = new Span(studySession.getTimeStart() + " - " + studySession.getTimeEnd());
+		Span time = new Span(studySession.getStartTime() + " - " + studySession.getEndTime());
 		
 		Span availableSeats = new Span(studySession.getCountMembers() + "/" +studySession.getStudyTable().getCapacity());
 		

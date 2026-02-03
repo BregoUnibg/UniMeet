@@ -146,8 +146,8 @@ public class NotificationPanel extends Div {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         
         String datePart = invitation.getSession().getDate().format(dateFormatter);
-        String startPart = invitation.getSession().getTimeStart().format(timeFormatter);
-        String endPart = invitation.getSession().getTimeEnd().format(timeFormatter);
+        String startPart = invitation.getSession().getStartTime().format(timeFormatter);
+        String endPart = invitation.getSession().getEndTime().format(timeFormatter);
         
         // Risultato es: "Lun 03 Feb, 14:00 - 16:00"
         String sessionTimeStr = datePart + ", " + startPart + " - " + endPart;
