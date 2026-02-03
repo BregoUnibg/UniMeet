@@ -1,5 +1,6 @@
 package local.unimeet.ui;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -113,12 +115,13 @@ public class NotificationPanel extends Div {
         card.getStyle().set("box-shadow", "0 2px 4px rgba(0,0,0,0.02)");
 
         HorizontalLayout infoLayout = new HorizontalLayout();
-        infoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        infoLayout.setAlignItems(FlexComponent.Alignment.START);
         infoLayout.setWidthFull();
         
         //Academy Cap
         Div iconObj = new Div(VaadinIcon.ACADEMY_CAP.create());
-        iconObj.addClassNames(LumoUtility.Background.PRIMARY_10, LumoUtility.Padding.SMALL, LumoUtility.BorderRadius.LARGE);
+        iconObj.addClassNames(LumoUtility.Background.PRIMARY_10, LumoUtility.Padding.SMALL, 
+                LumoUtility.BorderRadius.LARGE, LumoUtility.Margin.Top.XSMALL);
         iconObj.getStyle().set("color", "var(--lumo-primary-color)");
 
         // Text Content
@@ -134,13 +137,59 @@ public class NotificationPanel extends Div {
         Span sessionNameSpan = new Span(sessionTitle);
         sessionNameSpan.addClassNames(LumoUtility.FontWeight.BOLD, LumoUtility.FontSize.SMALL);
         
+        
+        
+        
+        // 1. DATA E ORA
+        // Uniamo LocalDate e LocalTime che sono separati nella tua Entity
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEE dd MMM");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        
+        String datePart = invitation.getSession().getDate().format(dateFormatter);
+        String startPart = invitation.getSession().getTimeStart().format(timeFormatter);
+        String endPart = invitation.getSession().getTimeEnd().format(timeFormatter);
+        
+        // Risultato es: "Lun 03 Feb, 14:00 - 16:00"
+        String sessionTimeStr = datePart + ", " + startPart + " - " + endPart;
+        
+        Icon clockIcon = VaadinIcon.CLOCK.create();
+        clockIcon.setSize("12px");
+        clockIcon.getStyle().set("margin-right", "4px");
+        
+        Span sessionTimeSpan = new Span(clockIcon, new Span(sessionTimeStr));
+        sessionTimeSpan.addClassNames(LumoUtility.FontSize.XSMALL, LumoUtility.TextColor.SECONDARY, 
+                                      LumoUtility.Display.FLEX, LumoUtility.AlignItems.CENTER);
+
+        // 2. LUOGO (Edificio e Via)
+        // Uso i metodi helper della tua Entity. 
+        // NOTA: Assumo che l'oggetto Building abbia un metodo .getName() o .toString() leggibile.
+        // Se la tua classe Building ha un campo nome diverso (es. getNome()), cambia .getName() qui sotto.
+        String buildingName = (invitation.getSession().getBuilding() != null) ? invitation.getSession().getBuilding().getName() : "Edificio N/A";
+        String address = invitation.getSession().getAddress(); // Questo metodo esiste nella tua entity StudySession
+        
+        String locationStr = buildingName + " (" + address + ")";
+        
+        Icon mapIcon = VaadinIcon.MAP_MARKER.create();
+        mapIcon.setSize("12px");
+        mapIcon.getStyle().set("margin-right", "4px");
+        
+        Span sessionLocationSpan = new Span(mapIcon, new Span(locationStr));
+        sessionLocationSpan.addClassNames(LumoUtility.FontSize.XSMALL, LumoUtility.TextColor.SECONDARY, 
+                                          LumoUtility.Display.FLEX, LumoUtility.AlignItems.CENTER);
+        
+        
+        
+        
+        
+        
+        
         // Date Formatting
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM HH:mm");
         String dateStr = invitation.getSentAtDateTime().format(formatter);
         Span timeSpan = new Span("Recived: " + dateStr);
         timeSpan.addClassNames(LumoUtility.FontSize.XXSMALL, LumoUtility.TextColor.TERTIARY);
         
-        textLayout.add(title, sessionNameSpan, timeSpan);
+        textLayout.add(title, sessionNameSpan,sessionTimeSpan, sessionLocationSpan,timeSpan);
         infoLayout.add(iconObj, textLayout);
         infoLayout.expand(textLayout); 
 

@@ -1,5 +1,6 @@
 package local.unimeet.ui.sessionview;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
@@ -133,6 +135,16 @@ public class SessionCard extends Div{
 		
 	    AvatarGroupItem avatar = new AvatarGroupItem(studySession.getOwner().getUsername());
 	    avatar.setColorIndex(1);
+	    
+	    byte[] ownerPicture = this.studySession.getOwner().getProfile().getProfilePicture();
+	    
+	    if (ownerPicture != null && ownerPicture.length > 0) {
+	        StreamResource resource = new StreamResource("avatar-" + this.studySession.getOwner().getUsername(), 
+	            () -> new ByteArrayInputStream(ownerPicture));
+	        
+	        avatar.setImageResource(resource);
+	    }
+	    
 	    avatarParticipants.add(avatar);
 	    
 	    int i = 2;
@@ -143,6 +155,18 @@ public class SessionCard extends Div{
 		    String name = partecipant.getUsername();
 		    AvatarGroupItem a = new AvatarGroupItem(name);
 		    a.setColorIndex(i++);
+		    
+		    //UserProfile Image
+		    
+		    byte[] profilePicture = this.userService.getUserByUsername(name).getProfile().getProfilePicture();
+		    
+		    if (profilePicture != null && profilePicture.length > 0) {
+		        StreamResource resource = new StreamResource("avatar-" + name, 
+		            () -> new ByteArrayInputStream(profilePicture));
+		        
+		        a.setImageResource(resource);
+		    }
+		    
 		    avatarParticipants.add(a);
 		    
 		    if(this.securityService.getAuthenticatedUsername().equals(partecipant.getUsername())){

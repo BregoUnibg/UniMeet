@@ -7,7 +7,6 @@ import java.util.Set;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
