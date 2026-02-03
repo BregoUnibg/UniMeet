@@ -61,4 +61,11 @@ public interface StudySessionRepository extends JpaRepository <StudySession, Lon
 	// Finds sessions where the 'participants' list contains a User with the given 'username'
 	List<StudySession> findByParticipantsUsername(String username);
 	
+	@Query("SELECT DISTINCT s FROM StudySession s " +
+		       "LEFT JOIN s.participants p " +
+		       "WHERE s.date = :date " +
+		       "AND (s.owner.username = :username OR p.username = :username)")
+	List<StudySession> findSessionsByDateAndUsername(@Param("date") LocalDate date, 
+		                                                 @Param("username") String username);
+	
 }

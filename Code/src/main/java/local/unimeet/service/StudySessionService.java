@@ -14,6 +14,7 @@ import local.unimeet.dto.SessionSearchCriteria;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.Subject;
 import local.unimeet.entity.User;
+import local.unimeet.exception.StudentBusyElsewhereException;
 import local.unimeet.repository.StudySessionRepository;
 import local.unimeet.repository.specifications.SearchSpecifications;
 
@@ -29,7 +30,30 @@ public class StudySessionService {
 		this.userService = userService;
 	}
 	
+	
+	/**
+	 * Saves a studysesion performing integrity checks
+	 * @param studySession
+	 * @return
+	 */
 	public StudySession saveStudySession(StudySession studySession) {
+		
+		//Checking for bad date time selection
+		if(studySession.getTimeStart().isAfter(studySession.getTimeEnd()) || 
+				studySession.getDate().isBefore(LocalDate.now()) || 
+				(studySession.getDate().isEqual(LocalDate.now()) && studySession.getTimeStart().isBefore(LocalTime.now()))){
+			throw new IllegalArgumentException();
+		}
+		
+		//Checking for date overlapp
+		if(!this.isTableAvailableGivenDateAndTime(studySession.getStudyTable().getId(), studySession.getDate(), studySession.getTimeStart(), studySession.getTimeEnd())){
+			throw new IllegalStateException();
+		}
+		
+		if(!this.isUserAvailableGivenDateAndTime(studySession.getOwner().getUsername(), studySession.getDate(), studySession.getTimeStart(), studySession.getTimeEnd())) {
+			throw new StudentBusyElsewhereException();
+		}
+		
 		
 		return this.studySessionRepository.save(studySession);
 		
@@ -54,6 +78,13 @@ public class StudySessionService {
 		
 		if((studySession.getParticipants().size()+1) >= studySession.getStudyTable().getCapacity())
 			throw new IllegalStateException();
+		
+		//User cannot participate in two sessions at the same tim, checks if user is allready in a session
+		if(!this.isUserAvailableGivenDateAndTime(username, studySession.getDate(), studySession.getTimeStart(), studySession.getTimeEnd())) {
+			throw new StudentBusyElsewhereException();
+		}
+		
+		
 			
 		studySession.addPartecipant(user);
 		
@@ -118,7 +149,25 @@ public class StudySessionService {
 		return true;
 		 
 	}
-
+	
+	/**
+	 * Checks if a user is free 
+	 */
+	public boolean isUserAvailableGivenDateAndTime(String username, LocalDate date, LocalTime startTime, LocalTime endTime) {
+	    
+	    //Sessions where the user is Owner or Participant said date
+	    List<StudySession> userSessions = studySessionRepository.findSessionsByDateAndUsername(date, username);
+	    
+	    for (StudySession s : userSessions) {	        
+	        
+	    	if (s.getTimeStart().isBefore(endTime) && s.getTimeEnd().isAfter(startTime)) {
+	            return false;
+	        }
+	    }
+	    
+	    return true;
+	}
+	
 	public List <StudySession> getStudySessionBySubject(Subject s) {
 		return studySessionRepository.findBySubject(s);
 	}

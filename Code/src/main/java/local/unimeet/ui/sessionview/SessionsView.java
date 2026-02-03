@@ -34,6 +34,7 @@ import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.StudyTable;
 import local.unimeet.entity.Subject;
+import local.unimeet.exception.StudentBusyElsewhereException;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.BuildingService;
 import local.unimeet.service.RoomService;
@@ -253,15 +254,6 @@ public class SessionsView extends VerticalLayout {
         	endTime.getValue() != null &&
         	selectedStudyTable != null) {
         	
-        	//Checking for date overlapp
-        	
-        	if(!this.studySessionService.isTableAvailableGivenDateAndTime(selectedStudyTable.getId(), datePicker.getValue(), startTime.getValue(), endTime.getValue())) {
-        		
-        		Notification.show("Selected table is already booked in selected period", 3000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
-        		return;
-        		
-        	}
-        	
         	//Creating the acutal StudySession
         	
         	StudySession newStudySession = new StudySession();
@@ -276,7 +268,28 @@ public class SessionsView extends VerticalLayout {
         	newStudySession.setOwner(this.userService.getUserByUsername(this.securityService.getAuthenticatedUsername()));
         	
         	//Saving study session to database
-        	this.studySessionService.saveStudySession(newStudySession);
+        	try {
+        		
+        		this.studySessionService.saveStudySession(newStudySession);
+        	
+        	}catch(Exception e) {
+        		
+        		if(e instanceof IllegalArgumentException) {
+        			Notification.show("Bad date time Selection", 2000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        		}
+        		
+        		if(e instanceof IllegalStateException) {
+        			Notification.show("Selected table is already booked in selected period", 2000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        		}
+        		
+        		if(e instanceof StudentBusyElsewhereException) {
+        			Notification.show("You allready have a session scheduled at that time", 2000, Notification.Position.MIDDLE).addThemeVariants(NotificationVariant.LUMO_ERROR);
+        		}
+        		
+        		
+        		return;
+        		
+        	}
         	
             Notification.show("Added succesfully", 2000, Notification.Position.BOTTOM_START).addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             courseSelect.clear();

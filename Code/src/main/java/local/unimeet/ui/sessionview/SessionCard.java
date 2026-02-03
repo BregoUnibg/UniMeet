@@ -22,6 +22,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
+import local.unimeet.exception.StudentBusyElsewhereException;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.StudySessionService;
@@ -266,7 +267,12 @@ public class SessionCard extends Div{
 	        	if(e instanceof IllegalStateException)
 	        		Notification.show("Session is already full");
 	        	
-	            Notification.show("Error joining session: " + e.getMessage());
+	        	if(e instanceof StudentBusyElsewhereException)
+	        		Notification.show("You allready have a session scheduled at that time");
+	        	
+	        	if(e instanceof IllegalArgumentException)
+	        		Notification.show("Error joining session: " + e.getMessage());
+	        	
 	        }
 	    });
 	    
@@ -326,7 +332,12 @@ public class SessionCard extends Div{
 
 		        }catch(Exception e) {
 		        	
-		        	Notification.show("Unsuccesfully invited: " + e.getMessage());
+		        	if(e instanceof StudentBusyElsewhereException){
+		        		Notification.show(selectedUser.getUsername() + " allready has a session scheduled at that time");
+		        	}else{
+		        		Notification.show("Unsuccesfully invited: " + e.getMessage());
+		        	}
+		        	
 		        	userPopover.close();
 		        	
 		        }

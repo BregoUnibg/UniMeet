@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import local.unimeet.entity.SessionInvitation;
 import local.unimeet.entity.StudySession;
 import local.unimeet.entity.User;
+import local.unimeet.exception.StudentBusyElsewhereException;
 import local.unimeet.repository.SessionInvitationRepository;
 import local.unimeet.repository.StudySessionRepository;
 
@@ -16,10 +17,14 @@ public class SessionInvitationService {
 
     private final SessionInvitationRepository invitationRepository;
     private final StudySessionRepository sessionRepository;
+    private final StudySessionService studySessionService;
     
-    public SessionInvitationService(SessionInvitationRepository invitationRepository, StudySessionRepository sessionRepository) {
+    public SessionInvitationService(SessionInvitationRepository invitationRepository, StudySessionRepository sessionRepository, StudySessionService studySessionService) {
+    	
     	this.invitationRepository = invitationRepository;
     	this.sessionRepository = sessionRepository;
+    	this.studySessionService = studySessionService;
+    	
     }
     
     
@@ -36,6 +41,10 @@ public class SessionInvitationService {
         
         if (session.getOwner().equals(userToInvite)) {
             throw new IllegalStateException("You own the session!");
+        }
+        
+        if(!this.studySessionService.isUserAvailableGivenDateAndTime(userToInvite.getUsername(), session.getDate(), session.getTimeStart(), session.getTimeEnd())) {
+        	throw new StudentBusyElsewhereException();
         }
         
         SessionInvitation invite = new SessionInvitation();
