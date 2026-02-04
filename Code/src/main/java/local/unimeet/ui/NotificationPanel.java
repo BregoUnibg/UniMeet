@@ -87,8 +87,7 @@ public class NotificationPanel extends Div {
         this.add(header, InviteList);
     }
 
-    // --- PUBLIC METHODS ---
-
+    
     public void toggle() {
         this.setVisible(!this.isVisible());
     }
@@ -140,8 +139,6 @@ public class NotificationPanel extends Div {
         
         
         
-        // 1. DATA E ORA
-        // Uniamo LocalDate e LocalTime che sono separati nella tua Entity
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEE dd MMM");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         
@@ -149,7 +146,6 @@ public class NotificationPanel extends Div {
         String startPart = invitation.getSession().getStartTime().format(timeFormatter);
         String endPart = invitation.getSession().getEndTime().format(timeFormatter);
         
-        // Risultato es: "Lun 03 Feb, 14:00 - 16:00"
         String sessionTimeStr = datePart + ", " + startPart + " - " + endPart;
         
         Icon clockIcon = VaadinIcon.CLOCK.create();
@@ -160,11 +156,7 @@ public class NotificationPanel extends Div {
         sessionTimeSpan.addClassNames(LumoUtility.FontSize.XSMALL, LumoUtility.TextColor.SECONDARY, 
                                       LumoUtility.Display.FLEX, LumoUtility.AlignItems.CENTER);
 
-        // 2. LUOGO (Edificio e Via)
-        // Uso i metodi helper della tua Entity. 
-        // NOTA: Assumo che l'oggetto Building abbia un metodo .getName() o .toString() leggibile.
-        // Se la tua classe Building ha un campo nome diverso (es. getNome()), cambia .getName() qui sotto.
-        String buildingName = (invitation.getSession().getBuilding() != null) ? invitation.getSession().getBuilding().getName() : "Edificio N/A";
+        	String buildingName = (invitation.getSession().getBuilding() != null) ? invitation.getSession().getBuilding().getName() : "Edificio N/A";
         String address = invitation.getSession().getAddress(); // Questo metodo esiste nella tua entity StudySession
         
         String locationStr = buildingName + " (" + address + ")";

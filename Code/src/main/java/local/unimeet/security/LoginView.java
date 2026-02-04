@@ -1,4 +1,4 @@
-package local.unimeet.ui;
+package local.unimeet.security;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;

@@ -2,8 +2,6 @@ package local.unimeet.security;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
-import local.unimeet.ui.LoginView;
-
 import java.util.Set;
 
 import org.springframework.context.annotation.Bean;
