@@ -198,10 +198,21 @@ public class NotificationPanel extends Div {
         btnAccept.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
         btnAccept.addClickListener(e -> {
         	
-        	this.sessionInvitationService.acceptInvite(invitation.getId());
-        	Notification.show("Invite Accepted");
+        	try {
+        		
+	        	this.sessionInvitationService.acceptInvite(invitation.getId());
+	        	Notification.show("Invite Accepted");
+	        	
+	        }catch(Exception exeption){
+	        	
+	        	if(exeption instanceof IllegalStateException)
+	        	Notification.show("Session is allready full");
+	        	this.sessionInvitationService.rejectInvite(invitation.getId());
+	        	
+	        }
         	
-            card.removeFromParent(); //remove card from UI
+        	card.removeFromParent(); //remove card from UI
+        	
         });
         
         

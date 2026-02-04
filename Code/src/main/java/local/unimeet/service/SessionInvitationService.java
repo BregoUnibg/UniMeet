@@ -62,6 +62,13 @@ public class SessionInvitationService {
 
         //Add user to the actual session
         StudySession session = invite.getSession();
+       
+        int capacity = session.getStudyTable().getCapacity(); 
+        
+        if (session.getCountMembers() >= capacity) {
+            throw new IllegalStateException("The study session is already full.");
+        }
+        
         session.addPartecipant(invite.getInvitee());
         sessionRepository.save(session);
 
