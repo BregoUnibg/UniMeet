@@ -43,7 +43,6 @@ import local.unimeet.ui.admin.AdminRoomsView;
 import local.unimeet.ui.admin.AdminSubjectsView;
 import local.unimeet.ui.admin.AdminTablesView;
 import local.unimeet.ui.admin.AdminUniversitiesView;
-import local.unimeet.ui.admin.AdminUsersView;
 import local.unimeet.ui.sessionview.SessionsView;
 
 public class MainLayout extends AppLayout {
