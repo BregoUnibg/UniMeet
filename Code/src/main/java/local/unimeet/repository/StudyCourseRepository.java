@@ -1,5 +1,6 @@
 package local.unimeet.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,5 +21,6 @@ public interface StudyCourseRepository extends JpaRepository<StudyCourse, Long> 
 	List<StudyCourse> findByDegreeType(DegreeType degreeType);
 	
 	Optional<StudyCourse> findByNameAndDepartmentAndDegreeType(String name, Department department, DegreeType degreeType);
+	Collection<StudyCourse> findByDepartmentAndDegreeType(Department selectedDept, DegreeType selectedType);
 	
 }

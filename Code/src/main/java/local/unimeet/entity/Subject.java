@@ -19,7 +19,7 @@ public class Subject {
     private Integer studyYear;
 
     // Relazione: Molte materie appartengono a un Corso di Laurea
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "study_course_id", nullable = false)
     private StudyCourse studyCourse;
     public Subject() {}

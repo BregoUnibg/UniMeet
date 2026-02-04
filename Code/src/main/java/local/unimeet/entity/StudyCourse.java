@@ -1,7 +1,20 @@
 package local.unimeet.entity;
 
-import jakarta.persistence.*;
+import java.util.List;
 import java.util.Objects;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "study_courses")
@@ -13,11 +26,13 @@ public class StudyCourse {
 
     @Column(nullable = false)
     private String name;
-
-    // Relazione: Molti corsi appartengono a un Dipartimento
-    @ManyToOne//(fetch = FetchType.LAZY)
+    
+    @ManyToOne
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
+    
+    @OneToMany(mappedBy = "studyCourse", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Subject> subjects;
 
     // Specifica se è BACHELOR, MASTER o Ciclo Unico
     @Enumerated(EnumType.STRING)
@@ -41,6 +56,9 @@ public class StudyCourse {
 
     public Department getDepartment() { return department; }
     public void setDepartment(Department department) { this.department = department; }
+    
+    public List<Subject> getSubjects() { return subjects; }
+    public void setSubject(List<Subject> subjects) { this.subjects = subjects; }
 
     public DegreeType getDegreeType() { return degreeType; }
     public void setDegreeType(DegreeType degreeType) { this.degreeType = degreeType; }

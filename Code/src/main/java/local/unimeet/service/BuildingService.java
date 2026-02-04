@@ -98,11 +98,23 @@ public class BuildingService {
     	buildingRepository.save(building);
     }
 
+    @Transactional
+    public void deleteBuilding(Building buildingFromUi) {
+        Building managedBuilding = buildingRepository.findById(buildingFromUi.getId())
+                .orElseThrow(() -> new RuntimeException("Building not found into DB"));
+        
+        University parentUniversity = managedBuilding.getUniversity();
 
-    public void delete(Building building) {
-    	buildingRepository.delete(building);
+        if (parentUniversity != null) {
+            parentUniversity.removeBuilding(managedBuilding);
+            
+            managedBuilding.setUniversity(null);
+            
+            universityRepository.save(parentUniversity);
+        }
+        
+        buildingRepository.delete(managedBuilding);
     }
-
 
 }
 

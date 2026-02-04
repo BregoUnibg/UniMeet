@@ -1,4 +1,4 @@
-package local.unimeet.ui;
+package local.unimeet.ui.admin;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.H1;
@@ -16,6 +16,7 @@ import local.unimeet.entity.User;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.BuildingService;
 import local.unimeet.service.UserService;
+import local.unimeet.ui.MainLayout;
 
 @Route(value = "admin", layout = MainLayout.class)
 @PageTitle("Admin Dashboard")

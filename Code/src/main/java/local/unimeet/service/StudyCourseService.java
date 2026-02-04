@@ -1,5 +1,6 @@
 package local.unimeet.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -59,13 +60,8 @@ public class StudyCourseService {
 	}
 	
 	@Transactional
-	public void deleteStudyCourse(Long id) {
-		
-		if (!studyCourseRepositoy.existsById(id)) {
-			throw new IllegalArgumentException("Course with " + id + " does not exist.");
-		}
-		
-		studyCourseRepositoy.deleteById(id);
+	public void deleteStudyCourse(StudyCourse studyCourse) {		
+		studyCourseRepositoy.delete(studyCourse);
 	}
 	
     public List<StudyCourse> getCoursesForUser(User user) {
@@ -75,12 +71,25 @@ public class StudyCourseService {
         
         else if (user.getRole() == Role.UNI_ADMIN){ 
         	
-        	//POSSIBLE CRITICAL LOGIC ERROR IN WHOLE DEPARTMENT - UNIVERSITY ENTITY MANAGMENT
         	return studyCourseRepositoy.findAll();
              
         }
         
         return List.of();
     }
+
+	public void saveCourse(StudyCourse course) {
+		if (course == null) return;
+
+		studyCourseRepositoy.save(course);
+		
+	}
+
+	public Collection<StudyCourse> getCoursesByDepartmentAndType(Department selectedDept, DegreeType selectedType) {
+		if (selectedDept == null || selectedType == null) 
+        	return List.of();
+        
+        return studyCourseRepositoy.findByDepartmentAndDegreeType(selectedDept, selectedType);
+	}
 	
 }

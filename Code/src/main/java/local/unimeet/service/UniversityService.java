@@ -6,7 +6,10 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import local.unimeet.entity.Building;
+import local.unimeet.entity.Role;
 import local.unimeet.entity.University;
+import local.unimeet.entity.User;
 import local.unimeet.repository.UniversityRepository;
 
 @Service 
@@ -40,6 +43,34 @@ public class UniversityService {
     
     public List<University> getAllUniversities() {
         return universityRepository.findAll();
+    }
+   
+    /**
+     * filtro per la griglia
+     */
+    public List<University> getBuildingsForUser(User user) {
+    	if (user.getRole() == Role.ADMIN) {
+    		// Master Admin: see everything
+    		return universityRepository.findAll();
+    	} 
+    	else if (user.getRole() == Role.UNI_ADMIN) {
+    		// Rettore: see only his unyversity
+    		return universityRepository.findByName(user.getUniversity().getName());
+    	}
+
+    	return List.of(); 
+    }
+
+
+    public void saveUniversity(University university) {
+    	if (university == null) return;
+
+    	universityRepository.save(university);
+    }
+
+
+    public void deleteUniversity(University university) {
+    	universityRepository.delete(university);
     }
     
 }
