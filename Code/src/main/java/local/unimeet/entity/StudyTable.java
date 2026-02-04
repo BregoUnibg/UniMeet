@@ -1,5 +1,7 @@
 package local.unimeet.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -29,6 +32,9 @@ public class StudyTable {
 	@ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "room_id") //creates Foreign Key column
     private Room room;
+	
+	@OneToMany(mappedBy = "studyTable")
+    private List<StudySession> studySessions;
 	
 	public StudyTable() {
 	}

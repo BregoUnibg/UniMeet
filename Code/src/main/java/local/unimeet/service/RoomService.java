@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import local.unimeet.entity.Building;
 import local.unimeet.entity.Role;
 import local.unimeet.entity.Room;
+import local.unimeet.entity.University;
 import local.unimeet.entity.User;
 import local.unimeet.repository.BuildingRepository;
 import local.unimeet.repository.RoomRepository;
@@ -93,5 +94,23 @@ public class RoomService {
 	    public void deleteRoom(Room room) {
 	        roomRepository.delete(room);
 	    }
+	    
+	    /*@Transactional
+	    public void deleteRoom(Room room) {
+	        Building managedBuilding = buildingRepository.findById(buildingFromUi.getId())
+	                .orElseThrow(() -> new RuntimeException("Edificio non trovato nel DB"));
+	        
+	        University parentUniversity = managedBuilding.getUniversity();
+
+	        if (parentUniversity != null) {
+	            parentUniversity.removeBuilding(managedBuilding);
+	            
+	            managedBuilding.setUniversity(null);
+	            
+	            RoomRepository.save(parentUniversity);
+	        }
+	        
+	        roomRepository.delete(managedBuilding);
+	    }*/
 	
 }

@@ -95,8 +95,8 @@ public class StudyTableService {
 	}
 
 
-	public void deleteTable(StudyTable table) {
-		studyTableRepository.delete(table);
+	public void deleteTable(StudyTable course) {
+		studyTableRepository.delete(course);
 	}
 
 

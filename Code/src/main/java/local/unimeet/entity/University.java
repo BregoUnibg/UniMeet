@@ -21,6 +21,9 @@ public class University {
 	@OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Building> buildings = new ArrayList<>();
 	
+	@OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Department> departments;
+	
 	public University() {
 	}
 	
@@ -37,6 +40,16 @@ public class University {
         buildings.remove(building);
         building.setUniversity(null);
     }
+    
+    public void addDepartment(Department department) {
+    	departments.add(department);
+    	department.setUniversity(this);
+    }
+
+    public void removeDepartment(Department department) {
+    	departments.remove(department);
+    	department.setUniversity(null);
+    }
 
 	public String getName() {
 		return name;
@@ -49,6 +62,10 @@ public class University {
 	public List<Building> getBuildings() {
 		return buildings;
 	}
+	
+	public List<Department> getDepartments() {
+        return departments;
+    }
 	
 	// Fondamentale per far funzionare correttamente le ComboBox di Vaadin
     @Override

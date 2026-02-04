@@ -30,12 +30,20 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import local.unimeet.entity.Role;
 import local.unimeet.entity.User;
 import local.unimeet.entity.UserProfile;
-import local.unimeet.repository.UserRepository;
 import local.unimeet.security.SecurityService;
 import local.unimeet.service.ColleagueRequestService;
 import local.unimeet.service.ProfileService;
 import local.unimeet.service.SessionInvitationService;
 import local.unimeet.service.UserService;
+import local.unimeet.ui.admin.AdminDepartmentsView;
+import local.unimeet.ui.admin.AdminBuildingsView;
+import local.unimeet.ui.admin.AdminCoursesView;
+import local.unimeet.ui.admin.AdminHomeView;
+import local.unimeet.ui.admin.AdminRoomsView;
+import local.unimeet.ui.admin.AdminSubjectsView;
+import local.unimeet.ui.admin.AdminTablesView;
+import local.unimeet.ui.admin.AdminUniversitiesView;
+import local.unimeet.ui.admin.AdminUsersView;
 import local.unimeet.ui.sessionview.SessionsView;
 
 public class MainLayout extends AppLayout {
@@ -122,7 +130,7 @@ public class MainLayout extends AppLayout {
             // =========================================================
             //  User pages
             // =========================================================
-        	SideNav userNav = new SideNav("Menu Principale"); // Il titolo appare sopra gli elementi
+        	SideNav userNav = new SideNav("Main Menu");
             userNav.setCollapsible(true);
             userNav.addItem(new SideNavItem("Home", HomeView.class, VaadinIcon.HOME.create()));
             userNav.addItem(new SideNavItem("My Sessions", SessionsView.class, VaadinIcon.BOOK.create()));
@@ -134,16 +142,34 @@ public class MainLayout extends AppLayout {
             //  Admin pages
             // =========================================================
             if (currentUser.getRole() == Role.ADMIN || currentUser.getRole() == Role.UNI_ADMIN) {
-            	SideNav adminNav = new SideNav("Amministrazione");
+            	SideNav adminNav = new SideNav("Administration");
                 adminNav.setCollapsible(true);
                 adminNav.setExpanded(false);
                 
                 adminNav.addItem(new SideNavItem("Dashboard", AdminHomeView.class, VaadinIcon.DASHBOARD.create()));
-                adminNav.addItem(new SideNavItem("Buildings", AdminBuildingsView.class, VaadinIcon.BUILDING.create()));
-                adminNav.addItem(new SideNavItem("Room", AdminRoomsView.class, VaadinIcon.KEY.create()));
-                adminNav.addItem(new SideNavItem("Tables", AdminTablesView.class, VaadinIcon.TABLE.create()));
-                adminNav.addItem(new SideNavItem("Courses", AdminCoursesView.class, VaadinIcon.ACADEMY_CAP.create()));
-
+                
+                SideNavItem structureFolder = new SideNavItem("Buildings");
+                structureFolder.setPrefixComponent(VaadinIcon.BUILDING.create());
+                structureFolder.setExpanded(false);
+                
+                if (currentUser.getRole() == Role.ADMIN) {
+                	structureFolder.addItem(new SideNavItem("Universities", AdminUniversitiesView.class));
+                }
+                structureFolder.addItem(new SideNavItem("Buildings", AdminBuildingsView.class));
+                structureFolder.addItem(new SideNavItem("Rooms", AdminRoomsView.class));
+                structureFolder.addItem(new SideNavItem("Tables", AdminTablesView.class));
+                
+                SideNavItem didacticsFolder = new SideNavItem("Didattica");
+                didacticsFolder.setPrefixComponent(VaadinIcon.ACADEMY_CAP.create());
+                didacticsFolder.setExpanded(false);
+                
+                didacticsFolder.addItem(new SideNavItem("Departments", AdminDepartmentsView.class));
+                didacticsFolder.addItem(new SideNavItem("Courses", AdminCoursesView.class));
+                didacticsFolder.addItem(new SideNavItem("Subjects", AdminSubjectsView.class));
+                
+                adminNav.addItem(structureFolder);
+                adminNav.addItem(didacticsFolder);
+                
                 navWrapper.add(adminNav);
             } 
         }
