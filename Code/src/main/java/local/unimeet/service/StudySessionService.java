@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import local.unimeet.dto.SessionSearchCriteria;
 import local.unimeet.entity.SessionType;
 import local.unimeet.entity.StudySession;
+import local.unimeet.entity.StudySessionStatus;
 import local.unimeet.entity.Subject;
 import local.unimeet.entity.User;
 import local.unimeet.exception.StudentBusyElsewhereException;
@@ -59,6 +61,21 @@ public class StudySessionService {
 		
 		return this.studySessionRepository.save(studySession);
 		
+	}
+	
+	@Transactional
+    public void deleteSession(StudySession studySession) {
+		
+		if (!studySessionRepository.existsById(studySession.getId())) {
+            throw new NoSuchElementException("Session not found with ID:");
+        }
+		
+		if(!studySession.getStatus().equals(StudySessionStatus.UPCOMING)) {
+			throw new IllegalStateException("Too late to be deleted");
+		}
+		
+        this.studySessionRepository.deleteById(studySession.getId());
+        
 	}
 	
 	public List <StudySession>getStudySessionByOwner(String username) {

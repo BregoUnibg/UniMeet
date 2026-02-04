@@ -62,6 +62,8 @@ public class SessionCard extends Div{
 		this.setMaxWidth("1000px");
 		this.getStyle().set("background-color", "white");
 		
+		this.getStyle().set("position", "relative");
+		
 		VerticalLayout card = new VerticalLayout();
 		HorizontalLayout top = new HorizontalLayout();
 		HorizontalLayout bottom = new HorizontalLayout();
@@ -414,6 +416,45 @@ public class SessionCard extends Div{
 	    card.add(top, bottom);
 	    
 	    this.add(card);
+	    
+	    
+	    
+	    //Delete Session Button
+	    
+	    String currentAuthenticatedUser = this.securityService.getAuthenticatedUsername();
+	    
+	    // Check if UPCOMING and current user is OWNER
+	    if (studySession.getStatus().equals(StudySessionStatus.UPCOMING) 
+	            && studySession.getOwner().getUsername().equals(currentAuthenticatedUser)) {
+	        
+	        Button deleteSessionBtn = new Button(VaadinIcon.TRASH.create());
+	        
+	        deleteSessionBtn.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
+	        
+	        // Positioning: Absolute Top Right
+	        deleteSessionBtn.getStyle().set("position", "absolute");
+	        deleteSessionBtn.getStyle().set("top", "10px");
+	        deleteSessionBtn.getStyle().set("right", "10px");
+	        deleteSessionBtn.setTooltipText("Delete Session");
+	        
+	        deleteSessionBtn.addClickListener(e -> {
+	            try {
+	                
+	            	studySessionService.deleteSession(studySession); // Or deleteSession(studySession.getId()) depending on your service
+	                
+	                Notification.show("Study session deleted successfully")
+	                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+	                
+	                this.setVisible(false);
+	                
+	            } catch (Exception ex) {
+	                Notification.show("Error deleting session: " + ex.getMessage())
+	                    .addThemeVariants(NotificationVariant.LUMO_ERROR);
+	            }
+	        });
+	        
+	        this.add(deleteSessionBtn);
+	    }
 	    
 	    
 	    this.addClassNames(

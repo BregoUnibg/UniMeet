@@ -2,9 +2,10 @@ package local.unimeet.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,6 +21,8 @@ public class SessionInvitation {
 
     @ManyToOne
     @JoinColumn(name = "session_id", nullable = false)
+    //When deleting a session with pending invites, thoose must also be deleted
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private StudySession session;
 
     @ManyToOne
