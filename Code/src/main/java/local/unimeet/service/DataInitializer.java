@@ -1,4 +1,6 @@
+/*
 package local.unimeet.service;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -366,3 +368,4 @@ public class DataInitializer implements CommandLineRunner {
         p.setTotVoters(5);
     }
 }
+*/

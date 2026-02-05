@@ -2,15 +2,13 @@ Documents/Diagrams/.settings
 
 #Temporary
 Documents/Diagrams/.project
-Code/.classpath
-Code/.project
 
 Code/.settings
 Code/node_modules
 Code/target
 Code/vite.generated.ts
 Code/src/main/frontend/generated/
-Code/data/
+#Code/data/
 #macos
 .DS_Store
 
