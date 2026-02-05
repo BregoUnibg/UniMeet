@@ -13,6 +13,8 @@
   <semanticResources>pathmap://PapyrusJava_PROFILES/PapyrusJava.profile.uml</semanticResources>
   <semanticResources>pathmap://PapyrusJava_PROFILES/PapyrusJava.profile.di</semanticResources>
   <semanticResources>pathmap://PapyrusJava_PROFILES/PapyrusJava.profile.notation</semanticResources>
+  <semanticResources>pathmap://PapyrusJava_LIBRARIES/JavaLibrary.uml</semanticResources>
+  <semanticResources>pathmap://PapyrusJava_LIBRARIES/JavaLibrary.notation</semanticResources>
   <ownedViews xmi:type="viewpoint:DView" uid="_PITCEMiOEfCaVfJDYyadQw">
     <viewpoint xmi:type="description:Viewpoint" href="platform:/plugin/org.eclipse.papyrus.sirius.uml.diagram.statemachine/description/papyrus_statemachine.odesign#//@ownedViewpoints[name='StateMachineDiagram']"/>
   </ownedViews>
